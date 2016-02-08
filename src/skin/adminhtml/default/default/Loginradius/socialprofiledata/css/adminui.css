@@ -1,0 +1,7 @@
+#row_socialprofiledata_profiledataoption_profiledata{
+    display:none;
+}
+#row_socialprofiledata_profiledataoption_profiledatacheckboxes input[type=checkbox] {
+    margin-right: 8px;
+    margin-top: -2px;
+}

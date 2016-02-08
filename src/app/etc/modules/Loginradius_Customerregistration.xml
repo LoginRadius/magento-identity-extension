@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Loginradius_Customerregistration>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Loginradius_Customerregistration>
+    </modules>
+</config>

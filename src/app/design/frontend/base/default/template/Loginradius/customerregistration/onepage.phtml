@@ -1,0 +1,159 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php /* Extensions placeholder */ ?>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        callSocialLoginInterface();
+        initializeSocialRegisterRaasForm();
+        initializeLoginRaasForm();
+        show_birthdate_date_block();
+        jQuery('.magento-raas-loading-image-div').hide();
+    });
+</script>
+
+<div class="col-2">
+        <h3><?php echo $this->__('Login') ?></h3>
+        <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+        <form id="login-form" action="<?php echo $this->getPostAction() ?>" method="post">
+            <fieldset>
+                <?php echo $this->getBlockHtml('formkey'); ?>
+                <h4><?php echo $this->__('Already registered?') ?></h4>
+
+                <p><?php echo $this->__('Please log in below:') ?></p>
+
+                <div class="loginradiusmessagediv" style="display:none;"></div>        
+                <div class="magento-raas-loading-image-div" style="display: none;"></div>
+                <div>
+                    <?php
+                echo Mage::getBlockSingleton('customerregistration/customerregistration')->getSocialLoginContainer();
+                ?>
+                    
+                    <div id="social_form" style="display: none;">
+                        <div class="LoginRadius_overlay" style="z-index: 999 !important;">
+
+                            <div style="clear:both"></div>
+                            <div id="popupouter">
+                                <div id="lr_heading_container_checkout" style="height: 50px;">
+                                    <div class="lr-popupheading" style="float:left !important;padding: 15px 15px 0px 15px !important;"><?php echo __('Please provide following details'); ?></div>
+                                    <div id="lr_popup_close_container">
+                                        <button onclick="lrHideOverlayOnCheckoutPage()" type="button" id="lr_close_button">&#215;</button>
+                                    </div>
+                                </div>
+
+
+                                <div style="clear:both"></div>
+                                <div class="messagediv1" id="lr_popup_error_container" style="display:none; margin: 15px !important;background: none repeat scroll 0 0 #FFFFFF; padding: 10px 8px 4px;background-color: rgb(255, 235, 232); ">
+                                    <ul>
+                                        <li class="top-tootip" style="width:96%;">
+                                            <p id="messageinfo1" class="lr_checkoutpage_overlay_message"></p>
+                                            <span> </span>
+                                        </li>
+                                        <div class="clear"></div>
+                                    </ul>
+                                </div>
+                                <div id="popupinner" style="margin:15px !important;">
+                                    <div id="social-registration-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </fieldset>
+        </form>
+    </div>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+<?php /* Extensions placeholder */ ?>
+<?php echo $this->getChildHtml('checkout.onepage.login.extra')?>
+<div class="col2-set">
+    <?php echo $this->getChildHtml('login_before')?>
+    <div class="col-1">
+        <h3><?php if( Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout() ): ?><?php echo $this->__('Checkout as a Guest or Register') ?><?php else: ?><?php echo $this->__('Register to Create an Account') ?><?php endif; ?></h3>
+        <?php if( Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout() ): ?>
+            <p><?php echo $this->__('Register with us for future convenience:') ?></p>
+        <?php else: ?>
+            <p><strong><?php echo $this->__('Register and save time!') ?></strong><br />
+            <?php echo $this->__('Register with us for future convenience:') ?></p>
+            <ul>
+                <li><?php echo $this->__('Fast and easy check out') ?></li>
+                <li><?php echo $this->__('Easy access to your order history and status') ?></li>
+            </ul>
+        <?php endif; ?>
+        <?php if( Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout() ): ?>
+            <ul class="form-list">
+                <?php if( Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout() ): ?>
+                <li class="control">
+                    <input type="radio" name="checkout_method" id="login:guest" value="guest"<?php if(Mage::getSingleton('checkout/session')->getQuote()->getCheckoutMethod()==Mage_Checkout_Model_Type_Onepage::METHOD_GUEST): ?> checked="checked"<?php endif; ?> class="radio" /><label for="login:guest"><?php echo $this->__('Checkout as Guest') ?></label>
+                </li>
+                <?php endif; ?>
+                <li class="control">
+                    <input type="radio" name="checkout_method" id="login:register" value="register"<?php if(Mage::getSingleton('checkout/session')->getQuote()->getCheckoutMethod()==Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER || !Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout()): ?> checked="checked"<?php endif ?> class="radio" /><label for="login:register"><?php echo $this->__('Register') ?></label>
+                </li>
+            </ul>
+            <h4><?php echo $this->__('Register and save time!') ?></h4>
+            <p><?php echo $this->__('Register with us for future convenience:') ?></p>
+            <ul class="ul">
+                <li><?php echo $this->__('Fast and easy check out') ?></li>
+                <li><?php echo $this->__('Easy access to your order history and status') ?></li>
+            </ul>
+        <?php else: ?>
+            <input type="hidden" name="checkout_method" id="login:register" value="register" checked="checked" />
+        <?php endif; ?>
+    </div>
+    <div class="col-2">
+        <h3><?php echo $this->__('Login') ?></h3>
+        <?php echo $this->getMessagesBlock()->toHtml() ?>
+        <div id="login-container" class="Loginradius-checkout-contenter"></div>
+        <div style="margin-top: 15px;">
+            <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>">
+                <?php echo $this->__('Forgot your password?') ?>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col2-set">
+    <div class="col-1">
+        <div class="buttons-set">
+            <p class="required">&nbsp;</p>
+            <button type="button" class="button" onclick="checkout.setMethod();"><span><span><?php echo (Mage::getSingleton('checkout/session')->getQuote()->isAllowedGuestCheckout() ? $this->__('Continue') : $this->__('Register')) ?></span></span></button>
+        </div>
+    </div>
+</div>

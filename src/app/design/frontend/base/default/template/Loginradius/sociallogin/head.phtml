@@ -1,0 +1,96 @@
+<?php
+/**
+ * template to render script which is required for social login.
+ */
+$currentUrl = Mage::helper('core/url')->getCurrentUrl();
+Mage::getSingleton('core/session')->setCurrentURLData($currentUrl);
+$loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
+if (strpos(Mage::helper('core/url')->getCurrentUrl(), 'https://') !== false) {
+    $loginRadiusCallback = str_replace('http://', 'https://', $loginRadiusCallback);
+}
+$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+$getBlockDir = $activationBlockObj->getBlockDir();
+$account_linking = '';
+if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->isLoggedIn()){
+    $account_linking = '&ac_linking=true';
+}
+if ($activationBlockObj->raasEnable() == 1) {
+    echo $this->getLayout()->createBlock('sociallogin/sociallogin')->setTemplate('Loginradius/customerregistration/head.phtml')->toHtml();
+} else {
+    if ($this->getLayout()->getBlock('head')->getTitle() == "Checkout") {
+        $loginRadiusCallback = $loginRadiusCallback . "?loginradiuscheckout=1";
+    } elseif ($this->getLayout()->getBlock('head')->getTitle() == "My Account") {
+        $loginRadiusCallback = $loginRadiusCallback . "?loginRadiusLinking=1";
+    } else {
+        $loginRadiusCallback = $loginRadiusCallback . "?redirect_to=" . Mage::helper('core/url')->getCurrentUrl();
+    }
+    if ($this->typeOfInterface() == 1) {
+        ?>
+        <style>
+            .interfacecontainerdiv a {
+                float: left;
+                margin: 0px 5px 5px 0px;
+            }
+        </style>
+        <script src="//hub.loginradius.com/cdn/Include/src/CustomeInterface.2.js"></script>
+        <script type="text/javascript">
+            $LRIC.util.ready(function () {
+                var lr_options = {};
+                lr_options.apikey = "<?php echo trim($activationBlockObj->apiKey()) ?>";
+                lr_options.templatename = "temp_sociallogin";
+                $LRIC.renderInterface("interfacecontainerdiv", lr_options);
+            });
+        </script>
+        <script type="text/html" id="temp_sociallogin">
+            <a class="socialmod" href="javascript:void()" onclick="return $LRIC.util.openWindow('<%=Endpoint%>&is_access_token=true<?php echo $account_linking;?>&callback=<?php echo Mage::helper('core/url')->getCurrentUrl(); ?>');">
+                <img src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/images/Custom', array('_area' => 'frontend')); ?>/<%=Name%>.png"/>
+            </a>
+        </script>
+    <?php
+    } else {
+        echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
+        ?>
+        <script type="text/javascript">
+            var loginRadiusOptions = {};
+            loginRadiusOptions.login = true;
+            LoginRadius_SocialLogin.util.ready(function () {
+                $ui = LoginRadius_SocialLogin.lr_login_settings;
+                $ui.interfacesize = "<?php echo $this->iconSize(); ?>";
+                    <?php
+                    if (trim($this->iconsPerRow()) != '') {
+                        echo '$ui.noofcolumns = ' . trim($this->iconsPerRow()) . ';';
+                    }
+                    if (trim($this->backgroundColor()) != '') {
+                        echo '$ui.lrinterfacebackground = "' . trim($this->backgroundColor()) . '";';
+                    }
+                    ?>
+                $ui.apikey = "<?php echo trim($activationBlockObj->apikey()) ?>";
+                $ui.callback = "<?php echo Mage::helper('core/url')->getCurrentUrl() ?>";
+                $ui.lrinterfacecontainer = "interfacecontainerdiv";
+                $ui.is_access_token = true;
+                <?php 
+                if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->isLoggedIn()){?>
+                    $ui.ac_linking = true;
+                <?php }
+                ?>
+                LoginRadius_SocialLogin.init(loginRadiusOptions);
+            });
+        </script>
+    <?php } ?>
+    <script src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/js/LoginRadiusSDK.js'); ?>"></script>
+    <script type="text/javascript">
+        LoginRadiusSDK.setLoginCallback(function () {
+            var form = document.createElement('form');
+            form.action = "<?php echo urldecode($loginRadiusCallback); ?>";
+            form.method = 'POST';
+            var hiddenToken = document.createElement('input');
+            hiddenToken.type = 'hidden';
+            hiddenToken.value = LoginRadiusSDK.getToken();
+            hiddenToken.name = "token";
+            form.appendChild(hiddenToken);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    </script>
+    <?php
+}

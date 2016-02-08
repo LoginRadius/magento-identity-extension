@@ -1,0 +1,171 @@
+.LoginRadius_overlay{
+    background: rgb(127, 127, 127); /* The Fallback */
+    background: none no-repeat scroll 0 0 rgba(127, 127, 127, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000001;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 0;
+    position: fixed;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=97)";
+    filter: alpha(opacity=97);
+}
+#loginRadiusCountry {
+    width:100%;
+}
+#lr_required_fields input[type=text] {
+    width:100%;
+    }
+#loginRadiusForm {
+    width:100%;
+}
+.lr-popupheading{
+    font-size: 17px;
+    text-align: center;
+    font-weight: normal;
+    padding: 15px;
+}
+#popupouter{
+    border-radius: 0 23px;
+    background: #f3f3f3;
+    left: 50%;
+    margin: -114px auto 0 -250px;
+    overflow: auto;
+    padding: 0;
+    position: absolute;
+    top: 30%;
+    width: 500px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+#popupinner {
+    overflow: auto;
+    background: #ffffff;
+    padding: 15px 20px;
+}
+#textmatter {
+    color: #666666;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 14px;
+    margin: 10px 0;
+    float:left
+}
+.loginRadiusText{
+    font-family: Arial, Helvetica, sans-serif;
+    color: #444;
+    font-size: 13px;
+    border: 1px solid #e2efe1;
+    width: 330px;
+    height: 33px;
+    line-height: 33px;
+    margin-bottom: 5px !important;
+    padding-left: 10px;
+    border-radius: 0px 12px;
+    background: #fff;
+}
+.footerbox {
+    padding-bottom: 12px;
+    float: left;
+    padding-top: 12px;
+    padding-left: 20px;
+}
+select.loginRadiusText {
+    width: 342px;
+}
+.inputbutton{
+    border: #dcdcdc 1px solid !important;
+    text-decoration: none !important;
+    color: #6e6e6e !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    background: #f3f3f3 !important;
+    padding: 6px 17px !important;
+    margin-right: 15px;
+    float: left;
+    margin-bottom: 0 !important;
+    border-radius: 0px 11px !important;
+    text-transform: none !important;
+    font-weight: normal !important;
+}
+.inputbutton:hover{
+    text-decoration: none !important;
+    cursor: pointer !important;
+    background: #f3f3f3 !important;
+    color: #000 !important;
+}
+#textdivpopup{
+    text-align:right;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:11px;
+    color:#000000;
+}
+.spanpopup{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:11px;
+    color:#00ccff;
+}
+.span1{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:11px;
+    color:#333333;
+}
+.lr-error {
+    text-align: left;
+    background-color: rgb(255, 235, 232);
+    padding: 12px;
+}
+
+#loginRadiusPhone {
+    margin-left:0 !important;
+}
+.lr-noerror {
+    text-align: left;
+    background-color: #e1eabc;
+    padding: 12px;
+
+}
+@media (max-width: 769px) {
+    #popupouter {
+        border-radius: 0 23px !important;
+        background: none repeat scroll 0 0 #f3f3f3;
+        border-radius: 4px;
+        left: 0;
+        margin: 5% auto 0;
+        overflow: auto;
+        padding: 0;
+        position: static;
+        top: 0;
+        width: 400px;
+    }
+
+}
+
+@media (max-width: 480px) {
+    #popupouter {
+        width: 300px;
+        border-radius: 0 23px !important;
+    }
+
+}
+
+#lr_close_button {
+    border: 0;
+    background: none;
+    font-size: 25px;
+}
+
+#lr_popup_close_container {
+    margin-right: 10px;
+    float: right
+}
+
+#popupinner div#social-registration-container #loginradius-raas-submit-Register {
+    margin-top: 5px;
+}
+
+#popupinner div#social-registration-container form[name="loginradius-raas-social-registration"] div.loginradius-raas-validation-message {
+    color: red;
+}

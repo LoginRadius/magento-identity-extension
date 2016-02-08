@@ -1,0 +1,20 @@
+#row_mailchimp_mailchimp_lists,
+#row_mailchimp_mailchimp_mappingFieldsHeading,
+#row_mailchimp_mailchimp_mappingFields,
+#row_mailchimp_mailchimp_mappingFieldsTag,
+#row_mailchimp_mailchimp_mappingFieldsValue{
+    display:none;
+}
+.lrmappingselect{
+    width:100% !important;
+}
+.lrmappinglabel{
+    width:37%;
+    padding-bottom: 10px;
+}
+#row_mailchimp_mailchimp_mappingFields .value tr td {
+    padding-bottom: 10px;
+}
+#row_mailchimp_mailchimp_getListButton .use-default, #row_mailchimp_mailchimp_getListButton .scope-label {
+    display: none;
+}

@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <socialshare translate="label" module="socialshare">
+            <label>Social Share</label>
+            <tab>socialconfig</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1002</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>    
+            <groups>
+                <info translate="label">
+                    <frontend_model>Loginradius_Activation_Model_Info</frontend_model>
+                    <comment><![CDATA[]]></comment>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </info>
+                <horizontalsharing translate="label">
+                    <label>Horizontal Social Sharing</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store> 
+                    <fields>
+                        <horizontalshareenable translate="label">
+                            <label>Enable Horizontal Social Sharing</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment><![CDATA[Do you want to enable Horizontal Social Sharing for your website?]]>
+                            </comment>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalshareenable>
+                        <horizontalsharingtheme translate="label">
+                            <label>Choose a theme</label>
+                            <frontend_type>radios</frontend_type>
+                            <source_model>Loginradius_Socialshare_Model_Source_Horizontalinterface</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalsharingtheme>
+                        <horizontalsharingproviders translate="label">
+                            <label>Sharing Providers</label>
+                            <frontend_type>checkboxes</frontend_type>
+                            <comment><![CDATA[<div style="clear: both !important;"><p class="note"><span>Selected providers will be displayed in the Social Sharing widget</span></p></div>]]></comment>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalsharingproviders>
+                        <horizontalsharingprovidershidden translate="label">
+                            <label>Rearrange Icons</label>
+                            <frontend_type>hidden</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalsharingprovidershidden>
+                        <horizontalcounterproviders translate="label">
+                            <label>Sharing Providers</label>
+                            <frontend_type>checkboxes</frontend_type>
+                            <comment><![CDATA[<div style="clear: both !important;"><p class="note"><span>Selected providers will be displayed in the Social Sharing widget</span></p></div>]]></comment>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalcounterproviders>
+                        <horizontalcounterprovidershidden translate="label">
+                            <label>Rearrange Icons</label>
+                            <frontend_type>hidden</frontend_type>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalcounterprovidershidden>
+                        <horizontalshareproduct translate="label">
+                            <label>Show Interface at Product Pages</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </horizontalshareproduct>
+                    </fields>
+                </horizontalsharing>
+                <verticalsharing translate="label">
+                    <label>Vertical Social Sharing</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>42</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store> 
+                    <fields>
+                        <verticalshareenable translate="label">
+                            <label>Enable Vertical Social Sharing</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment><![CDATA[Do you want to enable Social Counter for your website?]]>
+                            </comment>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalshareenable>
+                        <verticalsharingtheme translate="label">
+                            <label>Choose a theme</label>
+                            <frontend_type>radios</frontend_type>
+                            <source_model>Loginradius_Socialshare_Model_Source_verticalinterface</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalsharingtheme>
+                        <verticalalignment translate="label">
+                            <label>Alignment</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Select the position of the Social Counter widget with respect to page]]></comment>
+                            <source_model>Loginradius_Socialshare_Model_Source_Verticalalignment</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalalignment>
+                        <verticalsharingproviders translate="label">
+                            <label>Sharing Providers</label>
+                            <frontend_type>checkboxes</frontend_type>
+                            <comment><![CDATA[<div style="clear: both !important;"><p class="note"><span>Selected providers will be displayed in the Social Counter widget</span></p></div>]]></comment>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalsharingproviders>
+                        <verticalsharingprovidershidden translate="label">
+                            <label>Rearrange Icons</label>
+                            <frontend_type>hidden</frontend_type>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalsharingprovidershidden>
+                        <verticalcounterproviders translate="label">
+                            <label>Sharing Providers</label>
+                            <frontend_type>checkboxes</frontend_type>
+                            <comment><![CDATA[<div style="clear: both !important;"><p class="note"><span>Selected providers will be displayed in the Social Sharing widget</span></p></div>]]></comment>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalcounterproviders>
+                        <verticalcounterprovidershidden translate="label">
+                            <label>Rearrange Icons</label>
+                            <frontend_type>hidden</frontend_type>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalcounterprovidershidden>
+                        <verticalshareproduct translate="label">
+                            <label>Show Interface at Product Pages</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </verticalshareproduct>
+                    </fields>
+                </verticalsharing>
+            </groups>                
+        </socialshare>
+    </sections>
+</config>

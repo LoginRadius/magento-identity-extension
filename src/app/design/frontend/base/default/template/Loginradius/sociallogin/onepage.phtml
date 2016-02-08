@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * template to display custom social login interface
+ */
+if (!Mage::getBlockSingleton('sociallogin/sociallogin')->isLoggedIn()) {
+    $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+    echo '<div class="block"><div class="block-content"><p class="empty">';
+    if ($activationBlockObj->raasEnable() == '1') {
+        echo $this->getLayout()->createBlock('sociallogin/sociallogin')->setTemplate('Loginradius/customerregistration/onepage.phtml')->toHtml();
+    } else {
+
+        echo Mage::getBlockSingleton('sociallogin/sociallogin')->getSocialLoginContainer();
+        echo $this->getLayout()->createBlock('checkout/onepage_login')->setTemplate('checkout/onepage/login.phtml')->toHtml();
+    }
+    echo '</p></div></div>';
+}

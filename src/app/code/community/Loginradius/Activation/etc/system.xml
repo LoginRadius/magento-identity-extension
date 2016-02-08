@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <socialconfig translate="label" module="activation">
+            <label>LoginRadius</label>
+            <sort_order>1</sort_order>
+        </socialconfig>
+    </tabs>
+    <sections>
+        <activation translate="label" module="activation">
+            <label>Activation</label>
+            <tab>socialconfig</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>    
+            <groups>
+                <info translate="label">
+                    <frontend_model>Loginradius_Activation_Model_Info</frontend_model>
+                    <comment><![CDATA[]]></comment>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </info>
+                <apisettings translate="label">
+                    <label>Activation Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store> 
+                    <fields>
+                        <sitename translate="label">
+                            <label>Site Name</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[Paste LoginRadius Site Name here. To get the Site Name, login to <a href="http://www.loginradius.com" target="_blank">LoginRadius</a>]]>
+                            </comment>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sitename>
+                        <apikey translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[Paste LoginRadius API Key here. To get the API Key, login to <a href="http://www.loginradius.com" target="_blank">LoginRadius</a>]]>
+                            </comment>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </apikey>
+                        <apisecret translate="label">
+                            <label>API Secret</label>
+                            <frontend_type>text</frontend_type>
+                            <comment><![CDATA[Paste LoginRadius API Secret here. To get the API Secret, login to <a href="http://www.loginradius.com" target="_blank">LoginRadius</a>]]>
+                            </comment>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </apisecret>
+                    </fields>
+                </apisettings>
+            </groups>                
+        </activation>
+    </sections>
+</config>

@@ -1,0 +1,10 @@
+<?php
+/**
+ * add horizontal or vertical sharing container!
+ */
+if ($this->horizontalShareEnable() == "1" && $this->horizontalShareProductPage() == "1") {
+    echo $this->getHorizontalSharingInterface();
+}
+if ($this->verticalShareEnable() == "1" && $this->verticalShareProductPage() == "1") {
+    echo $this->getVerticalSharingInterface();
+}

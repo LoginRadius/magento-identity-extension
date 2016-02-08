@@ -1,0 +1,16 @@
+<?php
+
+if (!$this->isLoggedIn()) {
+    $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+    if ($activationBlockObj->raasEnable() == '1') {
+        echo $this->getLayout()->createBlock('sociallogin/sociallogin')->setTemplate('Loginradius/customerregistration/login.phtml')->toHtml();
+    } else {
+        if ($this->aboveLogin() == '1') {
+            echo $this->getSocialLoginContainer();
+        }
+        echo $this->getLayout()->createBlock('customer/form_login')->setTemplate('customer/form/login.phtml')->toHtml();
+        if ($this->belowLogin() == '1') {
+            echo $this->getSocialLoginContainer();
+        }
+    }
+}

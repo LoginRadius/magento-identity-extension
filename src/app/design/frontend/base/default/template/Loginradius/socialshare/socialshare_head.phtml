@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * template to add script required for social sharing
+ */
+if ($this->horizontalShareEnable() == "1" || $this->verticalShareEnable() == "1") {
+    $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+    ?>
+    <script type="text/javascript">
+        if (typeof jQuery == 'undefined') {
+            document.write('<script src="//code.jquery.com/jquery-1.10.2.min.js"><\/script>');
+        }
+        
+    </script>
+    <script type="text/javascript" src="<?php echo $this->getSkinUrl('../../../adminhtml/default/default/Loginradius/socialshare/js/socialshare.js') ?>"></script>
+    <script>
+        if (typeof jQuery != 'undefined') {
+            $j = jQuery.noConflict();
+        }
+        jQuery(function () {
+            // review list page
+            if (jQuery('#customer-reviews')) {
+                jQuery('#customer-reviews dl dd').each(function () {
+                    jQuery(this).append('<div></div><div data-share-url="' + jQuery(this).prev().find("a").attr("href") + '" class="loginRadiusHorizontalSharing"></div>')
+                });
+            }
+            // review detail page
+            if (jQuery('div.product-details')) {
+                jQuery('div.product-details dl').append('<div></div><div class="loginRadiusHorizontalSharing"></div>')
+            }
+        });
+    </script>
+<?php
+}
+$sharingScript = '<script type="text/javascript">';
+if ($this->horizontalShareEnable() == "1") {
+    // interface
+    if ($this->horizontalSharingTheme() == "32" || $this->horizontalSharingTheme() == "16") {
+        $interface = 'horizontal';
+    } elseif ($this->horizontalSharingTheme() == "single_large" || $this->horizontalSharingTheme() == "single_small") {
+        $interface = 'simpleimage';
+    } elseif ($this->horizontalSharingTheme() == "responsive") {
+        $interface = 'responsive';
+    } elseif ($this->horizontalSharingTheme() == "counter_horizontal" || $this->horizontalSharingTheme() == "counter_vertical") {
+        // set counter variables
+        $interface = 'simple';
+        $isHorizontal = "true";
+        // interface
+        if ($this->horizontalSharingTheme() == "counter_vertical") {
+            $type = 'vertical';
+        } else {
+            $type = 'horizontal';
+        }
+    } else {
+        $interface = 'horizontal';
+    }
+    // size
+    if ($this->horizontalSharingTheme() == "32" || $this->horizontalSharingTheme() == "responsive" || $this->horizontalSharingTheme() == "single_large") {
+        $size = '32';
+    } elseif ($this->horizontalSharingTheme() == "16" || $this->horizontalSharingTheme() == "single_small") {
+        $size = '16';
+    } else {
+        $size = '32';
+    }
+    // counter providers
+    if ($this->horizontalSharingTheme() == "counter_horizontal" || $this->horizontalSharingTheme() == "counter_vertical") {
+        if ($this->horizontalCounterProviders() != "") {
+            $providers = str_replace(',', '","', $this->horizontalCounterProviders());
+        } else {
+            $providers = 'Facebook Like","Google+ +1","Pinterest Pin it","LinkedIn Share","Hybridshare';
+        }
+        // prepare counter script
+        $sharingScript .= 'LoginRadius.util.ready(function () { $SC.Providers.Selected = ["' . trim(str_replace(array("\n", "\r"), '', $providers)) . '"]; $S = $SC.Interface.' . $interface . '; $S.isHorizontal = ' . $isHorizontal . '; $S.countertype = \'' . $type . '\'; $S.show("loginRadiusHorizontalSharing"); });';
+    } else {
+        if ($this->horizontalShareProviders() != "") {
+            $providers = str_replace(',', '","', $this->horizontalShareProviders());
+        } else {
+            $providers = 'Facebook","Twitter","GooglePlus","LinkedIn","Pinterest","Print","Email';
+        }
+        // prepare sharing script
+        $sharingScript .= 'LoginRadius.util.ready(function() { $i = $SS.Interface.' . $interface . '; $SS.Providers.Top = ["' . trim(str_replace(array("\n", "\r"), '', $providers)) . '"]; $u = LoginRadius.user_settings;';
+        if (trim($activationBlockObj->apiKey()) != "") {
+            $sharingScript .= '$u.apikey= \'' . trim($activationBlockObj->apiKey()) . '\';';
+        }
+        $sharingScript .= '$i.size = ' . $size . '; if(typeof document.getElementsByName("viewport")[0] != "undefined"){$u.isMobileFriendly=true;};$u.sharecounttype="url"; $i.show("loginRadiusHorizontalSharing"); });';
+    }
+    ?>
+    <style type="text/css">
+        div.loginRadiusHorizontalSharing {
+            z-index: 1000000;
+        }
+    </style>
+<?php
+}
+// vertical sharing interface
+if ($this->verticalShareEnable() == "1") {
+    // relative vertical position
+    if ($this->verticalAlignment() == 'top_left') {
+        $position1 = 'top';
+        $position2 = 'left';
+    } elseif ($this->verticalAlignment() == 'top_right') {
+        $position1 = 'top';
+        $position2 = 'right';
+    } elseif ($this->verticalAlignment() == 'bottom_left') {
+        $position1 = 'bottom';
+        $position2 = 'left';
+    } else {
+        $position1 = 'bottom';
+        $position2 = 'right';
+    }
+    // interface top offset
+    if ($this->verticalSharingTheme() == "counter_horizontal" || $this->verticalSharingTheme() == "counter_vertical") {
+        $sharingVariable = 'S';
+    } else {
+        $sharingVariable = 'i';
+    }
+    $offset = '$' . $sharingVariable . '.' . $position1 . ' = \'0px\'; $' . $sharingVariable . '.' . $position2 . ' = \'0px\';';
+    $interface = 'Simplefloat';
+    if ($this->verticalSharingTheme() == "32") {
+        $size = '32';
+    } elseif ($this->verticalSharingTheme() == "16") {
+        $size = '16';
+    } elseif ($this->verticalSharingTheme() == "counter_horizontal" || $this->verticalSharingTheme() == "counter_vertical") {
+        $interface = 'simple';
+        $isHorizontal = "false";
+        if ($this->verticalSharingTheme() == "counter_vertical") {
+            $type = 'vertical';
+        } elseif ($this->verticalSharingTheme() == "counter_horizontal") {
+            $type = 'horizontal';
+        }
+    } else {
+        $size = '16';
+    }
+
+    // counter providers
+    if ($this->verticalSharingTheme() == "counter_horizontal" || $this->verticalSharingTheme() == "counter_vertical") {
+        if ($this->verticalCounterProviders() != "") {
+            $providers = str_replace(',', '","', $this->verticalCounterProviders());
+        } else {
+            $providers = 'Facebook Like","Google+ +1","Pinterest Pin it","LinkedIn Share","Hybridshare';
+        }
+        // prepare counter script
+        $sharingScript .= 'LoginRadius.util.ready(function () { $SC.Providers.Selected = ["' . trim(str_replace(array("\n", "\r"), '', $providers)) . '"]; $S = $SC.Interface.' . $interface . '; $S.isHorizontal = ' . $isHorizontal . '; $S.countertype = \'' . $type . '\'; ' . $offset . ' $S.show("loginRadiusVerticalSharing"); });';
+    } else {
+        // sharing providers
+        if ($this->verticalSharingProviders() != "") {
+            $providers = str_replace(',', '","', $this->verticalSharingProviders());
+        } else {
+            $providers = 'Facebook","Twitter","GooglePlus","LinkedIn","Pinterest","Print","Email';
+        }
+        // prepare sharing script
+        $sharingScript .= 'LoginRadius.util.ready(function() { $i = $SS.Interface.' . $interface . '; $SS.Providers.Top = ["' . trim(str_replace(array("\n", "\r"), '', $providers)) . '"]; $u = LoginRadius.user_settings;';
+        if ($activationBlockObj->apiKey() != "") {
+            $sharingScript .= '$u.apikey= \'' . trim($activationBlockObj->apiKey()) . '\';';
+        }
+        $sharingScript .= '$i.size = ' . $size . '; ' . $offset . ' $i.show("loginRadiusVerticalSharing"); });';
+    }
+    ?>
+    <style type="text/css">
+        div.loginRadiusVerticalSharing {
+            z-index: 1000000;
+        }
+    </style>
+<?php
+}
+$sharingScript .= '</script>';
+echo $sharingScript;

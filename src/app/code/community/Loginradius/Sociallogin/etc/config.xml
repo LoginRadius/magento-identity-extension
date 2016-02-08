@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<config>
+    <default>
+        <sociallogin>
+            <socialinterface>
+                <title>Social Login</title>
+                <abovelogin>1</abovelogin>
+                <aboveregister>1</aboveregister>
+            </socialinterface>
+            <emailsettings>
+                <emailrequired>1</emailrequired>
+                <verificationText>Please click on the following link or paste it in browser to verify your email:-</verificationText>
+                <popupText>You are trying to connect with @provider</popupText>
+                <popupError>The email you entered is already registered or invalid. Please enter a valid email.</popupError>
+                <notifyUser>1</notifyUser>
+                <notifyUserText>Hi, You can login to the store using following e-mail address and password:-</notifyUserText>
+                <notifyAdmin>0</notifyAdmin>
+                <notifyAdminText>New customer has been registered to your store with following details:-</notifyAdminText>
+            </emailsettings>
+        </sociallogin>
+    </default>    
+    <modules>
+        <Loginradius_Sociallogin>
+            <version>2.0.2</version>
+        </Loginradius_Sociallogin>
+    </modules>
+    <global>
+        <helpers>
+            <sociallogin>
+                <class>Loginradius_Sociallogin_Helper</class>
+            </sociallogin>
+        </helpers>
+        <blocks>
+            <sociallogin>
+                <class>Loginradius_Sociallogin_Block</class>
+            </sociallogin>
+        </blocks>
+        <resources>
+            <sociallogin_setup>
+                <setup>
+                    <module>Loginradius_Sociallogin</module>
+                </setup>
+            </sociallogin_setup>
+        </resources>   
+    </global>
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <sociallogin>
+                                            <title>Store Activation Module Section</title>
+                                        </sociallogin>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <sociallogin>
+                    <file>Loginradius/sociallogin.xml</file>
+                </sociallogin>
+            </updates>
+        </layout>
+    </adminhtml>
+    <frontend>
+        <layout>
+            <updates>
+                <sociallogin>
+                    <file>Loginradius/sociallogin.xml</file>
+                </sociallogin>
+            </updates>
+        </layout>
+        <routers>
+            <sociallogin>
+                <use>standard</use>
+                <args>
+                    <module>Loginradius_Sociallogin</module>
+                    <frontName>sociallogin</frontName>
+                </args>
+            </sociallogin>
+        </routers>
+    </frontend>
+</config>

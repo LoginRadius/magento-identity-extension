@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<layout version="4.0.0">
+    <default>
+        <reference name="head">
+            <block type="socialshare/socialshare" name="socialshare_head" template="Loginradius/socialshare/socialshare_head.phtml"/>
+        </reference>
+    </default>
+    <catalog_product_view>
+        <reference name="alert.urls">
+            <block type="socialshare/socialshare" name="socialshareproduct" template="Loginradius/socialshare/socialshareproduct.phtml" before="-"/>
+        </reference>
+    </catalog_product_view>
+</layout> 

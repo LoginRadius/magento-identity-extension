@@ -1,0 +1,88 @@
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            callSocialLoginInterface();
+            initializeLoginRaasForm();
+            jQuery('.magento-raas-loading-image-div').hide();
+            initializeResetPasswordRaasForm();
+            initializeSocialRegisterRaasForm();
+            show_birthdate_date_block();
+        });
+    </script>
+    
+    <div class="loginradiusmessagediv" style="display:none;"></div>        
+    <div class="magento-raas-loading-image-div" style="display: none;"></div>
+    <div id="login_form" class="account-login">
+        <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+        <?php echo $this->getChildHtml('customer.form.login.extra') ?>
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="col2-set">
+            <div class="fieldset">
+                <h2 class="legend"><?php echo Mage::getBlockSingleton('customerregistration/customerregistration')->titleInterface() ?></h2>
+                <?php
+                echo Mage::getBlockSingleton('customerregistration/customerregistration')->getSocialLoginContainer();
+                ?>
+                <div style="clear: both"></div>
+            </div>
+            <div class="col-1 new-users">
+                <div class="content">
+                    <h2><?php echo $this->__('New Customers') ?></h2>
+
+                    <p><?php echo $this->__('By creating an account with our store, you will be able to move through the checkout process faster, store multiple shipping addresses, view and track your orders in your account and more.') ?></p>
+                </div>
+            </div>
+            <div class="col-2 registered-users lr-login-padding">
+                <div class="content">
+                    <h2><?php echo $this->__('ALREADY REGISTERED?') ?></h2>
+
+                    <p><?php echo $this->__('If you have an account with us, please log in.') ?></p>
+                    <div id="login-container"></div>
+                    <div style="padding-top: 15px;"><a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-left"><?php echo $this->__('Forgot your password') ?></a></div>
+                </div>                
+            </div>
+            <div class="col-1 new-users">
+                <div class="buttons-set">
+                    <button type="button" title="<?php echo $this->__('Create an Account') ?>" class="button" onclick="window.location = '<?php echo Mage::helper('customer')->getRegisterUrl() ?>';"><span><span><?php echo $this->__('Create an Account') ?></span></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="reset_form" class="account-login" style="display: none;">
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="content">
+                    <h2><?php echo $this->__('Reset Password') ?></h2>
+
+                    <div id="resetpassword-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="buttons-set">
+                    <a href="<?php echo Mage::helper('customer')->getRegisterUrl() ?>" class="f-left"><?php echo $this->__('Create an account') ?></a>
+                    <a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-right"><?php echo $this->__('Forgot your password') ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="social_registration_from" class="account-login" style="display:none;">
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="content">
+                    <h2><?php echo $this->__('Information') ?></h2>
+
+                    <div id="social-registration-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="buttons-set">
+                    <a href="<?php echo Mage::helper('customer')->getRegisterUrl() ?>" class="f-left"><?php echo $this->__('Create an account') ?></a>
+                    <a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-right"><?php echo $this->__('Forgot your password') ?></a>
+                </div>
+            </div>
+        </div>
+    </div>

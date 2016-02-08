@@ -1,0 +1,46 @@
+<?php
+/**
+ * template to render script which is required for social login.
+ */
+$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+if ($this->enableSinglesignon() == 1) {
+    $getBlockDir = $activationBlockObj->getBlockDir();
+    echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
+    ?>
+    <script src="//cdn.loginradius.com/hub/prod/js/LoginRadiusSSO.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            LoginRadiusSSO.init("<?php echo $activationBlockObj->siteName(); ?>");
+    <?php
+    if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->isLoggedIn()) {//user logged in
+        ?>
+                LoginRadiusSSO.isNotLoginThenLogout(function () {
+                    window.location.href = '<?php echo html_entity_decode(Mage::getUrl('customer/account/logout')); ?>';
+                });
+    <?php
+    } else {
+        if ($activationBlockObj->raasEnable() == 1) {
+            ?>
+                if (!LoginRadiusRaaS.loginradiushtml5passToken) {
+                    LoginRadiusRaaS.loginradiushtml5passToken = function (token) {
+                        if (token) {
+                            window.location = "<?php echo html_entity_decode(Mage::getUrl('customer/account/login')); ?>";
+                        }
+                    }
+                }
+        <?php } ?>
+                LoginRadiusSSO.login('<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . 'sociallogin'; ?>');
+        <?php } ?>
+            if (jQuery('a[href*="logout"]').length > 0) {
+                var href = jQuery('a[href*="logout"]').attr('href');
+                jQuery('a[href*="logout"]').attr('onclick', "return false;");
+                jQuery('a[href*="logout"]').click(function () {
+                    jQuery('body').prepend('<div class="magento-raas-loading-image-div" style="width:100%;"><div class="loadinternal"></div></div>');
+                    LoginRadiusSSO.logout(href);
+                });
+            }
+        });
+
+    </script>
+    <?php
+} 

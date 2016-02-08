@@ -1,0 +1,173 @@
+/* CSS Document */
+.socialoverlay {
+    background: rgb(127, 127, 127); /* The Fallback */
+    background: none no-repeat scroll 0 0 rgba(127, 127, 127, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100001;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 0;
+    position: fixed;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=97)";
+    filter: alpha(opacity=97);
+}
+
+#popupouter {
+    border-radius: 0 23px;
+    background: #f3f3f3;
+    left: 50%;
+    margin: -114px auto 0 -250px;
+    overflow: auto;
+    padding: 0;
+    position: fixed;
+    top: 50%;
+    width: 500px;
+    z-index: 999999;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.socialpopupheading {
+    font-size: 17px;
+    text-align: center;
+    padding: 15px;
+    font-weight: normal;
+}
+
+#outerp {
+    font-size: 17px;
+    line-height: 1.1em !important;
+    margin: 9px !important;
+    text-align: center !important;
+}
+
+#popupinner {
+    overflow-x: scroll;
+    background: #ffffff;
+    padding: 15px 20px;
+    max-height: 350px;
+}
+.socialDiv{
+    float:left;
+    margin: 0 0 4px 2px;
+    width: 100%
+}
+.socialDiv label{
+    width: 40%;
+    float: left;
+    margin: 5px 10px 10px 0;
+    display: block;
+    text-align: left;
+}
+.footerbox {
+    padding-bottom: 12px;
+    float: left;
+    padding-top: 12px;
+    padding-left: 20px;
+}
+
+.emailtext {
+    padding-bottom: 5px;
+    font-family: arial;
+    width: 100%;
+}
+
+
+.inputtxt {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #444;
+    font-size: 13px;
+    border: 1px solid #e2efe1;
+    width: 350px;
+    height: 25px !important;
+    line-height: 25px !important;
+    margin-bottom: 5px !important;
+    padding-left: 10px !important;
+    border-radius: 0 12px !important;
+    background: #fff;
+}
+
+.socialerror {
+    text-align: left;
+    background-color: rgb(255, 235, 232);
+    padding: 12px;
+}
+
+.socialnoerror {
+    text-align: left;
+    background-color: #e1eabc;
+    padding: 12px;
+}
+/**
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="submit"]:focus,
+input[type="button"]:focus {
+    border-radius: 0px 12px;
+    outline: none !important;
+}
+*/
+
+input:-webkit-autofill,
+textarea:-webkit-autofill
+select:-webkit-autofill {
+    background: #fff;
+}
+
+.inputbutton {
+    border: #dcdcdc 1px solid !important;
+    text-decoration: none !important;
+    color: #6e6e6e !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    background: #f3f3f3 !important;
+    padding: 6px 17px !important;
+    margin-right: 15px;
+    float: left;
+    margin-bottom: 0 !important;
+    border-radius: 0px 11px !important;
+    text-transform: none !important;
+    font-weight: normal !important;
+}
+
+.inputbutton:hover {
+    text-decoration: none !important;
+    cursor: pointer !important;
+    background: #f3f3f3 !important;
+    color: #000 !important;
+
+}
+
+@media (max-width: 769px) {
+    #popupouter {
+        border-radius: 0 23px !important;
+        background: none repeat scroll 0 0 #f3f3f3;
+        border-radius: 4px;
+        left: 0;
+        margin: 5% auto 0;
+        overflow: auto;
+        padding: 0;
+        position: static;
+        top: 0;
+        width: 400px;
+    }
+
+    .inputtxt {
+        width: 336px;
+    }
+}
+
+@media (max-width: 480px) {
+    #popupouter {
+        width: 300px;
+        border-radius: 0 23px !important;
+    }
+
+    .inputtxt {
+        width: 236px;
+    }
+}
+

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<layout version="4.0.0">
+    <default>
+        <reference name="right">
+            <block type="sociallogin/sociallogin" name="sociallogin" template="Loginradius/sociallogin/rightwidget.phtml" before="-"/>
+        </reference>
+        <reference name="head">
+            <block type="sociallogin/sociallogin" name="lrhead" template="Loginradius/sociallogin/head.phtml"/>
+        </reference>
+        <reference name="content">
+            <block type="sociallogin/sociallogin" name="sociallogin_popup" template="Loginradius/sociallogin/popupscript.phtml" before="-"/>
+        </reference>
+    </default>
+    <customer_account_login>
+        <remove name="customer_form_login"/>
+        <reference name="content">
+            <block type="sociallogin/sociallogin" name="loginradius_form_login" template="Loginradius/sociallogin/login.phtml"/>
+        </reference>
+    </customer_account_login>
+    <customer_account_create>
+        <remove name="customer_form_register"/>
+        <reference name="content">
+            <block type="sociallogin/sociallogin" name="loginradius_form_register" template="Loginradius/sociallogin/register.phtml"/>
+        </reference>
+    </customer_account_create>
+    <customer_account_index>
+        <reference name="content">
+            <block type="sociallogin/sociallogin" name="loginradius_form_sociallinking" after="-" template="Loginradius/sociallogin/linking.phtml"/>
+        </reference>
+    </customer_account_index>
+    <customer_account_forgotpassword translate="label">
+        <reference name="content">
+            <reference name="forgotPassword">
+                <block type="sociallogin/sociallogin" name="forgotPassword" template="Loginradius/sociallogin/forgotpassword.phtml"/>
+            </reference>
+        </reference>
+    </customer_account_forgotpassword>
+    <customer_account_edit>
+        <reference name="content">
+            <remove name="customer_edit"/>
+            <block type="sociallogin/sociallogin" name="changepasswordform" template="Loginradius/sociallogin/resetpassword.phtml"/>
+        </reference>
+    </customer_account_edit>
+    <checkout_onepage_index>
+        <reference name="content">            
+            <reference name="checkout.onepage.login">
+                <action method="setTemplate">
+                    <template>Loginradius/sociallogin/onepage.phtml</template>
+                </action>
+                <block type="sociallogin/sociallogin" name="onepageloginbefore" template="Loginradius/sociallogin/onepage.phtml"/>
+            </reference>
+        </reference>
+    </checkout_onepage_index>
+</layout> 
