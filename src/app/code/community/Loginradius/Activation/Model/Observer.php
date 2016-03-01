@@ -34,7 +34,7 @@ class Loginradius_Activation_Model_Observer extends Mage_Core_Helper_Abstract
         $post = Mage::app()->getRequest()->getPost();
         if((isset($post['groups']['apisettings']['fields']['apikey']['inherit']) && $post['groups']['apisettings']['fields']['apikey']['inherit'] == '1') && (isset($post['groups']['apisettings']['fields']['apisecret']['inherit']) && $post['groups']['apisettings']['fields']['apisecret']['inherit'] == '1')){
             
-        }elseif (isset($post['config_state']['activation_apisettings'])) {/*
+        }elseif (isset($post['config_state']['activation_apisettings'])) {
             $apiKey = $post['groups']['apisettings']['fields']['apikey']['value'];
             $apiSecret = $post['groups']['apisettings']['fields']['apisecret']['value'];
             $validateUrl = 'https://api.loginradius.com/api/v2/app/validate?apikey=' . rawurlencode($apiKey) . '&apisecret=' . rawurlencode($apiSecret);
@@ -50,7 +50,7 @@ class Loginradius_Activation_Model_Observer extends Mage_Core_Helper_Abstract
                     $result['message'] = 'LoginRadius API Secret key is not valid.';
                 }
                 throw new Exception($result['message']);
-            }*/
+            }
         }
     }
 

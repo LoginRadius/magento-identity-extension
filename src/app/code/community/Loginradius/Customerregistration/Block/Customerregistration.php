@@ -195,7 +195,7 @@ class Loginradius_Customerregistration_Block_Customerregistration extends Loginr
         $apiKey = trim($activationBlockObj->apiKey());
         $apiSecrete = trim($activationBlockObj->apiSecret());
         if ($apiKey == "" && $apiSecrete == "") {
-            $result = '<p style ="color:red;">To activate your plugin, please log in to LoginRadius and get API Key & Secret. Web: <b><a href ="http://www.loginradius.com" target = "_blank">www.LoginRadius.com</a></b></p>';
+            $result = $activationBlockObj->activationErrorMessage();
         } else {
             $result = '<div style="margin:5px"></div><div class="lr_embed_bricks_200 interfacecontainerdiv" id="interfacecontainerdiv" ></div>';
         }

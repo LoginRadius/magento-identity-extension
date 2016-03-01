@@ -131,7 +131,7 @@ class Loginradius_Sociallogin_Block_Sociallogin extends Mage_Core_Block_Template
         $apiKey = trim($activationBlockObj->apiKey());
         $apiSecrete = trim($activationBlockObj->apiSecret());
         if ($apiKey == "" && $apiSecrete == "") {
-            $result = '<p style ="color:red;">To activate your plugin, please log in to LoginRadius and get API Key & Secret. Web: <b><a href ="http://www.loginradius.com" target = "_blank">www.LoginRadius.com</a></b></p>';
+            $result = $activationBlockObj->activationErrorMessage();
         } else {
             $result = '<h2>' . $this->titleInterface() . '</h2><div class="interfacecontainerdiv"></div>';
         }

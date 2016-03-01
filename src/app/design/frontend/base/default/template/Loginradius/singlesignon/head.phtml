@@ -3,7 +3,7 @@
  * template to render script which is required for social login.
  */
 $activationBlockObj = Mage::getBlockSingleton('activation/activation');
-if ($this->enableSinglesignon() == 1) {
+if ($this->enableSinglesignon() == 1 && ($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != '')) {
     $getBlockDir = $activationBlockObj->getBlockDir();
     echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
     ?>

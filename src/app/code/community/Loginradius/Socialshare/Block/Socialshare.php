@@ -4,7 +4,11 @@ class Loginradius_Socialshare_Block_Socialshare extends Mage_Core_Block_Template
 {
     public function horizontalShareEnable()
     {
-        return Mage::getStoreConfig('socialshare/horizontalsharing/horizontalshareenable');
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
+            return Mage::getStoreConfig('socialshare/horizontalsharing/horizontalshareenable');
+        }
+        return '0';
     }
     public function horizontalSharingTheme()
     {
@@ -22,13 +26,13 @@ class Loginradius_Socialshare_Block_Socialshare extends Mage_Core_Block_Template
     {
         return Mage::getStoreConfig('socialshare/horizontalsharing/horizontalshareproduct');
     }
-    public function apiKey()
-    {
-        return Mage::getStoreConfig('activation/apisettings/apikey');
-    }
     public function verticalShareEnable()
     {
-        return Mage::getStoreConfig('socialshare/verticalsharing/verticalshareenable');
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
+            return Mage::getStoreConfig('socialshare/verticalsharing/verticalshareenable');
+        }
+        return '0';
     }
     public function verticalAlignment()
     {

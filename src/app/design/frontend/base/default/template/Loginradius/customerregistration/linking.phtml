@@ -1,5 +1,6 @@
 <?php
 $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
 $getBlockDir = $activationBlockObj->getBlockDir();
 if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == "0"){
 /**
@@ -165,4 +166,8 @@ if (isset($checkoutUid) && !empty($checkoutUid)) {
     }
 
 </script>
-<?php }?>
+<?php } 
+}else{
+    echo $activationBlockObj->activationErrorMessage();
+}
+?>

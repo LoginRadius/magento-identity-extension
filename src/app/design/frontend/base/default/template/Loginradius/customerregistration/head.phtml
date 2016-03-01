@@ -2,6 +2,8 @@
 /**
  * template to render script which is required for social login.
  */
+$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
 $currentUrl = Mage::helper('core/url')->getCurrentUrl();
 Mage::getSingleton('core/session')->setCurrentURLData($currentUrl);
 $loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
@@ -13,7 +15,7 @@ if ($this->getLayout()->getBlock('head')->getTitle() == "Checkout") {
 } else {
     $loginRadiusCallback .= "?redirect_to=" . Mage::helper('core/url')->getCurrentUrl();
 }
-$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+
 $getBlockDir = $activationBlockObj->getBlockDir();
 echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
 ?>
@@ -75,3 +77,4 @@ echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusI
 <?php } ?>
 
 <script src="<?php echo Mage::getDesign()->getSkinUrl('Loginradius/customerregistration/js/LoginRadiusFrontEnd.js', array('_area' => 'frontend')) ?>"></script>
+<?php }?>

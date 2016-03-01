@@ -23,8 +23,9 @@
  * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-?>
-<?php /* Extensions placeholder */ ?>
+
+$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){?>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script type="text/javascript">
@@ -86,21 +87,7 @@
             </fieldset>
         </form>
     </div>
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                        
 <?php /* Extensions placeholder */ ?>
 <?php echo $this->getChildHtml('checkout.onepage.login.extra')?>
 <div class="col2-set">
@@ -157,3 +144,6 @@
         </div>
     </div>
 </div>
+<?php }else{
+    echo $activationBlockObj->activationErrorMessage();
+}?>

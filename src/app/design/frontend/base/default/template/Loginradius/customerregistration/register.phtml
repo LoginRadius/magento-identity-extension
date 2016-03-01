@@ -1,3 +1,6 @@
+<?php
+$activationBlockObj = Mage::getBlockSingleton('activation/activation');
+if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){?>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <div class="account-create" id="reg_from">
@@ -28,3 +31,6 @@
     show_birthdate_date_block();
     jQuery(document).ready(setTimeout(function(){jQuery('.magento-raas-loading-image-div').hide()},3000));
 </script>
+<?php }else{
+    echo $activationBlockObj->activationErrorMessage();
+}?>
