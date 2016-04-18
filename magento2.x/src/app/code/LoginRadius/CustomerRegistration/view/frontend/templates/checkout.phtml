@@ -1,0 +1,17 @@
+<?php
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+    if (!$customerSession->isLoggedIn()) {
+        $customerSession->setLoginRadiusRedirection('checkout');
+        ?>
+        <script>
+            window.location.href = '<?php echo $this->getUrl('customer/account/login'); ?>';
+        </script>
+    <?php
+    } else {
+        $customerSession->unsLoginRadiusRedirection();
+    }
+}
+?>

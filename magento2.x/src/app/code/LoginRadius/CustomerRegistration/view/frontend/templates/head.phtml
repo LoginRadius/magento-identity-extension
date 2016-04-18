@@ -1,0 +1,111 @@
+<?php
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    
+    ?>
+
+    <script type="text/javascript">
+        //initialize raas options
+        var LocalDomain = '<?php echo $this->getUrl("customerregistration/auth/") ?>';
+        var raasoption = {};
+        raasoption.apikey = '<?php echo $activationHelper->siteApiKey(); ?>';
+        raasoption.appName = '<?php echo htmlentities($activationHelper->siteName()); ?>';
+        raasoption.templatename = "loginradiuscustom_tmpl";
+        raasoption.hashTemplate = true;
+        raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
+        raasoption.forgotPasswordUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
+        raasoption.V2Recaptcha = true;
+        raasoption.OptionalEmailVerification = <?php echo ($customerRegistrationHelper->emailVerification() == '2') ? "true" : "false" ?>;
+        raasoption.DisabledEmailVerification = <?php echo ($customerRegistrationHelper->emailVerification() == '1') ? "true" : "false" ?>;
+        raasoption.inFormvalidationMessage = <?php echo ($customerRegistrationHelper->formValidationMessage() == '1') ? "true" : "false" ?>;
+        raasoption.enableLoginOnEmailVerification = <?php echo ($customerRegistrationHelper->loginUponEmailVerification() == '1') ? "true" : "false" ?>;
+        raasoption.promptPasswordOnSocialLogin = <?php echo ($customerRegistrationHelper->promptPasswordOnSocialLogin() == '1') ? "true" : "false" ?>;
+        raasoption.enableUserName = <?php echo ($customerRegistrationHelper->usernameLogin() == '1') ? "true" : "false" ?>;
+        raasoption.askEmailAlwaysForUnverified = <?php echo ($customerRegistrationHelper->alwaysAskEmailForUnverified() == '1') ? "true" : "false" ?>;
+    <?php if ($customerRegistrationHelper->termsConditions() != '') { ?>
+            raasoption.termsAndConditionHtml = '<?php echo str_replace(array("'", '<script>', '</script>'), array('"', '', ''), $customerRegistrationHelper->termsConditions()); ?>';
+    <?php }if ($customerRegistrationHelper->delayTime() != '') { ?>
+            raasoption.formRenderDelay = <?php echo (int) $customerRegistrationHelper->delayTime(); ?>;
+    <?php }if ($customerRegistrationHelper->googleRecaptcha() != '') { ?>
+            raasoption.V2RecaptchaSiteKey = "<?php echo htmlentities($customerRegistrationHelper->googleRecaptcha()); ?>";
+    <?php }if ($customerRegistrationHelper->forgotEmail() != '') { ?>
+            raasoption.forgotPasswordTemplate = "<?php echo htmlentities($customerRegistrationHelper->forgotEmail()); ?>";
+    <?php }if ($customerRegistrationHelper->verificationEmail() != '') { ?>
+            raasoption.emailVerificationTemplate = "<?php echo htmlentities($customerRegistrationHelper->verificationEmail()); ?>";
+    <?php }if (($customerRegistrationHelper->minPassword() != $customerRegistrationHelper->maxPassword()) && ($customerRegistrationHelper->minPassword() != '') && ($customerRegistrationHelper->maxPassword() != '')) { ?>
+            raasoption.passwordlength = {
+                "min":<?php echo $customerRegistrationHelper->minPassword(); ?>,
+                "max":<?php echo $customerRegistrationHelper->maxPassword(); ?>
+            };
+        <?php
+    }
+    if ($customerRegistrationHelper->customJsOptions() != '' && $customerRegistrationHelper->customJsOptions() != 'null' && $customerRegistrationHelper->customJsOptions() != null) {
+        $lrCustomOption = json_decode($customerRegistrationHelper->customJsOptions(), true);
+        if (!is_array($lrCustomOption)) {
+            echo $customerRegistrationHelper->customJsOptions();
+        } else {
+            foreach ($lrCustomOption as $lrkey => $lrvalue) {
+                echo 'raasoption.' . $lrkey . ' = ' . (is_array($lrvalue) ? json_encode($lrvalue) : "'" . $lrvalue . "'") . ';';
+            }
+        }
+    }
+    ?>
+        require(['jquery'], function ($) {
+            $(document).ready(function(){
+            if(raasoption.OptionalEmailVerification || raasoption.DisabledEmailVerification){
+                if ($('a[href*="customerregistration/accounts/linking"]').length > 0) {
+                    $('a[href*="customerregistration/accounts/linking"]').parent().remove();
+                    $('#magento-raas-loading-image-div').hide();
+                }
+            }
+            });
+        });
+    </script>
+    <?php
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+    if (!$customerSession->isLoggedIn()) {
+        ?>
+        <script type="text/html" id="loginradiuscustom_tmpl">
+            <div class="lr_icons_box">
+                <div style="width:180px">
+                    <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&callback=<?php echo $this->getUrl() ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                    </span>
+                </div>
+            </div>
+        </script>
+    <?php } else { ?>
+        <script type="text/html" id="loginradiuscustom_tmpl">
+            <# if(isLinked) { #>
+            <div class="lr-linked">
+                <div class="lr-linked-id"><span class="lr-icon-frame">
+                        <span class="lr-icon lr-raas-<#= Name.toLowerCase() #>">
+                        </span>
+                    </span>
+
+                    <div class="lr-linked-image lr-icon-<#= Name.toLowerCase() #> lr-linked-provider" style="float:left;padding-right:30px;"></div>
+
+                    <# if(providerId == "<?php echo $customerSession->getLoginRadiusId(); ?>" ) { #>
+                    <span class="lr-linked-image"><?php echo __(' is connected currently'); ?></span>
+
+                    <# }  else {#>
+                    <span class="lr-linked-image"><?php echo __(' is connected'); ?></span>
+                    <a style="margin-left:15px" class="lr-unlink" href="<?php echo $this->getUrl('customerregistration/accounts/linking') ?>?providerid=<#= providerId #>&provider=<#= Name.toLowerCase() #>"><?php echo __('Remove'); ?></a>
+
+                    <# } #>
+                </div>
+            </div>
+            <# }  else {#>
+            <div class="lr_icons_box">
+                <div class="lr_icons_inner_box" style="width:100%;">
+                    <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&ac_linking=true&callback=<?php echo $this->getUrl('customer/account') ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                    </span>
+                </div>
+            </div>
+            <# } #>
+
+        </script>
+    <?php } ?>
+    <div id="magento-raas-loading-image-div"><div class="loadinternal"></div></div>
+<?php } ?>

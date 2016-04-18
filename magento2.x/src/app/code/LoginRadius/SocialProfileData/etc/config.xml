@@ -1,0 +1,18 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <lrsocialprofiledata>
+            <social_profile_data_settings>
+                <basic_profile>1</basic_profile>
+                <extended_location>1</extended_location>
+                <extended_profile>1</extended_profile>
+                <followed_companies>1</followed_companies>
+                <facebook_profile_events>1</facebook_profile_events>
+                <status_messages>1</status_messages>
+                <facebook_posts>1</facebook_posts>
+                <twitter_mentions>1</twitter_mentions>
+                <groups>1</groups>
+                <contacts>1</contacts>
+            </social_profile_data_settings>
+        </lrsocialprofiledata>
+    </default>
+</config>

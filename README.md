@@ -16,7 +16,10 @@ Please visit [here](http://www.loginradius.com/) for more information.
 
 ## Documentation
 * [User Registration](http://apidocs.loginradius.com/docs/user-registration) - Everything you need to implement the full LoginRadius User Registration system including Social Login.
-* [Extension Installation](http://support.loginradius.com/hc/en-us/articles/205133845-Magento-Advanced-Plugin-Instructions) - Everything you need to implement with magento.
+* [Extension Installation](http://support.loginradius.com/hc/en-us/articles/205133845-Magento-Advanced-Plugin-Instructions) - Everything you need to implement with magento 1.x.
+* [Extension Installation](http://support.loginradius.com/hc/en-us/articles/208501296-Magento-Customer-Identity-Extension-instructions-for-v2-x) - Everything you need to implement with magento 2.x.
+
+
 
 
 General documentation regarding the LoginRadius REST API and related flows can be found on the [LoginRadius API Documentations](http://apidocs.loginradius.com/) site. 

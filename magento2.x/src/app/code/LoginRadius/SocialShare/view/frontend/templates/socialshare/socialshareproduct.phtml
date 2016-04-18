@@ -1,0 +1,13 @@
+<?php
+
+$data = $this->helper('LoginRadius\SocialShare\Model\Helper\Data');
+/**
+ * add horizontal or vertical sharing container!
+ */
+if ($data->horizontalShareEnable() == "1" && $data->horizontalShareProductPage() == "1") {
+    
+    echo $data->getHorizontalSharingInterface();
+}
+if ($data->verticalShareEnable() == "1" && $data->verticalShareProductPage() == "1") {
+    echo $data->getVerticalSharingInterface();
+}

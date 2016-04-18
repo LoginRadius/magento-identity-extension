@@ -1,0 +1,44 @@
+<?php
+$singleSignOnHelper = $this->helper('LoginRadius\SingleSignOn\Model\Helper\Data');
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($singleSignOnHelper->enableSinglesignon() == '1' && $activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    ?>
+    <script type="text/javascript" src="//cdn.loginradius.com/hub/prod/js/LoginRadiusSSO.js"></script>
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+                LoginRadiusSSO.init("<?php echo $activationHelper->siteName(); ?>");
+                <?php
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+                if ($customerSession->isLoggedIn()) {//user logged in
+                    ?>
+                    LoginRadiusSSO.isNotLoginThenLogout(function () {
+                        window.location.href = '<?php echo html_entity_decode($this->getUrl('customer/account/logout')); ?>';
+                    });
+                    if ($('a[href*="logout"]').length > 0) {
+                    var href = $('a[href*="logout"]').attr('href');
+                    $('a[href*="logout"]').attr('onclick', "return false;");
+                    $('a[href*="logout"]').click(function () {
+                        $('body').prepend('<div id="magento-raas-loading-image-div" style="width:100%;"><div class="loadinternal"></div></div>');
+                        LoginRadiusSSO.logout(href);
+                    });
+                }
+            <?php } else { ?>
+                    if (typeof LoginRadiusRaaS != "undefined") {
+                        if (!LoginRadiusRaaS.loginradiushtml5passToken) {
+                            LoginRadiusRaaS.loginradiushtml5passToken = function (token) {
+                                if (token) {
+                                    window.location.href = "<?php echo html_entity_decode($this->getUrl('customer/account/login')); ?>";
+                                }
+                            }
+                        }
+                    }
+                    LoginRadiusSSO.login('<?php echo $this->getUrl('customerregistration/auth/'); ?>');                    
+            <?php } ?>
+                
+            });
+        });
+    </script>
+    <?php
+} 
