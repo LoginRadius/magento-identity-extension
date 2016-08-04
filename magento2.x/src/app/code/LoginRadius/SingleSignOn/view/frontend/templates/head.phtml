@@ -2,12 +2,16 @@
 $singleSignOnHelper = $this->helper('LoginRadius\SingleSignOn\Model\Helper\Data');
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
 if ($singleSignOnHelper->enableSinglesignon() == '1' && $activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+$ssoRootUrl = parse_url($this->getUrl(''));
+$ssoRootUrl['path'] = isset($ssoRootUrl['path'])?trim(trim($ssoRootUrl['path'],"/")):'';
+$ssoTempDir = explode("/",$ssoRootUrl['path']);
+$ssoDir = isset($ssoTempDir[0])?trim($ssoTempDir[0]):'';
     ?>
     <script type="text/javascript" src="//cdn.loginradius.com/hub/prod/js/LoginRadiusSSO.js"></script>
     <script type="text/javascript">
         require(['jquery'], function ($) {
             $(document).ready(function () {
-                LoginRadiusSSO.init("<?php echo $activationHelper->siteName(); ?>");
+                LoginRadiusSSO.init("<?php echo $activationHelper->siteName(); ?>","<?php echo '/'.$ssoDir;?>");
                 <?php
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $customerSession = $objectManager->get('Magento\Customer\Model\Session');

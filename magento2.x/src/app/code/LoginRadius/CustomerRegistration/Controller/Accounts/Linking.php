@@ -6,6 +6,8 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Controller\ResultFactory;
 
+ global $apiClient_class;
+$apiClient_class = '\LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 class Linking extends \Magento\Framework\App\Action\Action {
 
     protected $_resultPageFactory;

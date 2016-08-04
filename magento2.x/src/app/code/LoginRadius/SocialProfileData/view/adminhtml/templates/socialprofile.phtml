@@ -4,6 +4,7 @@ $data = $this->helper('LoginRadius\SocialProfileData\Model\Helper\Data');
 $basicProfileResult = $block->getBasicProfileData();
 $lrExtendedLocation = $block->getExtendedLocationData();
 $lrExtendedProfile = $block->getExtendedProfileData();
+
 $lrFbEvents = $block->getFacebookEventsData();
 
 $lrContacts = $block->getContactsData();
@@ -34,6 +35,7 @@ $lrRecommendations = $block->getRecommendationsReceivedData();
 $lrLanguages = $block->getLanguagesData();
 $lrPatents = $block->getPatentsData();
 $lrFavorites = $block->getFavoritesData();
+$lrBooks = $block->getBookData();
 $lrFbLikes = $block->getFacebookLikessData();
 ?>
 <style type="text/css">
@@ -394,6 +396,7 @@ $lrFbLikes = $block->getFacebookLikessData();
                             <th class="head"><?php echo 'State'; ?></th>
                             <th class="head"><?php echo 'Postal Code'; ?></th>
                             <th class="head"><?php echo 'Region'; ?></th>
+                            <th class="head"><?php echo 'Country'; ?></th>
                         </tr>
                     </thead>
                     <?php echo login_radius_show_data($lrAddress, true); ?>
@@ -577,6 +580,24 @@ $lrFbLikes = $block->getFacebookLikessData();
                 </table>
                 <?php
             }
+            if (count($lrBooks) > 0) {
+                echo '<h3>Books</h3>';
+                ?>
+                <table class="form-table sociallogin_table" cellspacing="0">
+                    <thead>
+                        <tr>
+                           <th class="head"><?php echo 'Book Id'; ?></th>
+                           <th class="head"><?php echo 'Category'; ?></th>
+                           <th class="head"><?php echo 'Name'; ?></th>
+                            <th class="head"><?php echo 'Created Date'; ?></th>
+                        </tr>
+                    </thead>
+                    <?php
+                    echo login_radius_show_data($lrBooks, true);
+                    ?>
+                </table>
+                <?php
+            }
             ?>
         </div>
     <?php } ?>
@@ -605,10 +626,10 @@ $lrFbLikes = $block->getFacebookLikessData();
                         <th class="head"><?php echo 'Provider'; ?></th>
                         <th class="head"><?php echo 'Name'; ?></th>
                         <th class="head"><?php echo 'Email'; ?></th>
-                        <th class="head"><?php echo 'Phone Number'; ?></th>
+                        <th class="head" style="width:306px;padding: 10px 8px;"><?php echo 'Phone Number'; ?></th>
                         <th class="head"><?php echo 'Social Id'; ?></th>
-                        <th class="head"><?php echo 'Profile URL'; ?></th>
-                        <th class="head"><?php echo 'Image URL'; ?></th>
+                        <th class="head" style="width: 224px;"><?php echo 'Profile URL'; ?></th>
+                        <th class="head" style="width: 216px"><?php echo 'Image URL'; ?></th>
                         <th class="head"><?php echo 'Status'; ?></th>
                         <th class="head"><?php echo 'Industry'; ?></th>
                         <th class="head"><?php echo 'Country'; ?></th>

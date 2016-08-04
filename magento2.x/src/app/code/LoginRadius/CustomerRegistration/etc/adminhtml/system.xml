@@ -21,10 +21,10 @@
             </group>
             <group id="interface_customization_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Interface Customization Configuration Options</label>
-                <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+<!--                <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                    <label>Title</label>
                    <tooltip><![CDATA[Text displayed above Social login Interface.]]></tooltip>
-                </field>
+                </field>-->
                 <field id="form_validation_message" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                    <label>Display Form Validation Message</label>
                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -106,6 +106,7 @@
                 </field>
             </group>
             <group id="email_template_settings" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+               
                 <label>Email Template Configuration Options</label>
                 <field id="forgot_email" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Forgot Password Email Template</label>
@@ -114,6 +115,14 @@
                 <field id="verification_email" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Email Verification Email Template</label>
                     <tooltip><![CDATA[Enter template name for Email Verification Email.]]></tooltip>
+                </field>
+            </group>
+            <group id="enablehostingpage" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Enable Hosted Page Functionality</label>
+                <field id="enable_hosted_page" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Do you want to enable hosted page functionality?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[Enable Hosted Page Functionality.]]></tooltip>
                 </field>
             </group>
             <group id="debug_settings" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">

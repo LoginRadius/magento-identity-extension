@@ -1,5 +1,7 @@
 <?php
+
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+$customerHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
 if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
     /** @var \Magento\Customer\Block\Form\Edit $block */
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -11,16 +13,28 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
     } catch (\LoginRadiusSDK\LoginRadiusException $e) {
         $this->_eventManager->dispatch('lr_logout_sso', array('exception' => $e));
     }
-
+   
     $showPasswordForm = false;
     if (isset($responce)) {
         foreach ($responce as $k => $val) {
-            if ((isset($val->Provider) && strtolower($val->Provider) == 'raas') || (isset($val->EmailVerified) && $val->EmailVerified == true)) {
-                $showPasswordForm = true;
-                break;
+            if($customerHelper->emailVerification() == '0' || $customerHelper->emailVerification() == '2'){
+                if ((isset($val->Provider) && strtolower($val->Provider) == 'raas') || (isset($val->EmailVerified) && $val->EmailVerified == true)) {
+                    $showPasswordForm = true;
+                    break;
+                }
+            }elseif($customerHelper->emailVerification() == '1'){
+                 if((isset($val->Provider) && strtolower($val->Provider) == 'raas')){
+                     $showPasswordForm = true;
+                     break;
+                 } else{
+                     $showPasswordForm = false;
+                     break;
+                 }
             }
         }
     }
+   
+
     ?>
     <div id="loginradiusmessagediv"></div>
     <form class="form form-edit-account" action="<?php /* @escapeNotVerified */ echo $block->getUrl('customer/account/editPost') ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>" autocomplete="off">
@@ -31,7 +45,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
             <div class="field email required">
                 <label class="label" for="email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></label>
                 <div class="control">
-                    <input type="email" readonly="readonly" name="email" id="email" value="<?php echo $block->escapeHtml($customerSession->getCustomer()->getEmail()) ?>" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" class="input-text" data-validate="{required:true, 'validate-email':true}">
+                    <input type="email" name="email" readonly="readonly" id="email" value="<?php echo $block->escapeHtml($customerSession->getCustomer()->getEmail()) ?>" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" class="input-text" data-validate="{required:true, 'validate-email':true}">
                 </div>
             </div>
             <?php $_dob = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Dob') ?>

@@ -19,11 +19,12 @@ var raasForm = {
                     // on failure this function will call ?errors? is an array of error with message.
                     responseHandler(false, response[0].description);
                 });
-            } else {
+            }
+            else {
                 LoginRadiusRaaS.init(raasoption, 'emailverification', function (response) {
                     //On Success this callback will call
                     responseHandler(true, "Your email has been verified successfully");
-                    
+
                     if (raasoption.enableLoginOnEmailVerification && response.access_token && response.access_token != null) {
                         raasRedirection(response.access_token);
                     } else {
@@ -77,7 +78,7 @@ var raasForm = {
                 raasRedirection(response);
             }
         }, function (response) {
-            
+
             if (response[0].description != null) {
                 raasRedirection(false, response[0].description);
             }
@@ -99,20 +100,23 @@ var raasForm = {
     },
     register: function () {
         LoginRadiusRaaS.init(raasoption, 'registration', function (response) {
-            
+
             if ((raasoption.OptionalEmailVerification || raasoption.DisabledEmailVerification) && response.access_token) {
-               
+
                 raasRedirection(response.access_token);
             } else {
-               
+
                 responseHandler(true, "An email has been sent to " + document.getElementById('loginradius-raas-registration-emailid').value + ".Please verify your email address.");
+
+                //responseHandler(true, "An email has been sent to " + document.getElementById('loginradius-raas-registration-emailid').value + ".Please verify your email address.");
             }
             jQuery('input[type="text"],input[type="password"], select').val('');
         }, function (response) {
-          
+
             if (response[0].description != null) {
                 responseHandler(false, response[0].description);
             }
+
         }, "registeration-container");
     },
     accountPassword: function () {
@@ -133,6 +137,25 @@ var raasForm = {
             document.forms["changepassword"].submit();
         }, function () {
         }, raasoption);
+    },
+    emailVerify: function () {
+        LoginRadiusRaaS.init(raasoption, 'emailverification', function (response) {
+            //On Success this callback will call
+           responseHandler(true, "Your email has been verified successfully");
+           document.getElementById('magento-raas-loading-image-div').style.display = 'none';
+             if (raasoption.enableLoginOnEmailVerification && response.access_token && response.access_token != null) {
+                raasRedirection(response.access_token);
+            } else {
+                window.setTimeout(function () {
+                    window.location.href = SignInDomain;
+                }, 5000);
+
+
+            }
+        }, function (response) {
+            // on failure this function will call ?errors? is an array of error with message.
+            responseHandler(false, response[0].description);
+        });
     }
 }
 require(['jquery', "mage/calendar"], function ($) {
@@ -140,20 +163,47 @@ require(['jquery', "mage/calendar"], function ($) {
         $('#magento-raas-loading-image-div').click(function () {
             $(this).hide();
         });
-        LoginRadiusRaaS.$hooks.setProcessHook(function () {
-        }, function () {
+        
             if ($('#changepasswordbox') || $('#setpasswordbox')) {
-                var getPasswordForm = $('#socialpasswordbox').find('form');
-                $(getPasswordForm.parent()).html(getPasswordForm.html());
-                $('#loginradius-raas-submit-Save').hide();
+                var passwordButtonHide = setInterval(function () {
+                    try {
+                        var getPasswordForm = $('#socialpasswordbox').find('form');
+                        $(getPasswordForm.parent()).html(getPasswordForm.html());
+                        
+                        $('#loginradius-raas-submit-Save').hide();
+                    } catch (err) {
+
+                    }
+                    if($(getPasswordForm.parent()).html(getPasswordForm.html()).length > 0){
+                        
+                    stopPasswordInterval();
+                }
+                }, 1000);
+
+                function stopPasswordInterval() {
+                    clearInterval(passwordButtonHide);
+                }
             }
+       
+        LoginRadiusRaaS.$hooks.setProcessHook(function () {
+            $('#magento-raas-loading-image-div').show();
+        }, function () {
+
             if (raasoption.formRenderDelay) {
+               
                 setTimeout(function () {
-                    $('.magento-raas-loading-image-div').hide();
+                    $('#magento-raas-loading-image-div').hide();
+                }, 1);
+            }else{
+                setTimeout(function () {
+                    $('#magento-raas-loading-image-div').hide();
                 }, 1);
             }
+            
         });
         LoginRadiusRaaS.$hooks.socialLogin.onFormRender = function () {
+           
+            $('#magento-raas-loading-image-div').hide();
             showformbyId('required_form');
         };
         var myVar = setInterval(function () {

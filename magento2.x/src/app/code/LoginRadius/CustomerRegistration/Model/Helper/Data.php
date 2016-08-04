@@ -105,44 +105,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     }
 
     public function usernameLogin() {
-        if ($this->emailVerification() != '0') {
-            return '0';
-        }
+
         return $this->getConfig('customerregistration', 'advance_settings/username_login');
     }
 
     public function emailVerification() {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $customerSession = $objectManager->get('Magento\Customer\Model\Session');
-        $dbEmailVerification = $this->getConfig('customerregistration', 'advance_settings/email_verification');
-        if ($customerSession->isLoggedIn() && $dbEmailVerification == '2') {
-            $emailVerified = $customerSession->getLoginRadiusEmailVerified();
-            if ($emailVerified == true) {
-                return '0';
-            }
-            return '1';
-        }
-        return $dbEmailVerification;
+
+        return $this->getConfig('customerregistration', 'advance_settings/email_verification');
     }
 
     public function loginUponEmailVerification() {
-        if ($this->emailVerification() == '1') {
-            return '0';
-        }
+
         return $this->getConfig('customerregistration', 'advance_settings/login_upon_email_verification');
     }
 
     public function alwaysAskEmailForUnverified() {
-        if ($this->emailVerification() == '1') {
-            return '0';
-        }
+
         return $this->getConfig('customerregistration', 'advance_settings/always_ask_email_for_unverified');
     }
 
     public function promptPasswordOnSocialLogin() {
-        if ($this->emailVerification() != '0') {
-            return '0';
-        }
+
         return $this->getConfig('customerregistration', 'advance_settings/prompt_password_on_social_login');
     }
 
@@ -193,7 +176,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     public function welcomeEmailMessageOwner() {
         return;
     }
-
+    
+    public function enableHostedPage() {
+        return $this->getConfig('customerregistration', 'enablehostingpage/enable_hosted_page');
+    }
+    
     //Debug Settings
     public function debug() {
         return $this->getConfig('customerregistration', 'debug_settings/debug');

@@ -25,10 +25,10 @@ class InstallSchema implements InstallSchemaInterface {
             'basic_profile_data' => array('id', 'entity_id', 'sociallogin_id', 'provider', 'first_name', 'middle_name', 'last_name', 'full_name', 'nick_name', 'profile_name', 'birth_date', 'gender', 'prefix', 'suffix', 'country_code', 'country_name', 'thumbnail_image_url', 'image_url', 'local_country', 'profile_country'),
             'emails' => array('id', 'entity_id', 'email_type', 'email'),
             'sports' => array('id', 'entity_id', 'sport_id', 'sport'),
-            'addresses' => array('id', 'entity_id', 'type', 'address_line1', 'address_line2', 'city', 'state', 'postal_code', 'region'),
+            'addresses' => array('id', 'entity_id', 'type', 'address_line1', 'address_line2', 'city', 'state', 'postal_code', 'region', 'country'),
             'contacts' => array('id', 'entity_id', 'provider', 'name', 'email', 'phone_number', 'social_id', 'profile_url', 'image_url', 'status', 'industry', 'country', 'gender'),
             'extended_location_data' => array('id', 'entity_id', 'main_address', 'hometown', 'state', 'city', 'local_city', 'profile_city', 'profile_url', 'local_language', 'language'),
-            'extended_profile_data' => array('id', 'entity_id', 'website', 'favicon', 'industry', 'about', 'timezone', 'verified', 'last_profile_update', 'created', 'relationship_status', 'quote', 'interested_in', 'interests', 'religion', 'political_view', 'https_image_url', 'followers_count', 'friends_count', 'is_geo_enabled', 'total_status_count', 'number_of_recommenders', 'honors', 'associations', 'hirable', 'repository_url', 'age', 'professional_headline', 'provider_access_token', 'provider_token_secret'),
+            'extended_profile_data' => array('id', 'entity_id', 'website', 'favicon', 'industry', 'about', 'timezone', 'verified', 'last_profile_update', 'created', 'relationship_status', 'quote', 'interested_in', 'interests', 'religion', 'political_view', 'https_image_url', 'followers_count', 'friends_count', 'is_geo_enabled', 'total_status_count', 'number_of_recommenders', 'honors', 'associations', 'hirable', 'repository_url', 'age', 'professional_headline', 'provider_access_token', 'provider_token_secret', 'no_of_login'),
             'positions' => array('id', 'entity_id', 'position', 'summary', 'start_date', 'end_date', 'is_current', 'company', 'location'),
             'companies' => array('id', 'entity_id', 'company_name', 'company_type', 'industry'),
             'education' => array('id', 'entity_id', 'school', 'year', 'type', 'notes', 'activities', 'degree', 'field_of_study', 'start_date', 'end_date'),
@@ -41,6 +41,7 @@ class InstallSchema implements InstallSchemaInterface {
             'facebook_posts' => array('id', 'entity_id', 'post_id', 'from_name', 'title', 'start_time', 'update_time', 'message', 'place', 'picture', 'likes', 'shares'),
             'facebook_events' => array('id', 'entity_id', 'event_id', 'event', 'start_time', 'rsvp_status', 'location'),
             'favorites' => array('id', 'entity_id', 'social_id', 'name', 'type'),
+            'books' => array('id', 'entity_id', 'book_id', 'category', 'name', 'created_date'),
             'patents' => array('id', 'entity_id', 'patent_id', 'title', 'date'),
             'languages' => array('id', 'entity_id', 'language_id', 'language'),
             'recommendations_received' => array('id', 'entity_id', 'recommendation_id', 'recommendation_type', 'recommendation_text', 'recommender'),
@@ -50,7 +51,8 @@ class InstallSchema implements InstallSchemaInterface {
             'current_status' => array('id', 'entity_id', 'status_id', 'status', 'source', 'created_date'),
             'skills' => array('id', 'entity_id', 'skill_id', 'name'),
             'inspirational_people' => array('id', 'entity_id', 'social_id', 'name'),
-            'facebook_likes' => array('id', 'entity_id','likes_id','name','category','created_date','website','description')
+            'facebook_likes' => array('id', 'entity_id','likes_id','name','category','created_date','website','description'),
+            'api_log' => array('id', 'api_url','requested_type','data','response','response_type','created_date')
             
         );
         return isset($colamns[$tableName]) ? $colamns[$tableName] : null;
@@ -131,6 +133,7 @@ class InstallSchema implements InstallSchemaInterface {
             'hirable' => array('hirable', Table::TYPE_TEXT, 1, array('nullable' => true, 'primary' => false), 'Hirable'),
             'repository_url' => array('repository_url', Table::TYPE_TEXT, 1000, array('nullable' => true, 'primary' => false), 'Repository Url'),
             'age' => array('age', Table::TYPE_TEXT, 3, array('nullable' => true, 'primary' => false), 'Age'),
+            'no_of_login' => array('no_of_login', Table::TYPE_TEXT, 3, array('nullable' => true, 'primary' => false), 'No Of Login'),
             'professional_headline' => array('professional_headline', Table::TYPE_TEXT, 1000, array('nullable' => true, 'primary' => false), 'Professional Headline'),
             'provider_access_token' => array('provider_access_token', Table::TYPE_TEXT, null, array('nullable' => true, 'primary' => false), 'Provider Access Token'),
             'provider_token_secret' => array('provider_token_secret', Table::TYPE_TEXT, null, array('nullable' => true, 'primary' => false), 'Provider Token Secret'),
@@ -199,6 +202,12 @@ class InstallSchema implements InstallSchemaInterface {
             'likes_id' => array('likes_id', Table::TYPE_TEXT, 50, array('nullable' => true, 'primary' => false), 'Likes Id'),
             'category' => array('category', Table::TYPE_TEXT, 100, array('nullable' => true, 'primary' => false), 'Category'),
             'description' => array('description', Table::TYPE_TEXT, null, array('nullable' => true, 'primary' => false), 'Description'),
+            'api_url' => array('api_url', Table::TYPE_TEXT, 600, array('nullable' => true, 'primary' => false), 'Api Url'),
+            'requested_type' => array('requested_type', Table::TYPE_TEXT, 50, array('nullable' => true, 'primary' => false), 'Requested Type'),
+            'data' => array('data', Table::TYPE_TEXT, 2000, array('nullable' => true, 'primary' => false), 'Data'),
+            'response' => array('response', Table::TYPE_TEXT, 3000, array('nullable' => true, 'primary' => false), 'Response'),
+            'response_type' => array('response_type', Table::TYPE_TEXT, 100, array('nullable' => true, 'primary' => false), 'Response Type'),
+            'book_id' => array('book_id', Table::TYPE_TEXT, 50, array('nullable' => true, 'primary' => false), 'Book Id'),
         );
         return isset($colamn[$name]) ? $colamn[$name] : null;
     }
@@ -227,6 +236,7 @@ class InstallSchema implements InstallSchemaInterface {
             'facebook_posts' => 'Facebook Posts Data',
             'facebook_events' => 'Facebook Events Data',
             'favorites' => 'Favorites Data',
+            'books' => 'Books Data',
             'patents' => 'Patents Data',
             'languages' => 'Languages Data',
             'recommendations_received' => 'Recommendations Received Data',
@@ -236,7 +246,8 @@ class InstallSchema implements InstallSchemaInterface {
             'current_status' => 'Current Status Data',
             'skills' => 'Skills Data',
             'inspirational_people' => 'Inspirational People Data',
-            'facebook_likes' => 'Facebook Likes Data'
+            'facebook_likes' => 'Facebook Likes Data',
+            'api_log' => 'Lr Api Log'
         );
         foreach ($tables as $table => $comment) {
             $this->createTable($setup, $table, $comment);

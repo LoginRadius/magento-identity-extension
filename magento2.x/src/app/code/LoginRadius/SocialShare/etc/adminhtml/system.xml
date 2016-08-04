@@ -16,8 +16,12 @@
                     <label>Choose a theme</label>
                     <source_model>LoginRadius\SocialShare\Model\Source\Horizontalinterface</source_model>
                 </field>
+                <field id="loginRadiushorizontalerrordiv" translate="label" type="radios" sortOrder="25" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>You can select only 9 providers.</label>
+                </field>
                 <field id="share_provider" translate="label" type="checkboxes" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Providers</label>
+                    
                     <source_model>LoginRadius\SocialShare\Model\Source\Sharingprovider</source_model>
                     <depends>
                         <field id="theme" separator="|">0|1|2</field>
@@ -58,6 +62,9 @@
                     <label>Alignment</label>
                     <source_model>LoginRadius\SocialShare\Model\Source\Verticalposition</source_model>
                     <tooltip>Select the position of the Social Counter widget with respect to page</tooltip>
+                </field>
+                 <field id="loginRadiusverticalerrordiv" translate="label" type="radios" sortOrder="35" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>You can select only 9 providers.</label>
                 </field>
                 <field id="share_provider" translate="label" type="checkboxes" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Providers</label>

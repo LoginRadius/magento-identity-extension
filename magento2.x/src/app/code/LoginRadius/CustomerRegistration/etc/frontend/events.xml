@@ -3,4 +3,6 @@
     <event name="customer_save_after_data_object">
         <observer name="customer_save_after_data_object" instance="LoginRadius\CustomerRegistration\Observer\SaveUserData" />
     </event>    
+
+       
 </config>

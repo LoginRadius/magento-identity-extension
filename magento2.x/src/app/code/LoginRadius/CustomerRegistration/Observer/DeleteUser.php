@@ -8,7 +8,8 @@
 namespace LoginRadius\CustomerRegistration\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-
+ global $apiClient_class;
+$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 class DeleteUser implements ObserverInterface {
 
     protected $_messageManager;

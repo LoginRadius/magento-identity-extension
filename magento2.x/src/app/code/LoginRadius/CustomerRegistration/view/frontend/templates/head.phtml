@@ -2,27 +2,51 @@
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
 if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
     $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
     
     ?>
 
     <script type="text/javascript">
         //initialize raas options
         var LocalDomain = '<?php echo $this->getUrl("customerregistration/auth/") ?>';
+        var SignInDomain = '<?php echo $this->getUrl("customer/account/login/") ?>';
         var raasoption = {};
         raasoption.apikey = '<?php echo $activationHelper->siteApiKey(); ?>';
         raasoption.appName = '<?php echo htmlentities($activationHelper->siteName()); ?>';
         raasoption.templatename = "loginradiuscustom_tmpl";
         raasoption.hashTemplate = true;
-        raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
+        raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customerregistration/verification') ?>';
         raasoption.forgotPasswordUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
         raasoption.V2Recaptcha = true;
         raasoption.OptionalEmailVerification = <?php echo ($customerRegistrationHelper->emailVerification() == '2') ? "true" : "false" ?>;
         raasoption.DisabledEmailVerification = <?php echo ($customerRegistrationHelper->emailVerification() == '1') ? "true" : "false" ?>;
         raasoption.inFormvalidationMessage = <?php echo ($customerRegistrationHelper->formValidationMessage() == '1') ? "true" : "false" ?>;
-        raasoption.enableLoginOnEmailVerification = <?php echo ($customerRegistrationHelper->loginUponEmailVerification() == '1') ? "true" : "false" ?>;
-        raasoption.promptPasswordOnSocialLogin = <?php echo ($customerRegistrationHelper->promptPasswordOnSocialLogin() == '1') ? "true" : "false" ?>;
-        raasoption.enableUserName = <?php echo ($customerRegistrationHelper->usernameLogin() == '1') ? "true" : "false" ?>;
-        raasoption.askEmailAlwaysForUnverified = <?php echo ($customerRegistrationHelper->alwaysAskEmailForUnverified() == '1') ? "true" : "false" ?>;
+        <?php if($customerRegistrationHelper->emailVerification() == '0' && $customerRegistrationHelper->loginUponEmailVerification() == '1') { ?>
+            raasoption.enableLoginOnEmailVerification = true;
+        <?php }?>
+        
+        <?php if($customerRegistrationHelper->emailVerification() == '0' && $customerRegistrationHelper->promptPasswordOnSocialLogin() == '1') { ?>
+            raasoption.promptPasswordOnSocialLogin = true;
+        <?php }?>
+        
+        <?php if($customerRegistrationHelper->emailVerification() == '0' && $customerRegistrationHelper->usernameLogin() == '1') { ?>
+            raasoption.enableUserName = true;
+        <?php }?>
+            
+        <?php if($customerRegistrationHelper->emailVerification() == '0' && $customerRegistrationHelper->alwaysAskEmailForUnverified() == '1') { ?>
+            raasoption.askEmailAlwaysForUnverified = true;
+        <?php }?>    
+            
+        <?php if($customerRegistrationHelper->emailVerification() == '2' && $customerRegistrationHelper->loginUponEmailVerification() == '1') { ?>
+            raasoption.enableLoginOnEmailVerification = true;
+        <?php }?>
+            
+        <?php if($customerRegistrationHelper->emailVerification() == '2' && $customerRegistrationHelper->alwaysAskEmailForUnverified() == '1') { ?>
+            raasoption.askEmailAlwaysForUnverified = true;
+        <?php }?>     
+        
+       
     <?php if ($customerRegistrationHelper->termsConditions() != '') { ?>
             raasoption.termsAndConditionHtml = '<?php echo str_replace(array("'", '<script>', '</script>'), array('"', '', ''), $customerRegistrationHelper->termsConditions()); ?>';
     <?php }if ($customerRegistrationHelper->delayTime() != '') { ?>
@@ -53,6 +77,9 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
     ?>
         require(['jquery'], function ($) {
             $(document).ready(function(){
+                if(raasoption.OptionalEmailVerification){
+                    raasoption.OptionalEmailVerification = <?php echo ($customerSession->getLoginRadiusEmailVerified()=='1') ? "false" : "true" ?>;
+                }
             if(raasoption.OptionalEmailVerification || raasoption.DisabledEmailVerification){
                 if ($('a[href*="customerregistration/accounts/linking"]').length > 0) {
                     $('a[href*="customerregistration/accounts/linking"]').parent().remove();

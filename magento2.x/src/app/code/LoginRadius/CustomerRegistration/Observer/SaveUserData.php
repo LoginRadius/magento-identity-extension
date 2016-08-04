@@ -8,6 +8,8 @@
 namespace LoginRadius\CustomerRegistration\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+ global $apiClient_class;
+$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 
 class SaveUserData implements ObserverInterface {
 
@@ -26,10 +28,15 @@ class SaveUserData implements ObserverInterface {
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer) {
+
         $customer = $observer->getEvent()->getCustomerDataObject();
 
         $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');
         $customerRegistrationHelper = $this->_objectManager->get("LoginRadius" . "\\" . $activationHelper->getAuthDirectory() . "\Model\Helper\Data");
+        $customerSession = $this->_objectManager->get('Magento\Customer\Model\Session');
+
+
+        
         $editUserData = array(
             'firstname' => $customer->getFirstname(),
             'lastname' => $customer->getLastname(),
@@ -37,10 +44,12 @@ class SaveUserData implements ObserverInterface {
             'gender' => $customer->getGender(),
             'birthdate' => $customer->getDob()
         );
-        $customerSession = $this->_objectManager->get('Magento\Customer\Model\Session');
-        $userAPI = new \LoginRadiusSDK\CustomerRegistration\UserAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('authentication' => true, 'output_format' => 'json'));
-        try {
 
+        
+
+        $userAPI = new \LoginRadiusSDK\CustomerRegistration\UserAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('authentication' => true, 'output_format' => 'json'));
+        
+        try {
             $userEditdata = $userAPI->edit($customerSession->getLoginRadiusId(), $editUserData);
             /* Edit profile in local db */
         } catch (\LoginRadiusSDK\LoginRadiusException $e) {
@@ -58,7 +67,8 @@ class SaveUserData implements ObserverInterface {
                     $this->_messageManager->addError('The Password field must be at least ' . $customerRegistrationHelper->minPassword() . ' characters in length.');
                 } elseif (($customerRegistrationHelper->maxPassword() != 0) && (strlen($postData['password']) > $customerRegistrationHelper->maxPassword())) {
                     $this->_messageManager->addError('The Password field must not exceed ' . $customerRegistrationHelper->maxPassword() . ' characters in length.');
-                } elseif ($postData['password'] === $postData['confirmpassword']) { //check both password
+                } elseif ($postData['password'] === $postData['confirmpassword']) {
+                    //check both password
                     //setpassword
                     $data = array(
                         'accountid' => $customerSession->getLoginRadiusUid(),
@@ -86,6 +96,7 @@ class SaveUserData implements ObserverInterface {
                     try {
                         $changeUserPassword = $accountAPI->changeAccountPassword($customerSession->getLoginRadiusUid(), $postData['oldpassword'], $postData['newpassword']);
                     } catch (\LoginRadiusSDK\LoginRadiusException $e) {
+
                         $errorDescription = isset($e->getErrorResponse()->description) ? $e->getErrorResponse()->description : '';
                         $this->_messageManager->addError($errorDescription);
                     }

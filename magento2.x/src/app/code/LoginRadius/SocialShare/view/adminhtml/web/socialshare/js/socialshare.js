@@ -1,6 +1,6 @@
 require(['jquery', 'jquery/ui'], function ($) {
     $(document).ready(function () {
-        if ($('#system_config_tabs').find('li._active').text().toLowerCase().replace(/\s/g, "") != 'socialshare'){
+        if ($('#system_config_tabs').find('li._active').text().toLowerCase().replace(/\s/g, "") != 'socialshare') {
             return;
         }
         $('#row_lrsocialshare_horizontal_share_counter_provider_theme, #row_lrsocialshare_vertical_share_counter_provider_theme').hide();
@@ -19,6 +19,9 @@ require(['jquery', 'jquery/ui'], function ($) {
             popupWidthToggle();
         });
         customOptionCheckValidJson();
+        $('#row_lrsocialshare_horizontal_share_loginRadiushorizontalerrordiv,#row_lrsocialshare_vertical_share_loginRadiusverticalerrordiv').html('<div class="errorShareDiv">You can select only 9 providers.</div>');
+        $('#row_lrsocialshare_horizontal_share_loginRadiushorizontalerrordiv,#row_lrsocialshare_vertical_share_loginRadiusverticalerrordiv').hide();
+        $('.lr-vertical-interface-32').parent().parent().css("margin-top", "6px");
     });
     function popupWidthToggle() {
         if ($('#lrsocialshare_advance_setting_custom_popup').val() == '1') {
@@ -32,11 +35,14 @@ require(['jquery', 'jquery/ui'], function ($) {
         for (var i = 0; i < shareProvider.length; i++) {
             var shareProviderTag = shareProvider[i].getElementsByTagName('input');
             for (var j = 0; j < shareProviderTag.length; j++) {
-                shareProviderTag[j].addEventListener("click", function () {
-                    shareProviderChanged(theme, type);
+                shareProviderTag[j].addEventListener("click", function (event) {
+                    var eventId = event.target.id;
+                    var provider = eventId.replace('lrsocialshare_' + theme + '_share_' + type + '_provider_', '');
+                    loginRadiusSharingLimit(provider, theme, type);
                 });
             }
         }
+        socialProvidersChecked(theme, type);
     }
     function customOptionCheckValidJson() {
         var addCustomOption = $('#lrsocialshare_advance_setting_custom_option');
@@ -67,7 +73,6 @@ require(['jquery', 'jquery/ui'], function ($) {
     function shareProviderChanged(theme, type) {
         var provider = '';
         var shareProvider = $('#row_lrsocialshare_' + theme + '_share_' + type + '_provider .value');
-
         for (var i = 0; i < shareProvider.length; i++) {
             var shareProviderTag = shareProvider[i].getElementsByTagName('input');
             for (var j = 0; j < shareProviderTag.length; j++) {
@@ -133,13 +138,14 @@ require(['jquery', 'jquery/ui'], function ($) {
                     if (shareThemeInput.value == '' || shareThemeInput.value == '0' || shareThemeInput.value == '1' || shareThemeInput.value == '2') {
                         $('#row_lrsocialshare_horizontal_share_share_provider,#row_lrsocialshare_horizontal_share_rearrange_icons').show();
                         $('#row_lrsocialshare_horizontal_share_count_provider').hide();
-                        socialProvidersChecked('horizontal', 'share');
+                        shareProviderClick('horizontal', 'share');
+
                     } else if (shareThemeInput.value == '3' || shareThemeInput.value == '4') {
                         $('#row_lrsocialshare_horizontal_share_share_provider, #row_lrsocialshare_horizontal_share_count_provider, #row_lrsocialshare_horizontal_share_rearrange_icons').hide();
                     } else if (shareThemeInput.value == '5' || shareThemeInput.value == '6') {
                         $('#row_lrsocialshare_horizontal_share_share_provider, #row_lrsocialshare_horizontal_share_rearrange_icons').hide();
                         $('#row_lrsocialshare_horizontal_share_count_provider').show();
-                        socialProvidersChecked('horizontal', 'count');
+                        shareProviderClick('horizontal', 'count');
                     }
                 }
             }
@@ -156,11 +162,11 @@ require(['jquery', 'jquery/ui'], function ($) {
                     if (shareThemeInput.value == '' || shareThemeInput.value == '0' || shareThemeInput.value == '1') {
                         $('#row_lrsocialshare_vertical_share_share_provider, #row_lrsocialshare_vertical_share_rearrange_icons').show();
                         $('#row_lrsocialshare_vertical_share_count_provider').hide();
-                        socialProvidersChecked('vertical', 'share');
+                        shareProviderClick('vertical', 'share');
                     } else if (shareThemeInput.value == '2' || shareThemeInput.value == '3') {
                         $('#row_lrsocialshare_vertical_share_share_provider, #row_lrsocialshare_vertical_share_rearrange_icons').hide();
                         $('#row_lrsocialshare_vertical_share_count_provider').show();
-                        socialProvidersChecked('vertical', 'count');
+                        shareProviderClick('vertical', 'count');
                     }
                 }
             }
@@ -172,4 +178,29 @@ require(['jquery', 'jquery/ui'], function ($) {
     function verticalShareThemeChanged() {
         verticalShareTheme();
     }
+
+    function loginRadiusSharingLimit(provider, theme, type) {
+        var checkCount = 0;
+        // get providers table-row reference
+        var loginRadiusSharingProvidersRow = document.getElementById('row_lrsocialshare_' + theme + '_share_share_provider');
+        // get sharing providers checkboxes reference
+        var loginRadiusSharingProviders = loginRadiusSharingProvidersRow.getElementsByTagName('input');
+        for (var i = 0; i < loginRadiusSharingProviders.length; i++) {
+            if (loginRadiusSharingProviders[i].checked) {
+                // count checked providers
+                checkCount++;
+                if (checkCount > 9) {
+                    $('#row_lrsocialshare_' + theme + '_share_loginRadius' + theme + 'errordiv').show();
+                    $('#lrsocialshare_' + theme + '_share_' + type + '_provider_' + provider).removeAttr('checked');
+                    setTimeout(function(){
+                        $('#row_lrsocialshare_' + theme + '_share_loginRadius' + theme + 'errordiv').hide();
+                    }, 5000);
+                    return;
+                }else {
+                    shareProviderChanged(theme, type);
+                }
+            }
+        }
+    }
+
 });

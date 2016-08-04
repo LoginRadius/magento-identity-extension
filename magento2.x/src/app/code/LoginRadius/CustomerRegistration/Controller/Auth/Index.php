@@ -4,7 +4,10 @@ namespace LoginRadius\CustomerRegistration\Controller\Auth;
 
 use Magento\Framework\App\Action\NotFoundException;
 use Magento\Framework\Controller\ResultFactory;
-
+use LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient;
+ require_once('Customhttpclient.php');
+ global $apiClient_class;
+$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 class Index extends \Magento\Framework\App\Action\Action {
 
     /**
@@ -21,6 +24,8 @@ class Index extends \Magento\Framework\App\Action\Action {
     public function __construct(
     \Magento\Framework\App\Action\Context $context, \Magento\Customer\Model\Session $customerSession, \Magento\Customer\Model\Account\Redirect $accountRedirect
     ) {
+       
+
         $this->_customerSession = $customerSession;
         $this->_accountRedirect = $accountRedirect;
         parent::__construct($context);
@@ -39,12 +44,14 @@ class Index extends \Magento\Framework\App\Action\Action {
      */
     public function execute() {
         $token = isset($_REQUEST['token']) && !empty($_REQUEST['token']) ? trim($_REQUEST['token']) : '';
+       
         if (empty($token)) {
             return $this->redirectLoginPage('customer/account');
         } else {
             $this->_messageManager = $this->_objectManager->get('Magento\Framework\Message\ManagerInterface');
             $this->_helperActivation = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');
             $this->_helperCustomerRegistration = $this->_objectManager->get('LoginRadius\\' . $this->_helperActivation->getAuthDirectory() . '\Model\Helper\Data');
+            
             // Social API's
             $socialLoginObject = new \LoginRadiusSDK\SocialLogin\SocialLoginAPI($this->_helperActivation->siteApiKey(), $this->_helperActivation->siteApiSecret(), array('authentication' => false, 'output_format' => 'json'));
             try {
@@ -63,18 +70,22 @@ class Index extends \Magento\Framework\App\Action\Action {
                 if (isset($userProfileData) && isset($userProfileData->ID)) {
                     /* Checking  provider id in local database */
                     $socialEntityId = $this->getEntityIdbyProfileData($userProfileData);
+                    
                     if ($this->_customerSession->isLoggedIn()) {
+                        
                         //Account Linking
                         if (empty($socialEntityId)) {
                             $customer = $this->_customerSession->getCustomer();
                             $accountAPI = new \LoginRadiusSDK\CustomerRegistration\AccountAPI($this->_helperActivation->siteApiKey(), $this->_helperActivation->siteApiSecret(), array('authentication' => true, 'output_format' => 'json'));
                             try {
+                                
                                 $accountLink = $accountAPI->accountLink($this->_customerSession->getLoginRadiusUid(), $userProfileData->ID, $userProfileData->Provider);
                             } catch (\LoginRadiusSDK\LoginRadiusException $e) {
                                 //$this->_eventManager->dispatch('lr_logout_sso', array('exception' => $e));
                             }
                             if (isset($accountLink) && $accountLink->isPosted == true) {
-                                $this->socialLinkingData($customer->getId(), $userProfileData);
+                                
+                                $this->socialLinkingData($customer->getId(), $userProfileData );
                                 $this->_customerSession->setLoginRadiusStatus('Success');
                                 $this->_customerSession->setLoginRadiusMessage('Your Account is successfully linked.');
                             } else {
@@ -92,17 +103,48 @@ class Index extends \Magento\Framework\App\Action\Action {
                             /* update query */
                             $customer = $this->updateEntitiesData($socialEntityId, $userProfileData);
                             $this->socialLinkingData($socialEntityId, $userProfileData, true);
+
+                            $accountAPI = new \LoginRadiusSDK\CustomerRegistration\AccountAPI($this->_helperActivation->siteApiKey(), $this->_helperActivation->siteApiSecret(), array('authentication' => true, 'output_format' => 'json'));
+                            try {
+                                $getAccount = $accountAPI->getAccounts($userProfileData->Uid);
+
+                            } catch (\LoginRadiusSDK\LoginRadiusException $e) {
+                                //$this->_eventManager->dispatch('lr_logout_sso', array('exception' => $e));
+                            }
+                            if(isset($getAccount) && !empty($getAccount)){
+                                foreach($getAccount as $key => $value){
+
+                                    $output = '';
+                                    $resource = $this->_objectManager->get('Magento\Framework\App\ResourceConnection');
+                                    $ruleTable = $resource->getTableName('lr_sociallogin');
+                                    $connection = $resource->getConnection();
+                                    $select = $connection->select()->from(['r' => $ruleTable])
+                                            ->where('uid=?', $value->Uid)
+                                            ->where('provider=?', $value->Provider);
+                                            
+                                    $output = $connection->fetchAll($select);
+
+                                  if(empty($output)){
+                                     
+                                      $this->socialLinkingData($socialEntityId, $value);
+                                  }
+                                   
+                                }
+                            }
+                            
                             return $this->setCustomerLoggedIn($customer, $userProfileData);
                         } else {
-
+                           
                             /* Checking if email is not empty */
                             if (isset($userProfileData->Email[0]->Value) && !empty($userProfileData->Email[0]->Value)) {
                                 $customerEmail = $this->getEntityIdbyEmail($userProfileData->Email[0]->Value);
                                 if (isset($customerEmail[0]['email']) && !empty($customerEmail[0]['email'])) {
+                                     
                                     $customer = $this->updateEntitiesData($customerEmail[0]['entity_id'], $userProfileData);
                                     $this->socialLinkingData($customerEmail[0]['entity_id'], $userProfileData);
                                     return $this->setCustomerLoggedIn($customer, $userProfileData);
                                 } else {
+                                    
                                     // Register
                                     $customer = $this->saveEntitiesData($userProfileData);
                                     $this->socialLinkingData($customer->getId(), $userProfileData);
@@ -253,9 +295,9 @@ class Index extends \Magento\Framework\App\Action\Action {
 
     function setCustomerLoggedIn($customer, $userProfileData, $is_new = false) {
         if (!$is_new && $this->_helperCustomerRegistration->updateProfile() == '1') {
-            $this->_eventManager->dispatch('update_social_profile_data', array('entityid' => $customer->getId(), 'token' => $this->_accessToken));
+            $this->_eventManager->dispatch('update_social_profile_data', array('entityid' => $customer->getId(), 'token' => $this->_accessToken, 'profiledata'=>$userProfileData));
         } elseif ($is_new) {
-            $this->_eventManager->dispatch('save_social_profile_data', array('entityid' => $customer->getId(), 'token' => $this->_accessToken));
+            $this->_eventManager->dispatch('save_social_profile_data', array('entityid' => $customer->getId(), 'token' => $this->_accessToken, 'profiledata'=>$userProfileData));
         }
         $userProfileData->Uid = isset($userProfileData->Uid) ? $userProfileData->Uid : '';
         $this->_customerSession->setLoginRadiusId($userProfileData->ID);

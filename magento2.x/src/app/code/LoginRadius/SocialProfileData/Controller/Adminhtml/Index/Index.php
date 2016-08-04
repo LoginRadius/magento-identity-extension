@@ -1,7 +1,8 @@
 <?php
 
 namespace LoginRadius\SocialProfileData\Controller\Adminhtml\Index;
-
+ global $apiClient_class;
+$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 class Index extends \Magento\Customer\Controller\Adminhtml\Index {
 
     public function execute() {
@@ -29,6 +30,7 @@ class Index extends \Magento\Customer\Controller\Adminhtml\Index {
         $block->setFacebookLikessData($this->getSocialProfileData($customerId, 'facebook_likes'))->setUseAjax(true);
         $block->setFacebookEventsData($this->getSocialProfileData($customerId, 'facebook_events'))->setUseAjax(true);
         $block->setFavoritesData($this->getSocialProfileData($customerId, 'favorites'))->setUseAjax(true);
+        $block->setBookData($this->getSocialProfileData($customerId, 'books'))->setUseAjax(true);
         $block->setPatentsData($this->getSocialProfileData($customerId, 'patents'))->setUseAjax(true);
         $block->setLanguagesData($this->getSocialProfileData($customerId, 'languages'))->setUseAjax(true);
         $block->setRecommendationsReceivedData($this->getSocialProfileData($customerId, 'recommendations_received'))->setUseAjax(true);

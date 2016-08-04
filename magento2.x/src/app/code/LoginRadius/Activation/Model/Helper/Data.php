@@ -20,15 +20,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     //Activation Settings
     public function siteName() {
-        return $this->getConfig('activation', 'activation/site_name');
+        return (($this->getConfig('activation', 'activation/site_name') != null) ? trim($this->getConfig('activation', 'activation/site_name')) : '');
     }
 
     public function siteApiKey() {
-        return $this->getConfig('activation', 'activation/site_api');
+        return (($this->getConfig('activation', 'activation/site_api') != null) ? trim($this->getConfig('activation', 'activation/site_api')) : '');
     }
 
     public function siteApiSecret() {
-        return $this->getConfig('activation', 'activation/site_secret');
+        return (($this->getConfig('activation', 'activation/site_secret') != null) ? trim($this->getConfig('activation', 'activation/site_secret')) : '');
     }
 
     public function enableCustomerRegistration() {

@@ -3,9 +3,11 @@
 $data = $this->helper('LoginRadius\SocialShare\Model\Helper\Data');
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
 
+
 /**
  * template to add script required for social sharing
  */
+if($activationHelper->siteApiKey() != ''){
 if ($data->horizontalShareEnable() == "1" || $data->verticalShareEnable() == "1") {
     ?>
     <script type="text/javascript">
@@ -136,11 +138,14 @@ if ($data->horizontalShareEnable() == "1") {
     if ($data->getSingleWindowPopUp() != '') {
         $horizontalShare .='isOpenSingleWindow:' . (($data->getSingleWindowPopUp() == '1') ? "true" : "false") . ',';
     }
-
-    if ($data->getPopUpHeight() != '' && $data->getPopUpWidth() != '') {
+    
+    if($data->customPopUp() == '1'){
+        if ($data->getPopUpHeight() != '' && $data->getPopUpWidth() != '') {
         $popUpWindow = '{height:' . $data->getPopUpHeight() . ',width :' . $data->getPopUpWidth() . '}';
         $horizontalShare .='popupWindowSize:' . $popUpWindow . ',';
     }
+    }
+    
     if ($data->getTwitterMention() != '') {
         $horizontalShare .='twittermention:"' . $data->getTwitterMention() . '",';
     }
@@ -273,7 +278,7 @@ if ($data->verticalShareEnable() == "1") {
         $verticalShare .='isTotalShare:' . (($data->getTotalShare() == '1') ? "true" : "false") . ',';
     }
     if($activationHelper->siteApiKey() != ''){
-        $horizontalShare .='serviceProviderKey:"' . $activationHelper->siteApiKey() . '",';
+        $verticalShare .='serviceProviderKey:"' . $activationHelper->siteApiKey() . '",';
     }
     if ($data->getFacebookAppId() != '') {
         $verticalShare .='facebookAppId:"' . $data->getFacebookAppId() . '",';
@@ -284,10 +289,12 @@ if ($data->verticalShareEnable() == "1") {
     if ($data->getSingleWindowPopUp() != '') {
         $verticalShare .='isOpenSingleWindow:' . (($data->getSingleWindowPopUp() == '1') ? "true" : "false") . ',';
     }
-
+    
+    if($data->customPopUp() == '1'){
     if ($data->getPopUpHeight() != '' && $data->getPopUpWidth() != '') {
         $popUpWindow = '{height:' . $data->getPopUpHeight() . ',width :' . $data->getPopUpWidth() . '}';
         $verticalShare .='popupWindowSize:' . $popUpWindow . ',';
+    }
     }
     if ($data->getTwitterMention() != '') {
         $verticalShare .='twittermention:"' . $data->getTwitterMention() . '",';
@@ -335,6 +342,7 @@ if ($data->verticalShareEnable() == "1") {
     </script>';
 
     echo $share_script . '<style>' . $style . '</style>';
+}
 }
 ?>
 

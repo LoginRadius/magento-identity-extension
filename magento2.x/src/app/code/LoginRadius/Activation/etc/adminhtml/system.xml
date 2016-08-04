@@ -9,8 +9,14 @@
             <label>Activation</label>
             <tab>lractivation</tab>
             <resource>LoginRadius_Activation::activation_config</resource>
+            <group id="activationhelp" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="example" type="hidden" translate="label" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <source_model>LoginRadius\Activation\Model\Source\Info</source_model>
+                </field> 
+            </group>
             <group id="activation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Activation Configuration Options</label>
+                
                 <field id="site_name" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Site Name</label>
                     <validate>required-entry</validate>

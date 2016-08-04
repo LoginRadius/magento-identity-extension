@@ -23,20 +23,15 @@ class Observer implements ObserverInterface {
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer) {
+        
         $event = $observer->getEvent();
         $accessToken = $event->getToken();
         $entityid = $event->getEntityid();
+        $userProfiledata = $event->getProfiledata();
         $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');
         $socialProfileDataHelper = $this->_objectManager->get('LoginRadius\SocialProfileData\Model\Helper\Data');
         $this->_socialLoginObject = new \LoginRadiusSDK\SocialLogin\SocialLoginAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('authentication' => false, 'output_format' => 'json'));
-        try {
-            $userProfiledata = $this->_socialLoginObject->getUserProfiledata($accessToken);
-        } catch (\LoginRadiusSDK\LoginRadiusException $e) {
-            if ($this->_objectManager->get("LoginRadius" . "\\" . $activationHelper->getAuthDirectory() . "\Model\Helper\Data")->debug() == '1') {
-                $errorDescription = isset($e->getErrorResponse()->description) ? $e->getErrorResponse()->description : '';
-                $this->_messageManager->addError($errorDescription);
-            }
-        }
+       
         if ($socialProfileDataHelper->basicProfile() == '1') {
             $this->saveBasicProfileData($entityid, $userProfiledata);
             $this->saveEmailsData($entityid, $userProfiledata);
@@ -45,6 +40,7 @@ class Observer implements ObserverInterface {
             $this->saveExtendedLocationData($entityid, $userProfiledata);
         }
         if ($socialProfileDataHelper->extendedProfile() == '1') {
+            
             $this->saveExtendedProfileData($entityid, $userProfiledata);
             $this->savePositionComapnyData($entityid, $userProfiledata);
             $this->saveEducationData($entityid, $userProfiledata);
@@ -62,6 +58,7 @@ class Observer implements ObserverInterface {
             $this->savelanguagesData($entityid, $userProfiledata);
             $this->savePatentsData($entityid, $userProfiledata);
             $this->saveFavoritesData($entityid, $userProfiledata);
+            $this->saveBooksData($entityid, $userProfiledata);
         }
         if ($socialProfileDataHelper->contacts() == '1') {
             $this->saveContactsData($entityid, $userProfiledata->Provider, $accessToken);
@@ -361,6 +358,21 @@ class Observer implements ObserverInterface {
             }
         }
     }
+    private function saveBooksData($entityid, $userProfiledata) {
+        if (isset($userProfiledata->Books) && count($userProfiledata->Books) > 0) {
+            $this->deleteDataFromTable($entityid, 'books');
+            foreach ($userProfiledata->Books as $books) {
+                $data = array(
+                    'entity_id' => $entityid,
+                    'book_id' => $this->checkVariable($books, 'Id'),
+                    'category' => $this->checkVariable($books, 'Category'),
+                    'name' => $this->checkVariable($books, 'Name'),
+                    'created_date' => $this->checkVariable($books, 'CreatedDate')
+                );
+                $this->saveDataInTable('books', $data);
+            }
+        }
+    }
 
     private function saveRecommendationsReceivedData($entityid, $userProfiledata) {
         if (isset($userProfiledata->RecommendationsReceived) && count($userProfiledata->RecommendationsReceived) > 0) {
@@ -486,7 +498,9 @@ class Observer implements ObserverInterface {
     }
 
     private function saveAddressesData($entityid, $userProfiledata) {
+        
         if (isset($userProfiledata->Addresses) && count($userProfiledata->Addresses) > 0) {
+            
             $this->deleteDataFromTable($entityid, 'addresses');
             foreach ($userProfiledata->Addresses as $addresses) {
                 $data = array(
@@ -497,7 +511,8 @@ class Observer implements ObserverInterface {
                     'city' => $this->checkVariable($addresses, 'City'),
                     'state' => $this->checkVariable($addresses, 'State'),
                     'postal_code' => $this->checkVariable($addresses, 'PostalCode'),
-                    'region' => $this->checkVariable($addresses, 'Region')
+                    'region' => $this->checkVariable($addresses, 'Region'),
+                    'country' => $this->checkVariable($addresses, 'Country')
                 );
                 $this->saveDataInTable('addresses', $data);
             }
@@ -613,7 +628,8 @@ class Observer implements ObserverInterface {
             'age' => $this->checkVariable($userProfiledata, 'Age'),
             'professional_headline' => $this->checkVariable($userProfiledata, 'ProfessionalHeadline'),
             'provider_access_token' => $this->checkVariable($userProfiledata->ProviderAccessCredential, 'AccessToken'),
-            'provider_token_secret' => $this->checkVariable($userProfiledata->ProviderAccessCredential, 'TokenSecret')
+            'provider_token_secret' => $this->checkVariable($userProfiledata->ProviderAccessCredential, 'TokenSecret'),
+            'no_of_login' => $this->checkVariable($userProfiledata, 'NoOfLogins')
         );
         $this->deleteDataFromTable($entityid, 'extended_profile_data');
         $this->saveDataInTable('extended_profile_data', $data);

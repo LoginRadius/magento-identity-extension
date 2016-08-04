@@ -4,7 +4,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $customerSession = $objectManager->get('Magento\Customer\Model\Session');
     $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
-    if ($customerRegistrationHelper->emailVerification() == "0") {
+    if (in_array($customerRegistrationHelper->emailVerification(),array("0","2"))) {
         ?>
         <div class="page-title-wrapper">
             <h1 class="page-title">

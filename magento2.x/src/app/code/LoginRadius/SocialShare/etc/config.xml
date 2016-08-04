@@ -7,7 +7,8 @@
                 <theme>0</theme>
                 <share_provider></share_provider>
                 <count_provider></count_provider>
-                <rearrange_icons>facebook|google|twitter</rearrange_icons>
+                <counter_provider_theme>facebook-like|facebook-recommend|facebook-send|twitter-tweet|pinterest-pin-it</counter_provider_theme>
+                <rearrange_icons>facebook|google|twitter|email|linkedin</rearrange_icons>
                 <show_product_pages>1</show_product_pages>
             </horizontal_share>
             <vertical_share>
@@ -16,7 +17,8 @@
                 <alignment>0</alignment>
                 <share_provider></share_provider>
                 <count_provider></count_provider>
-                <rearrange_icons>facebook|google|twitter</rearrange_icons>
+                <rearrange_icons>facebook|google|twitter|email|linkedin</rearrange_icons>
+                 <counter_provider_theme>facebook-like|facebook-recommend|facebook-send|twitter-tweet|pinterest-pin-it</counter_provider_theme>
                 <show_product_pages>1</show_product_pages>              
             </vertical_share>
             <advance_setting>

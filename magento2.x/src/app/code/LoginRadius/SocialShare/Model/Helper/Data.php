@@ -103,6 +103,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         return $this->getConfig('lrsocialshare/advance_setting/facebook_app_id');
     }
 
+    public function customPopUp() {
+        return $this->getConfig('lrsocialshare/advance_setting/custom_popup');
+    }
     public function getPopUpHeight() {
         return $this->getConfig('lrsocialshare/advance_setting/popup_height');
     }

@@ -1,0 +1,41 @@
+<?php
+
+$data = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+$activationData = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+
+$changePassUrl = basename(dirname($_SERVER['REQUEST_URI']));
+
+
+ $lastWordUrl = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+if ($data->enableHostedPage() == '1') {
+
+    if ($lastWordUrl == 'login') {
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $lastWordUrl . '&return_url=' . $this->getUrl("customerregistration/auth/");
+        header('Location:' . $hostedPageUrl);
+        die;
+    }elseif($lastWordUrl == 'create'){
+       
+        
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=register&return_url=' . $this->getUrl("customerregistration/auth/");
+        header('Location:' . $hostedPageUrl);
+        die;
+    }elseif($lastWordUrl == 'forgotpassword'){
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $lastWordUrl . '&return_url=' . $this->getUrl('customerregistration/auth/');
+        header('Location:' . $hostedPageUrl);
+        die;
+    }elseif($lastWordUrl == 'linking'){
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $lastWordUrl;
+        header('Location:' . $hostedPageUrl);
+        die;
+    }elseif($lastWordUrl == 'edit'){
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $lastWordUrl;
+        header('Location:' . $hostedPageUrl);
+        die;
+    }elseif($changePassUrl == 'changepass'){
+   
+        $hostedPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx';
+        header('Location:' . $hostedPageUrl);
+        die;
+    }
+}

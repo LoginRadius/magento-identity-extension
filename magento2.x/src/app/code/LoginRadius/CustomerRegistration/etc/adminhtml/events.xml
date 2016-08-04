@@ -9,4 +9,5 @@
     <event name="customer_delete_commit_after">
         <observer name="customer_delete_commit_after" instance="LoginRadius\CustomerRegistration\Observer\DeleteUser" />
     </event>
+    
 </config>

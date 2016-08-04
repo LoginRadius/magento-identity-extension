@@ -452,6 +452,9 @@ table#lr_required_fields input, table#lr_required_fields select {
     float: right;
     margin: 15px 10px 0px 0px;
 }
+#loginradius-raas-setpassword-emailid,#loginradius-raas-setpassword-username{margin-top:7.5px}
+#loginradius-raas-setpassword-password{margin-top: 8px;}
+#loginradius-raas-setpassword-confirmpassword{margin-top: 7px;}
 
 /*ie 8 end */
 
@@ -471,4 +474,14 @@ table#lr_required_fields input, table#lr_required_fields select {
         vertical-align: top;
         text-align: left;
     }
+}
+
+#changepasswordbox{
+    margin-top: 8px;
+}
+.content-loginradius-raas-newpassword{
+    margin-top: 17px;
+}
+.content-loginradius-raas-confirmnewpassword{
+    margin-top: 18px;
 }

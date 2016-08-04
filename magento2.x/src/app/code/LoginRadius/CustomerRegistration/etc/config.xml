@@ -28,6 +28,9 @@
                 <forgot_email></forgot_email>
                 <verification_email></verification_email>
             </email_template_settings>
+            <enablehostingpage>
+                <enable_hosted_page>0</enable_hosted_page>
+            </enablehostingpage>
             <debug_settings>
                 <debug>0</debug>
             </debug_settings>
