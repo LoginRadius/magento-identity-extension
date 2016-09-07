@@ -208,7 +208,7 @@ class Observer implements ObserverInterface {
                 //$this->_eventManager->dispatch('lr_logout_sso', array('exception' => $e));
             }
 
-            if (isset($linkedInCompanies) && !is_string($linkedInCompanies) && count($linkedInCompanies) > 0) {
+            if (isset($linkedInCompanies) && count($linkedInCompanies) > 0) {
                 $this->deleteDataFromTable($entityid, 'linkedin_companies');
                 foreach ($linkedInCompanies as $company) {
                     $data = array(

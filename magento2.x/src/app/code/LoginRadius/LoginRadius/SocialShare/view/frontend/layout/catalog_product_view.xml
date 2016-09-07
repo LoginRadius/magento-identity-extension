@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="//share.lrcontent.com/prod/v2/css/os-share-widget-style.css" src_type="url" />
+        <script src="//share.lrcontent.com/prod/v2/js/opensocialsharedefaulttheme.js" src_type="url" />
+        <script src="//share.lrcontent.com/prod/v2/js/opensocialshare.js" src_type="url" />
+    </head>
+
+    <referenceContainer name="content">
+        <block class="LoginRadius\SocialShare\Block\SocialShare" name="socialshare_head" template="socialshare/socialshare_head.phtml" />
+    </referenceContainer>
+    <referenceContainer name="alert.urls">
+        <block class="LoginRadius\SocialShare\Block\SocialShare" name="socialshareproduct" template="socialshare/socialshareproduct.phtml"/>
+    </referenceContainer>
+</page>

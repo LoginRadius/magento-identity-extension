@@ -1,0 +1,45 @@
+<?php 
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+$loginRadiusAccessToken = $customerSession->getLoginRadiusAccessToken();
+$loginRadiusPopupMessage = $customerSession->getLoginRadiusPopupMessage();
+if(!empty($loginRadiusAccessToken)){
+    switch($loginRadiusPopupMessage){
+        case 'emailexist':
+            $status = 'error';
+            $message = __('This Email Already Exist Please Try another once.');
+            break;
+        default :
+            $status = 'info';
+            $message = __('Enter Email Address');
+    }
+?>
+<!-- Modal content -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close action primary">×</span>
+            <b><?php echo __('Please provide following details.') ?></b>
+        </div>
+        <div class="modal-body">
+            <h2><div class="<?php echo $status;?>"><?php echo $message;?></div></h2>
+            <form method="post">
+                <p>
+                    <div class="field email required">
+                        <label class="label" for="email"><span><?php echo __('Email') ?></span></label>
+                        <div class="control">
+                            <input type="email" name="email" required id="email" title="<?php echo __('Email') ?>" class="input-text">
+                            <input type="hidden" name="token" value="<?php echo $loginRadiusAccessToken;?>">
+                        </div>
+                    </div>
+                </p>
+                <p><button class="action subscribe primary" title="submit"><?php echo __('Submit') ?></button></p>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <b>&nbsp;</b>
+        </div>
+    </div>
+</div>
+<?php 
+}?>

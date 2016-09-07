@@ -1,0 +1,39 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <lrcustomerregistration>
+            <redirection_settings>
+                <login_redirection>same</login_redirection>
+            </redirection_settings>
+            <interface_customization_settings>
+                <title>Social Login</title>
+                <form_validation_message>1</form_validation_message>
+                <terms_conditions></terms_conditions>
+                <delay_time></delay_time>
+                <google_recaptcha></google_recaptcha>
+            </interface_customization_settings>
+            <password_customization_settings>
+                <min_password></min_password>
+                <max_password></max_password>
+            </password_customization_settings>
+            <advance_settings>
+                <update_profile>1</update_profile>
+                <username_login>1</username_login>
+                <email_verification>0</email_verification>
+                <login_upon_email_verification>1</login_upon_email_verification>
+                <always_ask_email_for_unverified>1</always_ask_email_for_unverified>
+                <prompt_password_on_social_login>1</prompt_password_on_social_login>
+                <custom_js_options></custom_js_options>                
+            </advance_settings>
+            <email_template_settings>
+                <forgot_email></forgot_email>
+                <verification_email></verification_email>
+            </email_template_settings>
+            <enablehostingpage>
+                <enable_hosted_page>0</enable_hosted_page>
+            </enablehostingpage>
+            <debug_settings>
+                <debug>0</debug>
+            </debug_settings>
+        </lrcustomerregistration>
+    </default>
+</config>
