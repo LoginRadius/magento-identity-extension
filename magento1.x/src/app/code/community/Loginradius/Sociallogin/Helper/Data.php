@@ -47,21 +47,30 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             if ($this->loginRadiusRead("lr_sociallogin", "provider exists in sociallogin", array($entityId, $socialLoginLinkData['provider']))) {
                 $redirectionLink .= '?LoginRadiusLinked=0';
             } else {
-                $dataForLinking = $this->getCustomerData((array('lr_sociallogin')), array(Mage::getSingleton("customer/session")->getLoginRadiusUid()), 'uid');
-
-                $customerEntity = $dataForLinking->fetch();
+                $customerEntity['uid'] = Mage::getSingleton("customer/session")->getLoginRadiusUid();
+                
                 if (isset($customerEntity['uid']) && !empty($customerEntity['uid'])) {
-                    $blockObj = new Loginradius_Customerregistration_Helper_RaasSDK();
+                    require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+                    global $apiClient_class;
+                    $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+                    $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+                    $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
                     $innerJoinQuery = $this->getCustomerData(array('customer_entity', 'lr_sociallogin'), array($socialLoginLinkData['sociallogin_id']), 'id');
                     if ($innerJoinQuery->fetch()) {
                         Mage::getSingleton('core/session')->addError('Account already exists or linked with another account.');
                     } else {
-                        $response = $blockObj->raas_link_account($customerEntity['uid'], $socialLoginLinkData['provider'], $socialLoginLinkData['sociallogin_id']);
-                        if (isset($response->isPosted) && $response->isPosted == true) {
-                            $session->addSuccess(__('Account linked successfully.'));
-                            $this->SocialLoginInsert("lr_sociallogin", $socialLoginLinkData);
-                        } else {
-                            $session->addError($response->description);
+                        try {
+                            $response = $accountAPI->accountLink($customerEntity['uid'], $socialLoginLinkData['sociallogin_id'], $socialLoginLinkData['provider']);
+                            
+                            if (isset($response->isPosted) && $response->isPosted == true) {
+                                $this->SocialLoginInsert("lr_sociallogin", $socialLoginLinkData);
+                                $session->addSuccess(__('Account linked successfully.'));
+                            } else {
+                                $session->addError(__('An Error here'));
+                            }
+                        } catch (\LoginRadiusSDK\LoginRadiusException $e) {
+                            $session->addError($e->getErrorResponse()->description);
                         }
                     }
                 }
@@ -71,7 +80,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             $existAccount = $this->getCustomerData(array('customer_entity', 'lr_sociallogin'), array($socialLoginLinkData['sociallogin_id']), 'id');
             if (is_array($existAccount->fetch())) {
                 $session->addError(__('This accounts is already linked with an account.'));
-            } elseif ($this->loginRadiusRead("sociallogin", "provider exists in sociallogin", array($entityId, $socialLoginLinkData['provider']))) {
+            } elseif ($this->loginRadiusRead("lr_sociallogin", "provider exists in sociallogin", array($entityId, $socialLoginLinkData['provider']))) {
                 $session->addError(__('Multiple accounts cannot be linked from the same Social ID Provider.'));
             } else {
                 $this->SocialLoginInsert("lr_sociallogin", $socialLoginLinkData);
@@ -106,7 +115,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
         $this->SocialLoginInsert("lr_sociallogin", $data);
         // send verification mail
         $message = __(Mage::helper('core')->htmlEscape(trim($blockObject->verificationText())));
-        $message .= "<br/>" . Mage::getBaseUrl() . "sociallogin/?loginRadiusKey=" . $vKey;
+        $message .= "<br/>" . Mage::getBaseUrl() . "sociallogin/?lractivation=" . $vKey . "&email=" . urlencode($email);
         $this->loginRadiusEmail(__("Email verification"), $message, $email, $email);
         // show popup message
         $session = Mage::getSingleton('core/session');
@@ -180,7 +189,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             }
 
             $address->city = isset($userProfile->City) ? ucfirst($userProfile->City) : '';
-            $address->region = isset($userProfile->State) && !empty($userProfile->State)?$userProfile->State:'';
+            $address->region = isset($userProfile->State) && !empty($userProfile->State) ? $userProfile->State : '';
 
             $address->telephone = '';
             if (isset($userProfile->PhoneNumbers) && is_array($userProfile->PhoneNumbers) && count($userProfile->PhoneNumbers) > 0) {
@@ -245,6 +254,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
                 }
             }
         } else {
+            $loginRadiusUsername = $userProfile->FirstName . " " . $userProfile->LastName;
             // new user notification to admin
             if ($blockObject->notifyAdmin() == "1") {
                 $loginRadiusAdminEmail = Mage::getStoreConfig('trans_email/ident_general/email');
@@ -301,13 +311,13 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
         $blockObject = Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir);
         $session->loginById($entityId);
         $session->setLoginRadiusId($profileData->ID);
-        if($activation->raasEnable() == '1'){
-            $emailVerified = isset($profileData->EmailVerified)?$profileData->EmailVerified:true;
+        if ($activation->raasEnable() == '1') {
+            $emailVerified = isset($profileData->EmailVerified) ? $profileData->EmailVerified : true;
             $session->setLoginRadiusEmailVerified($emailVerified);
             if (isset($profileData->Uid) && ($profileData->Uid != null)) {
                 $session->setLoginRadiusUid($profileData->Uid);
             }
-        }        
+        }
         $userProfileData = array('entityid' => $entityId);
         if (($blockObject->updateProfileData() == 1) || ($loginOrRegister != 'Login')) {
             $userProfileData['profiledata'] = $profileData;
@@ -418,8 +428,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
      * @param type $emailRequired
      * @param type $hideZipcode
      */
-    public function setTmpSession($loginRadiusPopupTxt = '', $socialLoginMsg = "", $loginRadiusShowForm = true, $profileData = array(), $emailRequired = true, $hideZipcode = false) {
-        Mage::getSingleton('core/session')->setTmpPopupTxt($loginRadiusPopupTxt);
+    public function setTmpSession($socialLoginMsg = "", $loginRadiusShowForm = true, $profileData = array(), $emailRequired = true, $hideZipcode = false) {
         Mage::getSingleton('core/session')->setTmpPopupMsg($socialLoginMsg);
         Mage::getSingleton('core/session')->setTmpShowForm($loginRadiusShowForm);
         Mage::getSingleton('core/session')->setTmpProfileData($profileData);
@@ -518,6 +527,9 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             case 'uid':
                 $query = "SELECT * FROM $tableName[0] WHERE uid = '" . $params[0] . "'";
                 break;
+            case 'activation':
+                $query = "SELECT * FROM $tableName[0] WHERE vkey = '" . $params[0] . "'";
+                break;
             case 'check uid':
                 $query = "SELECT * FROM $tableName[0] INNER JOIN $tableName[1] WHERE $tableName[0].entity_id=$tableName[1].entity_id AND $tableName[1].uid = '" . $params[0] . "'";
         }
@@ -576,6 +588,8 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             return $select;
         }
         if ($select->fetch()) {
+            var_dump($select->fetch());
+            die;
             return true;
         }
 

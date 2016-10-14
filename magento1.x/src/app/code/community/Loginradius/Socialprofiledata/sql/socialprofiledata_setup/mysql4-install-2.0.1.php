@@ -86,6 +86,7 @@ $this->run("CREATE TABLE IF NOT EXISTS {$this->getTable('lr_extended_profile_dat
     `provider_token_secret` varchar(100) DEFAULT NULL,
     PRIMARY KEY (`user_id`)
 );");
+
 $this->run("CREATE TABLE IF NOT EXISTS {$this->getTable('lr_positions')} (
     `user_id` int(11) NOT NULL,
     `position` varchar(100) DEFAULT NULL,

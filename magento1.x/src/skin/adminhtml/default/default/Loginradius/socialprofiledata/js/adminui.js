@@ -14,7 +14,7 @@ $loginRadiusJquery(window).load(function () {
         {value: 'ex_profile',
             text: 'Extended Profile Data <a href="javascript:void(0)" title="Data fields include: Website, Favicon, Industry, About, Timezone, Verified, Last Profile Update, Created, Relationship Status, Favorite Quote, Interested In, Interests, Religion, Political View, HTTPS Image Url, Followers Count, Friends Count, Is Geo Enabled, Total Status Count, Number of Recommenders, Honors, Associations, Hirable, Repository Url, Age, Professional Headline, Provider Access Token, Provider Token Secret, Positions, Companies, Education, Phone Numbers, IM Accounts, Addresses, Sports, Inspirational People, Skills, Current Status, Certifications, Courses, Volunteer, Recommendations Received, Languages, Patents, Favorites" style="text-decoration:none">(?)</a>'},
         {value: 'linkedin_companies',
-            text: 'Followed Companies on LinkedIn <a href="javascript:void(0)" title="A list of all the companies this user follows on LinkedIn." style="text-decoration:none">(?)</a>'},
+            text: 'Companies <a href="javascript:void(0)" title="A list of all the companies this user follows." style="text-decoration:none">(?)</a>'},
         {value: 'events',
             text: 'Facebook Profile Events <a href="javascript:void(0)" title="A list of events (birthdays, invitation, etc.) on the Facebook profile of user" style="text-decoration:none">(?)</a>'},
         {value: 'status',
@@ -27,6 +27,8 @@ $loginRadiusJquery(window).load(function () {
             text: 'Groups <a href="javascript:void(0)" title="A list of the Facebook groups of user." style="text-decoration:none">(?)</a>'},
         {value: 'contacts',
             text: 'Contacts/Friend Data <a href="javascript:void(0)" title="For email providers (Google and Yahoo), a list of the contacts of user in his/her address book. For social networks (Facebook, Twitter, and LinkedIn), a list of the people in the network of user." style="text-decoration:none">(?)</a>'},
+        {value: 'likes',
+            text: 'Facebook Likes Data <a href="javascript:void(0)" title="Likes of the user For social networks (Facebook)." style="text-decoration:none">(?)</a>'},
     ];
     // get the reference to the <td> corressponding to the Social Profile Data option
     if (document.getElementById('row_socialprofiledata_profiledataoption_profiledatacheckboxes') != null) {

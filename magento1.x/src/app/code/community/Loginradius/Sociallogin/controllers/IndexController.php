@@ -11,10 +11,11 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
      * handle social login functionlaity
      */
     function indexAction() {
-        $token = $this->getRequest()->getPost('token');
+        $token = $this->getRequest()->getParam('token');
         $getBlockDir = Mage::getBlockSingleton('activation/activation')->getBlockDir();
         $this->blockObj = Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir);
         $this->dataObject = Mage::helper('sociallogin/Data');
+        $this->loginRadiusPopErr = $this->blockObj->popupError();
         if (!empty($token)) {
             $this->tokenHandler($token);
         } else {
@@ -22,8 +23,33 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
             $requiredFieldPopupCancel = $this->getRequest()->getPost('LoginRadiusPopupCancel');
             if (($requiredFieldPopupSubmit == 'Submit') || ($requiredFieldPopupCancel == 'Cancel')) {
                 $this->popupHandler();
-            } else {
-                header("Location: " . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)); // redirect to index page
+            } else {                
+                $activation = $this->getRequest()->getParam('lractivation');
+                $email = $this->getRequest()->getParam('email');
+                $redirect = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+                if(!empty($activation) && !empty($email)){
+                    $customerQuery = $this->dataObject->getCustomerData(array('customer_entity'), array($email), 'email');
+                    $customerData = $customerQuery->fetch();
+                    $socialQuery = $this->dataObject->getCustomerData(array('lr_sociallogin'), array($activation), 'activation');
+                    $socialData = $socialQuery->fetch();
+                    $session = Mage::getSingleton('core/session');
+                    if(isset($customerData['entity_id']) && isset($socialData['entity_id']) && $socialData['entity_id'] == $customerData['entity_id']){
+                        $lrData = array(
+                            'vkey' => '',
+                            'verified' => 1,
+                        );
+                        $condition = array(
+                            'entity_id = ?' => (int) $customerData['entity_id'],
+                            'vkey = ?' => $activation,
+                        );
+                        $this->dataObject->SocialLoginInsert('lr_sociallogin', $lrData, true, $condition);
+                        $session->addSuccess(__('Your Account is verified success. Please Login with your account.'));
+                        $redirect = Mage::helper('customer')->getLoginUrl();
+                    }else{
+                        $session->addError(__('Verification link has been expired. Please get new link from <a href="' . Mage::helper('customer')->getForgotPasswordUrl() . '">here</a>.'));
+                    }                    
+                }
+                header("Location: " . $redirect); // redirect to index page
                 exit();
             }
         }
@@ -76,12 +102,12 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                     // check if email already exists
                     $userId = $this->dataObject->loginRadiusRead("customer_entity", "email exists pop1", array($email), true);
                     if (isset($userId) && $userId->fetch()) {
-                        $errorMessage = $this->blockObj->getPopupError();
-
+                       
                         if ($this->blockObj->getProfileFieldsRequired() == 1) {
-                            $this->dataObject->setTmpSession('', $errorMessage, true, $socialLoginProfileData, true);
+                            $this->dataObject->setTmpSession($this->loginRadiusPopErr, true, $socialLoginProfileData, true, true);
                         } else {
-                            $this->dataObject->setTmpSession('', $errorMessage, true, array(), true);
+                            
+                            $this->dataObject->setTmpSession($this->loginRadiusPopErr, true, true, true, true);
                         }
                         $this->getPopupTemplate();
                         return;
@@ -93,7 +119,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                         } else {
                             $hideZipCountry = true;
                         }
-                        $this->dataObject->setTmpSession($this->blockObj->getPopupText(), $this->blockObj->getPopupError(), true, $loginRadiusProfileData, true, $hideZipCountry);
+                        $this->dataObject->setTmpSession($this->loginRadiusPopErr, true, $loginRadiusProfileData, true, $hideZipCountry);
                         $this->getPopupTemplate();
 
                         return;
@@ -102,7 +128,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                     $userId = $this->dataObject->loginRadiusRead("customer_entity", "email exists pop1", array($email), true);
                     if ($rowArray = $userId->fetch()) { // email exists
                         //check if entry exists on same provider in sociallogin table
-                        $verified = $this->dataObject->loginRadiusRead("sociallogin", "email exists sl", array($rowArray['entity_id'], $loginRadiusPopProvider), true);
+                        $verified = $this->dataObject->loginRadiusRead("lr_sociallogin", "email exists sl", array($rowArray['entity_id'], $loginRadiusPopProvider), true);
                         if ($rowArrayTwo = $verified->fetch()) {
                             // check verified field
                             if ($rowArrayTwo['verified'] == "1") {
@@ -111,7 +137,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                                     $this->dataObject->socialLoginUserLogin(false, $rowArray['entity_id'], $rowArrayTwo['sociallogin_id'], $loginRadiusPopProvider);
                                     return;
                                 } else {
-                                    $this->dataObject->setTmpSession($this->loginRadiusPopMsg, $this->loginRadiusPopErr, true, array(), true, true);
+                                    $this->dataObject->setTmpSession($this->loginRadiusPopErr, true, array(), true, true);
                                     $this->getPopupTemplate();
                                     return;
                                 }
@@ -138,7 +164,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
 
                 // validate other profile fields
                 if ((isset($profileAddress) && $profileAddress == "") || (isset($profileCity) && $profileCity == "") || (isset($profileCountry) && $profileCountry == "") || (isset($profilePhone) && $profilePhone == "")) {
-                    $this->dataObject->setTmpSession($this->loginRadiusPopMsg, $this->loginRadiusPopErr, true, $loginRadiusProfileData, false);
+                    $this->dataObject->setTmpSession($this->loginRadiusPopErr, true, $loginRadiusProfileData, false);
                     $this->getPopupTemplate();
                     return false;
                 }
@@ -196,23 +222,28 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
      * @return type
      */
     function tokenHandler($token) {
-        $this->loginradiusSdkObject = Mage::helper('sociallogin/LoginradiusSDK');
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
         $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $this->loginradiusSdkObject = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
         try {
-            $this->accessTokenObject = $this->loginradiusSdkObject->loginradius_exchange_access_token($activationBlockObj->apiSecret(), $token);
+            $this->accessTokenObject = $this->loginradiusSdkObject->exchangeAccessToken($token);
         } catch (LoginRadiusException $e) {
             Mage::dispatchEvent('lr_logout_sso', array('exception' => $e));
             $this->handleDebugMode($e);
         }
+        
         if (isset($this->accessTokenObject->access_token) && !empty($this->accessTokenObject->access_token)) {
             try {
-                $this->userProfileData = $this->loginradiusSdkObject->loginradius_get_user_profiledata($this->accessTokenObject->access_token);
+                $this->userProfileData = $this->loginradiusSdkObject->getUserProfiledata($this->accessTokenObject->access_token);
             } catch (LoginRadiusException $e) {
                 $this->handleDebugMode($e);
             }
             if (isset($this->userProfileData->ID) && !empty($this->userProfileData->ID)) {
                 $this->userProfileData->accesstoken = $this->accessTokenObject->access_token;
                 //mep user profile data in array format
+                
                 if ($this->blockObj->isLoggedIn()) {
                     //linking functionlaity will work
                     $this->dataObject->loginRadiusSocialLinking(Mage::getSingleton("customer/session")->getCustomer()->getId(), $this->userProfileData);
@@ -278,7 +309,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                                     if ($this->blockObj->profilefieldsRequired() == 1) {//show required field popup
                                         $this->dataObject->setInSession($this->userProfileData->ID, $this->userProfileData);
                                         // show a popup to fill required profile fields
-                                        $this->dataObject->setTmpSession($this->blockObj->popupText, "", true, $this->userProfileData, false);
+                                        $this->dataObject->setTmpSession("", true, $this->userProfileData, false);
                                         $this->getPopupTemplate();
                                         return;
                                     } else {
@@ -290,17 +321,18 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                                 $emailRequired = true;
                                 if ($this->blockObj->emailRequired() == false) {
                                     $email = $this->dataObject->getAutoGeneratedEmail($this->userProfileData);
-                                    $this->userProfileData->Email[0]->Value = $email;
+                                    $this->userProfileData->Email = array(json_decode(json_encode(array('Value' => $email))));
+                                    
                                     $emailRequired = false;
                                 }
                                 //show required fields popup
                                 $this->dataObject->setInSession($this->userProfileData->ID, $this->userProfileData);
                                 if ($this->blockObj->profilefieldsRequired() == 1) {
                                     // show a popup to fill required profile fields
-                                    $this->dataObject->setTmpSession($this->loginRadiusPopMsg, "", true, $this->userProfileData, $emailRequired);
+                                    $this->dataObject->setTmpSession("", true, $this->userProfileData, $emailRequired);
                                     $this->getPopupTemplate();
                                 } elseif ($this->blockObj->emailRequired() == 1) {
-                                    $this->dataObject->setTmpSession($this->loginRadiusPopMsg, "", true, array(), $emailRequired, true);
+                                    $this->dataObject->setTmpSession("", true, array(), $emailRequired, true);
                                     $this->getPopupTemplate();
                                 } else {
                                     //create new user without showing popup

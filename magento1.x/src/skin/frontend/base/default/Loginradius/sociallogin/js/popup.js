@@ -28,7 +28,7 @@ function loginRadiusValidateForm() {
             continue;
         }
         if (loginRadiusForm.elements[i].value.trim() == "" && loginRadiusForm.elements[i].id != "loginRadiusEmail") {
-            loginRadiusErrorDiv.innerHTML = "Please fill all the fields";
+            loginRadiusErrorDiv.innerHTML = LRpopupErrorMessage;
             loginRadiusErrorDiv.style.backgroundColor = "rgb(255, 235, 232)";
             loginRadiusErrorDiv.style.textAlign = "left";
             return false;

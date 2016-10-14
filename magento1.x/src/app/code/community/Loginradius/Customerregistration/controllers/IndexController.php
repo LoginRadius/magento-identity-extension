@@ -37,6 +37,12 @@ class Loginradius_Customerregistration_IndexController extends Mage_Core_Control
             exit();
         }
     }
+    public function verificationAction()
+    {
+        $this->loadLayout();
+        $this->renderLayout();
+        
+    }
 
     public function updateUserStatus($entity_id)
     {
@@ -52,8 +58,12 @@ class Loginradius_Customerregistration_IndexController extends Mage_Core_Control
             $tableStatus = 'blocked';
 
         }
-        $raasObj = Mage::helper('customerregistration/RaasSDK');
-        $raasObj->raas_block_user(http_build_query($params), $result['uid']);
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+        $accountAPI->setStatus($result['uid'], $params['isblock']);
         Mage::helper('sociallogin/data')->SocialLoginInsert("lr_sociallogin", array('status' => $tableStatus, 'entity_id' => $entity_id),true, '', true);
         die($displayText);
 

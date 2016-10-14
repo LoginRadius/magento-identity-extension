@@ -9,7 +9,7 @@ $emailRequired = Mage::getSingleton('core/session')->getTmpEmailRequired();
 $hideZipcode = Mage::getSingleton('core/session')->getTmpHideZipcode();
 $provider = isset($profileData->Provider) ? trim($profileData->Provider) : '';
 $blockObj = Mage::getBlockSingleton('sociallogin/sociallogin');
-$popupTitle = str_replace('@provider', $provider, $blockObj->getPopupText());
+$popupTitle = str_replace('@provider', $provider, $blockObj->popupText());
 ?>
 <div id="fade" class="LoginRadius_overlay">
     <div id="popupouter">
@@ -63,7 +63,14 @@ $popupTitle = str_replace('@provider', $provider, $blockObj->getPopupText());
                                         ?>
                                         <td>
 
-                                            <select onChange="if(this.value == 'US'){ document.getElementById('loginRadiusProvinceContainer').style.display = 'block' }else{ document.getElementById('loginRadiusProvinceContainer').style.display = 'none' }" name="loginRadiusCountry" id="loginRadiusCountry" class="loginRadiusText">
+                                            <select onChange="
+                                                if ( document.getElementById('loginRadiusProvinceContainer') !== null ) {
+                                                if(this.value == 'US'){
+                                                
+                                                document.getElementById('loginRadiusProvinceContainer').style.display = 'block' 
+                                            }else{ 
+                                                document.getElementById('loginRadiusProvinceContainer').style.display = 'none' 
+                                            }}" name="loginRadiusCountry" id="loginRadiusCountry" class="loginRadiusText">
                                                 <option value="">-- <?php echo __("Please Select"); ?> --</option>
                                                 <?php foreach ($countries as $country): ?>
                                                     <option value="<?php echo $country['value'] ?>">

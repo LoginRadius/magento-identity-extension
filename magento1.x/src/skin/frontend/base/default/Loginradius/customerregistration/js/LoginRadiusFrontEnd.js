@@ -62,6 +62,7 @@ function handleResponse(isSuccess, message, show) {
         var status='Error';
         if (isSuccess) {
             status='Success';
+            setTimeout(function(){window.location.href = loginPage;},5000);
         }
         jQuery(".loginradiusmessagediv").show();
         jQuery('.loginradiusmessagediv').html('<div class="'+status+'">'+message+'</div>');

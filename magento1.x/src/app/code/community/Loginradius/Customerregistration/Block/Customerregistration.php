@@ -19,10 +19,10 @@ class Loginradius_Customerregistration_Block_Customerregistration extends Loginr
     }
 
     public function socialLinking() {
-        //if ($this->emailVerified() == '1') {
+        if ($this->emailVerified() == '1') {
             return '1';
-        //}
-        //return Mage::getStoreConfig('customerregistration/othersettings/sociallinking');
+        }
+        return Mage::getStoreConfig('customerregistration/othersettings/sociallinking');
     }
 
     public function debugMode() {

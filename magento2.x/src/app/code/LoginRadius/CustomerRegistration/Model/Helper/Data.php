@@ -20,6 +20,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     public function enableRaas() {
         return $this->getConfig('customerregistration', 'redirection_settings/raas_enable');
     }
+    //Redirection Settings on checkout page
+    public function redirectLogin() {
+        return $this->getConfig('customerregistration', 'redirection_settings/login_interface');
+    }
 
     public function interfaceSize() {
         if($this->enableRaas() == '1'){

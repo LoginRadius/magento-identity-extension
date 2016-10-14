@@ -62,10 +62,13 @@ class Loginradius_Activation_Model_Observer extends Mage_Core_Helper_Abstract
      * @return array $result
      */
     public function getLoginRadiusKeysValidationStatus($url)
-    {
-        if(class_exists('Loginradius_Sociallogin_Helper_LoginradiusSDK')){
-            $loginradiusObject = Mage::helper('sociallogin/LoginradiusSDK');
-            $responce = json_decode($loginradiusObject->loginradius_api_client($url));
+    {        
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        if(class_exists('Loginradius_Sociallogin_Helper_SDKClient')){
+            $loginradiusObject = Mage::helper('sociallogin/SDKClient');
+            global $apiClient_class;
+            $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+            $responce = json_decode($loginradiusObject->request($url));
             $result['status'] = isset($responce->Status) ? $responce->Status : 'Error';
             $result['message'] = isset($responce->Messages[0]) ? $responce->Messages[0] : 'an error occurred';
         }else{

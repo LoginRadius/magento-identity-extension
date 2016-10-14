@@ -133,7 +133,7 @@ class Loginradius_Sociallogin_Block_Sociallogin extends Mage_Core_Block_Template
         if ($apiKey == "" && $apiSecrete == "") {
             $result = $activationBlockObj->activationErrorMessage();
         } else {
-            $result = '<h2>' . $this->titleInterface() . '</h2><div class="interfacecontainerdiv"></div>';
+            $result = '<h2>' . $this->titleInterface() . '</h2><div class="interfacecontainerdiv"></div><div style="clear:both;"></div>';
         }
         return $result;
     }
@@ -143,8 +143,10 @@ class Loginradius_Sociallogin_Block_Sociallogin extends Mage_Core_Block_Template
      *
      * @return string
      */
-    public function getPopupScriptUrl() {
-            $jsPath = Mage::getDesign()->getSkinUrl('Loginradius/sociallogin/js/popup.js', array('_area' => 'frontend'));
+    public function getPopupScriptUrl() {?>
+        <script>var LRpopupErrorMessage = '<?php echo $this->popupError();?>';</script>
+        <?php    
+        $jsPath = Mage::getDesign()->getSkinUrl('Loginradius/sociallogin/js/popup.js', array('_area' => 'frontend'));
             $cssPath = Mage::getDesign()->getSkinUrl('Loginradius/sociallogin/css/popup.css', array('_area' => 'frontend'));
             return '<script  type="text/javascript" src="' . $jsPath . '"></script><link rel = "stylesheet" href="' . $cssPath . '" media = "all" />';
     }

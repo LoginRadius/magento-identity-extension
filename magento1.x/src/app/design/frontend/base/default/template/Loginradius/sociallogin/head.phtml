@@ -77,7 +77,7 @@ if ($activationBlockObj->raasEnable() == 1) {
             });
         </script>
     <?php } ?>
-    <script src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/js/LoginRadiusSDK.js'); ?>"></script>
+    <script src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/js/LoginRadiusSDK.2.0.1.js'); ?>"></script>
     <script type="text/javascript">
         LoginRadiusSDK.setLoginCallback(function () {
             var form = document.createElement('form');
@@ -94,3 +94,35 @@ if ($activationBlockObj->raasEnable() == 1) {
     </script>
     <?php
 }
+$connection = Mage::getSingleton('core/resource');
+            $readConnection = $connection->getConnection('core_read');
+            $tableName = $connection->getTableName('lr_extended_profile_data');
+            $columnName=$readConnection->describeTable($tableName);
+            
+            if(!in_array('total_logins',array_keys($columnName))){
+                 
+
+
+$readConnection
+->addColumn($connection->getTableName('lr_extended_profile_data'),'total_logins', array(
+    'type'      => Varien_Db_Ddl_Table::TYPE_INTEGER,
+    'nullable'  => false,
+    'length'    => 11,
+    'after'     => null, // column name to insert new column after
+    'comment'   => 'Total Login'
+    ));   
+
+            }
+   
+            $readConnection
+    ->changeColumn($connection->getTableName('lr_status'), 'status_id', 'status_id', array(
+        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+        'nullable' => true,
+        
+    ));
+            $readConnection
+    ->changeColumn($connection->getTableName('lr_status'), 'provider', 'provider', array(
+        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+        'nullable' => true,
+        
+    ));

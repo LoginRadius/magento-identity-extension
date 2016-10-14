@@ -35,6 +35,11 @@
                     <label>Redirection After Login</label>
                     <source_model>LoginRadius\CustomerRegistration\Model\Source\Redirection</source_model>
                 </field>
+                <field id="login_interface" translate="label" type="select" sortOrder="55" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Are you want to redirect on login page while checkout?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                   <tooltip><![CDATA[Select Yes if you want to redirect on login page while checkout.]]></tooltip>
+                </field>
                 <field id="custom_login_redirection" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
                     <validate>required-entry</validate>
                     <depends>

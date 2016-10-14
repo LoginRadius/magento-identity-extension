@@ -11,7 +11,12 @@ class Loginradius_Socialprofiledata_Model_Observer {
         $entityid = $event->getEntityid();
         $profiledata = $event->getProfiledata();
         $update = $event->getUpdate();
-        $loginradiusSDK = Mage::helper('sociallogin/LoginradiusSDK');
+        
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $loginradiusSDK = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
         $socialloginData = Mage::helper('sociallogin/Data');
         $socialProfileCheckboxes = explode(',', $this->getSocialProfileCheckboxes());
         if (!is_array($socialProfileCheckboxes) || !isset($profiledata->ID)) {
@@ -83,8 +88,10 @@ class Loginradius_Socialprofiledata_Model_Observer {
         }
         // update extended profile data if option is selected
         if (in_array('ex_profile', $socialProfileCheckboxes)) {
+            
             $data = array();
             $data['user_id'] = $entityid;
+            $data['total_logins'] = isset($profiledata->NoOfLogins) ? $profiledata->NoOfLogins : '';
             $data['website'] = isset($profiledata->Website) ? $profiledata->Website : '';
             $data['favicon'] = isset($profiledata->Favicon) ? $profiledata->Favicon : '';
             $data['industry'] = isset($profiledata->Industry) ? $profiledata->Industry : '';
@@ -283,8 +290,8 @@ class Loginradius_Socialprofiledata_Model_Observer {
         // insert contacts if option is selected
         if (in_array($profiledata->Provider, array('twitter', 'facebook', 'linkedin', 'google', 'yahoo')) && in_array('contacts', $socialProfileCheckboxes)) {
             try {
-                $contacts = $loginradiusSDK->loginradius_get_contacts($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $contacts = $loginradiusSDK->getContacts($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
         
@@ -307,8 +314,8 @@ class Loginradius_Socialprofiledata_Model_Observer {
         // insert facebook events if option is selected
         if ($profiledata->Provider == 'facebook' && in_array('events', $socialProfileCheckboxes)) {
             try {
-                $events = $loginradiusSDK->loginradius_get_events($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $events = $loginradiusSDK->getEvents($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
             
@@ -320,11 +327,27 @@ class Loginradius_Socialprofiledata_Model_Observer {
                 $this->socialLoginInsertArray($entityid, 'facebook_events', $keysArray, $events);
             }
         }
+        // insert facebook events if option is selected
+        if ($profiledata->Provider == 'facebook' && in_array('likes', $socialProfileCheckboxes)) {
+            try {
+                $likes = $loginradiusSDK->getLikes($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                
+            }
+            
+            if (is_array($likes) && count($likes) > 0) {
+                if ($update) {
+                    $this->deleteFromLoginRadiusTable('facebook_likes', array('user_id = ?' => $entityid));
+                }
+                $keysArray = array("ID", "Name", "Category", "DateTime", "Website", "Description");
+                $this->socialLoginInsertArray($entityid, 'facebook_likes', $keysArray, $likes);
+            }
+        }
         // insert posts if option is selected
         if ($profiledata->Provider == 'facebook' && in_array('posts', $socialProfileCheckboxes)) {
             try {
-                $posts = $loginradiusSDK->loginradius_get_posts($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $posts = $loginradiusSDK->getPosts($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
             if (is_array($posts) && count($posts) > 0) {
@@ -335,11 +358,12 @@ class Loginradius_Socialprofiledata_Model_Observer {
                 $this->socialLoginInsertArray($entityid, 'facebook_posts', $keysArray, $posts);
             }
         }
+        
         // insert LinkedIn Companies if option is selected
-        if ($profiledata->Provider == 'linkedin' && in_array('linkedin_companies', $socialProfileCheckboxes)) {
+        if (in_array($profiledata->Provider, array('facebook', 'linkedin')) && in_array('linkedin_companies', $socialProfileCheckboxes)) {
             try {
-                $linkedInCompanies = $loginradiusSDK->loginradius_get_followed_companies($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $linkedInCompanies = $loginradiusSDK->getFollowedCompanies($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }            
             if (isset($linkedInCompanies) && is_array($linkedInCompanies) && count($linkedInCompanies) > 0) {
@@ -353,8 +377,8 @@ class Loginradius_Socialprofiledata_Model_Observer {
         // insert status if option is selected
         if (in_array($profiledata->Provider, array('twitter', 'facebook', 'linkedin')) && in_array('status', $socialProfileCheckboxes)) {
             try {
-                $status = $loginradiusSDK->loginradius_get_status($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $status = $loginradiusSDK->getStatus($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
             
@@ -369,8 +393,8 @@ class Loginradius_Socialprofiledata_Model_Observer {
         // insert mentions if option is selected
         if ($profiledata->Provider == 'twitter' && in_array('mentions', $socialProfileCheckboxes)) {
             try {
-                $mentions = $loginradiusSDK->loginradius_get_mentions($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $mentions = $loginradiusSDK->getMentions($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
             if (isset($mentions) && is_array($mentions) && count($mentions) > 0) {
@@ -384,8 +408,8 @@ class Loginradius_Socialprofiledata_Model_Observer {
         // insert groups if option is selected
         if (in_array($profiledata->Provider, array('facebook', 'linkedin')) && in_array('groups', $socialProfileCheckboxes)) {
             try {
-                $groups = $loginradiusSDK->loginradius_get_groups($profiledata->accesstoken);
-            } catch (LoginRadiusException $e) {
+                $groups = $loginradiusSDK->getGroups($profiledata->accesstoken);
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 
             }
             if (isset($groups) && is_array($groups) && count($groups) > 0) {

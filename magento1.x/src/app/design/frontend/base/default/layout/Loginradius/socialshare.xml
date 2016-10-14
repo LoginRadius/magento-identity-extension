@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <layout version="4.0.0">
     <default>
-        <reference name="head">
+        <reference name="footer">
             <block type="socialshare/socialshare" name="socialshare_head" template="Loginradius/socialshare/socialshare_head.phtml"/>
         </reference>
     </default>

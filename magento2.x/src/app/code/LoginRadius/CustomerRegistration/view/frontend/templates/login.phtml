@@ -5,85 +5,85 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $customerSession = $objectManager->get('Magento\Customer\Model\Session');
     if ($customerRegistrationHelper->enableRaas() == '1') {
-    ?>
-    <main id="maincontent" class="page-main">
-        <div id="loginradiusmessagediv"></div>
-        <div class="columns">
-            <div id="login_form">
-                <div class="page-title-wrapper">
-                    <h1 class="page-title">
-                        <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
-                    </h1>
-                </div>
-                <fieldset class="fieldset create info account form-create-account">
-                    <legend class="legend">
-                        <span><?php
-                            echo $customerRegistrationHelper->interfaceTitle();
-                            ?></span>
-                    </legend><br>
-                    <?php
-                    echo $customerRegistrationHelper->generateInterfaceDiv();
-                    ?>
+        ?>
+        <main id="maincontent" class="page-main">
+            <div id="loginradiusmessagediv"></div>
+            <div class="columns">
+                <div id="login_form">
+                    <div class="page-title-wrapper">
+                        <h1 class="page-title">
+                            <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
+                        </h1>
+                    </div>
+                    <fieldset class="fieldset create info account form-create-account">
+                        <legend class="legend">
+                            <span><?php
+                                echo $customerRegistrationHelper->interfaceTitle();
+                                ?></span>
+                        </legend><br>
+                        <?php
+                        echo $customerRegistrationHelper->generateInterfaceDiv();
+                        ?>
 
-                </fieldset>
+                    </fieldset>
 
-    <?php echo $block->getBlockHtml('formkey'); ?>
-                <div class="login-container"><div class="block block-customer-login">
-                        <div class="block-title">
-                            <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Registered Customers') ?></strong>
-                        </div>
-                        <div class="block-content" aria-labelledby="block-customer-login-heading">
-                            <div id="login-container"></div>
-                            <div class="raasforgotpassword primary">
-                                <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>"><span><?php echo __('Forgot Password') ?></span></a>
+                    <?php echo $block->getBlockHtml('formkey'); ?>
+                    <div class="login-container"><div class="block block-customer-login">
+                            <div class="block-title">
+                                <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Registered Customers') ?></strong>
+                            </div>
+                            <div class="block-content" aria-labelledby="block-customer-login-heading">
+                                <div id="login-container"></div>
+                                <div class="raasforgotpassword primary">
+                                    <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>"><span><?php echo __('Forgot Password') ?></span></a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="block block-new-customer">
-                        <div class="block-title">
-                            <strong id="block-new-customer-heading" role="heading" aria-level="2"><?php echo __('New Customers') ?></strong>
-                        </div>
-                        <div class="block-content" aria-labelledby="block-new-customer-heading">
-                            <p><?php echo __('Creating an account has many benefits: check out faster, keep more than one address, track orders and more.') ?></p>
-                            <div class="actions-toolbar">
-                                <div class="primary">
-                                    <a href="<?php echo $this->getUrl('customer/account/create') ?>" class="action create primary"><span><?php echo __('Create an Account') ?></span></a>
+                        <div class="block block-new-customer">
+                            <div class="block-title">
+                                <strong id="block-new-customer-heading" role="heading" aria-level="2"><?php echo __('New Customers') ?></strong>
+                            </div>
+                            <div class="block-content" aria-labelledby="block-new-customer-heading">
+                                <p><?php echo __('Creating an account has many benefits: check out faster, keep more than one address, track orders and more.') ?></p>
+                                <div class="actions-toolbar">
+                                    <div class="primary">
+                                        <a href="<?php echo $this->getUrl('customer/account/create') ?>" class="action create primary"><span><?php echo __('Create an Account') ?></span></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="required_form">
-                <div class="page-title-wrapper">
-                    <h1 class="page-title">
-                        <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
-                    </h1>
+                <div id="required_form">
+                    <div class="page-title-wrapper">
+                        <h1 class="page-title">
+                            <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
+                        </h1>
+                    </div>
+                    <div id="social-registration-container"></div>
                 </div>
-                <div id="social-registration-container"></div>
-            </div>
-            <div id="reset_form" style="display: none;">
-                <div class="page-title-wrapper">
-                    <h1 class="page-title">
-                        <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Reset Password') ?></span>  
-                    </h1>
+                <div id="reset_form" style="display: none;">
+                    <div class="page-title-wrapper">
+                        <h1 class="page-title">
+                            <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Reset Password') ?></span>  
+                        </h1>
+                    </div>
+                    <div id="resetpassword-container"></div>
                 </div>
-                <div id="resetpassword-container"></div>
             </div>
-        </div>
-    </main>
-    <script>
-        require(['jquery',"mage/calendar"], function ($) {
-            raasForm.login();
-            raasForm.interface();
-            raasForm.socialLogin();
-            showformbyId("login_form");
-            raasForm.resetPassword();
-            responseHandler(true);
-        });
-    </script>
-<?php
-} else {
+        </main>
+        <script>
+            require(['jquery', "mage/calendar"], function ($) {
+                raasForm.login();
+                raasForm.interface();
+                raasForm.socialLogin();
+                showformbyId("login_form");
+                raasForm.resetPassword();
+                responseHandler(true);
+            });
+        </script>
+        <?php
+    } else {
         ?>
         <main id="maincontent" class="page-main">
             <div class="columns">
@@ -108,7 +108,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
 
                     <?php echo $block->getBlockHtml('formkey'); ?>
                     <div class="login-container">
-                        <?php echo $this->getLayout()->createBlock("Magento\Customer\Block\Form\Login")->setTemplate("Magento_Customer::form/login.phtml")->toHtml();?>
+                        <?php echo $this->getLayout()->createBlock("Magento\Customer\Block\Form\Login")->setTemplate("Magento_Customer::form/login.phtml")->toHtml(); ?>
                         <div class="block block-new-customer">
                             <div class="block-title">
                                 <strong id="block-new-customer-heading" role="heading" aria-level="2"><?php echo __('New Customers') ?></strong>
@@ -126,27 +126,27 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
                 </div>
             </div>
         </main>
-    <script>
-        require(['jquery'], function ($) {
-                    $(document).ready(function () {
-        <?php
-            $style = '';
-            $status = $customerSession->getLoginRadiusStatus();
-            $message = $customerSession->getLoginRadiusMessage();
-            if (!empty($status) && !empty($message)) {
-                $status = ($status == 'Success') ? 'true' : 'false';
-                ?>
-                responseHandler(<?php echo $status; ?>, '<?php echo $message; ?>');
-                <?php
-                $style = '<style>#loginradiusmessagediv{display:block !important;}</style>';
-                $customerSession->unsLoginRadiusStatus();
-                $customerSession->unsLoginRadiusMessage();
-            }
-            ?>
-                    });
+        <script>
+            require(['jquery'], function ($) {
+                $(document).ready(function () {
+                    <?php
+                    $style = '';
+                    $status = $customerSession->getLoginRadiusStatus();
+                    $message = $customerSession->getLoginRadiusMessage();
+                    if (!empty($status) && !empty($message)) {
+                        $status = ($status == 'Success') ? 'true' : 'false';
+                        ?>
+                                    responseHandler(<?php echo $status; ?>, '<?php echo $message; ?>');
+                        <?php
+                        $style = '<style>#loginradiusmessagediv{display:block !important;}</style>';
+                        $customerSession->unsLoginRadiusStatus();
+                        $customerSession->unsLoginRadiusMessage();
+                    }
+                    ?>
                 });
-            </script>
-            <?php
-            echo $style;
+            });
+        </script>
+        <?php
+        echo $style;
     }
 }?>

@@ -6,11 +6,18 @@ $activationBlockObj = Mage::getBlockSingleton('activation/activation');
 if ($this->enableSinglesignon() == 1 && ($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != '')) {
     $getBlockDir = $activationBlockObj->getBlockDir();
     echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
+$ssoRootUrl = parse_url($this->getUrl(''));
+$ssoRootUrl['path'] = isset($ssoRootUrl['path'])?trim(trim($ssoRootUrl['path'],"/")):'';
+$ssoTempDir = explode("/",$ssoRootUrl['path']);
+$ssoDir = isset($ssoTempDir[0])?trim($ssoTempDir[0]):'';
     ?>
     <script src="//cdn.loginradius.com/hub/prod/js/LoginRadiusSSO.js"></script>
     <script>
         jQuery(document).ready(function () {
-            LoginRadiusSSO.init("<?php echo $activationBlockObj->siteName(); ?>");
+            if(jQuery('#popupouter').length) {
+                return;
+            }
+            LoginRadiusSSO.init("<?php echo $activationBlockObj->siteName(); ?>","<?php echo '/'.$ssoDir;?>");
     <?php
     if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->isLoggedIn()) {//user logged in
         ?>

@@ -2,18 +2,125 @@
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
 if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
     $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
-    if ($customerRegistrationHelper->enableRaas() == '1') {
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $customerSession = $objectManager->get('Magento\Customer\Model\Session');
-    if (!$customerSession->isLoggedIn()) {
-        $customerSession->setLoginRadiusRedirection('checkout');
-        ?>
-        <script>
-            window.location.href = '<?php echo $this->getUrl('customer/account/login'); ?>';
-        </script>
-    <?php
+
+    if ($customerRegistrationHelper->redirectLogin() == '1') {
+        $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+        if (!$customerSession->isLoggedIn()) {
+            $customerSession->setLoginRadiusRedirection('checkout');
+            ?>
+            <script>
+                window.location.href = '<?php echo $this->getUrl('customer/account/login'); ?>';
+            </script>
+            <?php
         } else {
             $customerSession->unsLoginRadiusRedirection();
+        }
+    } else {
+        if ($customerRegistrationHelper->enableRaas() == '1') {
+            if (!$customerSession->isLoggedIn()) {
+                ?>
+                <main id="maincontent" class="page-main">
+                    <div id="loginradiusmessagediv"></div>
+                    <div class="columns">
+                        <div id="login_form">
+                            <div class="page-title-wrapper">
+                                <h1 class="page-title">
+                                    <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
+                                </h1>
+                            </div>
+                            <fieldset class="fieldset create info account form-create-account">
+                                <legend class="legend">
+                                    <span><?php
+                                        echo $customerRegistrationHelper->interfaceTitle();
+                                        ?></span>
+                                </legend><br>
+                                <?php
+                                echo $customerRegistrationHelper->generateInterfaceDiv();
+                                ?>
+                            </fieldset>
+                            <?php echo $block->getBlockHtml('formkey'); ?>
+                            <div class="login-container"><div class="block block-customer-login">
+                                    <div class="block-title">
+                                        <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Registered Customers') ?></strong>
+                                    </div>
+                                    <div class="block-content" aria-labelledby="block-customer-login-heading">
+                                        <div id="login-container"></div>
+                                        <div class="raasforgotpassword primary">
+                                            <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>"><span><?php echo __('Forgot Password') ?></span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block block-new-customer">
+                                    <div class="block-title">
+                                        <strong id="block-new-customer-heading" role="heading" aria-level="2"><?php echo __('New Customers') ?></strong>
+                                    </div>
+                                    <div class="block-content" aria-labelledby="block-new-customer-heading">
+                                        <p><?php echo __('Creating an account has many benefits: check out faster, keep more than one address, track orders and more.') ?></p>
+                                        <div class="actions-toolbar">
+                                            <div class="primary">
+                                                <a href="<?php echo $this->getUrl('customer/account/create') ?>" class="action create primary"><span><?php echo __('Create an Account') ?></span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="required_form">
+                            <div class="page-title-wrapper">
+                                <h1 class="page-title">
+                                    <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
+                                </h1>
+                            </div>
+                            <div id="social-registration-container"></div>
+                        </div>
+                        <div id="reset_form" style="display: none;">
+                            <div class="page-title-wrapper">
+                                <h1 class="page-title">
+                                    <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Reset Password') ?></span>  
+                                </h1>
+                            </div>
+                            <div id="resetpassword-container"></div>
+                        </div>
+                    </div>
+                </main>
+                <script>
+                    require(['jquery', "mage/calendar"], function ($) {
+                        raasForm.login();
+                        raasForm.interface();
+                        raasForm.socialLogin();
+                        showformbyId("login_form");
+                        raasForm.resetPassword();
+                        responseHandler(true);
+
+                    });
+                </script>
+                <script type="text/html" id="loginradiuscustom_tmpl">
+                    <div class="lr_icons_box">
+                        <div style="width:180px">
+                            <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&callback=<?php echo $this->getUrl() ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                            </span>
+                        </div>
+                    </div>
+                </script>
+                <?php
+            } else {
+                $customerSession->unsLoginRadiusRedirection();
+            }
+            ?>
+            <script>
+                require(['jquery'], function ($) {
+                    $(document).ready(function () {
+                        $('#magento-raas-loading-image-div').hide();
+                    });
+                });
+            </script>
+            <?php
+        } else {
+            if (!$customerSession->isLoggedIn()) {
+                echo $customerRegistrationHelper->generateInterfaceDiv();
+            }
         }
     }
 }

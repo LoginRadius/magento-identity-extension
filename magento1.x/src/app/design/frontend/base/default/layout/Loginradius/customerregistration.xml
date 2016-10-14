@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<layout version="4.0.0">
+    <customerregistration_index_verification>
+        <remove name="right"/>
+        <reference name="content">
+            <block type="customerregistration/customerregistration" name="customerregistration.verification" template="Loginradius/customerregistration/login.phtml"/>
+        </reference>
+    </customerregistration_index_verification>
+</layout> 

@@ -1,7 +1,7 @@
 var $loginRadiusJquery = jQuery.noConflict();
 $loginRadiusJquery(document).ready(function () {
     customerregistrationCustomUrl('login');
-    emailVerifiedOption();
+    
     $loginRadiusJquery('#customerregistration_settings_redirectionafterlogin').change(function(){customerregistrationCustomUrl('login')});
     $loginRadiusJquery('#customerregistration_othersettings_emailVerified').change(function(){emailVerifiedOption();});
     if($loginRadiusJquery('#googleanalytics_settings_enable').val() == '1'){
@@ -14,6 +14,11 @@ $loginRadiusJquery(document).ready(function () {
     });
     lrCheckValidJson();
     $loginRadiusJquery('#customerregistration_socialinterface_formrenderdelay,#customerregistration_socialinterface_minpasswordlength,#customerregistration_socialinterface_maxpasswordlength').prop("type", "number");
+setTimeout(function(){
+    emailVerifiedOption();
+},2000);
+
+
 });
 function lrCheckValidJson() {
     $loginRadiusJquery('#customerregistration_othersettings_customraasoptions').blur(function(){
@@ -53,10 +58,10 @@ function emailVerifiedOption(){
     var emailVerified = $loginRadiusJquery('#customerregistration_othersettings_emailVerified').val();
     if(emailVerified == '2'){
         $loginRadiusJquery('#row_customerregistration_othersettings_askemailalwaysforunverified,#row_customerregistration_othersettings_emailverificationtemplate,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_sociallinking,#row_customerregistration_othersettings_loginonemailverification').show();
-        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin').hide();
+        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin,#row_customerregistration_othersettings_enableusername').hide();
     }else if(emailVerified == '1'){
-        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin,#row_customerregistration_othersettings_emailverificationtemplate,#row_customerregistration_othersettings_askemailalwaysforunverified,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_sociallinking,#row_customerregistration_othersettings_loginonemailverification').hide();
+        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin,#row_customerregistration_othersettings_emailverificationtemplate,#row_customerregistration_othersettings_askemailalwaysforunverified,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_sociallinking,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_enableusername').hide();
     }else{
-        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin,#row_customerregistration_othersettings_emailverificationtemplate,#row_customerregistration_othersettings_askemailalwaysforunverified,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_sociallinking,#row_customerregistration_othersettings_loginonemailverification').show();
+        $loginRadiusJquery('#row_customerregistration_othersettings_passwordonsociallogin,#row_customerregistration_othersettings_emailverificationtemplate,#row_customerregistration_othersettings_askemailalwaysforunverified,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_sociallinking,#row_customerregistration_othersettings_loginonemailverification,#row_customerregistration_othersettings_enableusername').show();
     }
 }

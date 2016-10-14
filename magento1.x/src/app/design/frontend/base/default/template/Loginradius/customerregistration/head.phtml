@@ -23,13 +23,14 @@ echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusI
 <script type="text/javascript">
     //initialize raas options
     var LocalDomain = '<?php echo $loginRadiusCallback; ?>';
+    var loginPage = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
     var raasoption = {};
     raasoption.apikey = '<?php echo $activationBlockObj->apiKey(); ?>';
     raasoption.appName = '<?php echo htmlentities($activationBlockObj->siteName()); ?>';
     raasoption.templatename = "loginradiuscustom_tmpl";
     raasoption.hashTemplate = true;
-    raasoption.emailVerificationUrl = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
-    raasoption.forgotPasswordUrl = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
+    raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
+    raasoption.forgotPasswordUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
     raasoption.V2Recaptcha = true;
     raasoption.OptionalEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '2')?"true":"false" ?>;
     raasoption.DisabledEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '1')?"true":"false" ?>;
@@ -74,7 +75,43 @@ echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusI
             </div>
         </div>
     </script>
-<?php } ?>
+<?php  } ?>
 
 <script src="<?php echo Mage::getDesign()->getSkinUrl('Loginradius/customerregistration/js/LoginRadiusFrontEnd.js', array('_area' => 'frontend')) ?>"></script>
-<?php }?>
+<?php }
+
+$connection = Mage::getSingleton('core/resource');
+            $readConnection = $connection->getConnection('core_read');
+            $tableName = $connection->getTableName('lr_extended_profile_data');
+            $columnName=$readConnection->describeTable($tableName);
+            
+            if(!in_array('total_logins',array_keys($columnName))){
+                 
+
+
+$readConnection
+->addColumn($connection->getTableName('lr_extended_profile_data'),'total_logins', array(
+    'type'      => Varien_Db_Ddl_Table::TYPE_INTEGER,
+    'nullable'  => false,
+    'length'    => 11,
+    'after'     => null, // column name to insert new column after
+    'comment'   => 'Total Login'
+    ));   
+
+            }
+   
+            $readConnection
+    ->changeColumn($connection->getTableName('lr_status'), 'status_id', 'status_id', array(
+        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+        'nullable' => true,
+        
+    ));
+            $readConnection
+    ->changeColumn($connection->getTableName('lr_status'), 'provider', 'provider', array(
+        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+        'nullable' => true,
+        
+    ));
+
+
+?>

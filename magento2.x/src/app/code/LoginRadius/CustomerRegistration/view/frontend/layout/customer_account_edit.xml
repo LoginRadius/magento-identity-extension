@@ -14,7 +14,7 @@
     <referenceContainer name="content">
         <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customer_edit" template="edit.phtml" cacheable="false" />
     </referenceContainer>
-    <referenceBlock name="top.links">
+    <referenceBlock name="top.links" >
         <!-- Contact us Link -->
         <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="contactus.link" after="register-link">
             <arguments>

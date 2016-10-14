@@ -42,3 +42,87 @@ colgroup.label {
 #socialshare_horizontalsharing_horizontalsharingthemecounter_vertical{
     margin-top: 30px
 }
+
+.ossshare_iconsprite32 {
+    cursor: pointer;
+    height: 32px;
+    width: 32px;
+    margin: 4px;
+    padding: 0;
+    border: none;
+    background: url(../images/ossshare_iconsprite32.png) no-repeat scroll left top transparent;
+    -webkit-transition: all .3s ease;
+    -ms-transition: all .3s ease;
+    -moz-transition: all .3s ease;
+    transition: all .3s ease;
+    list-style-type: none;
+}
+.ossshare_iconsprite32::after {
+    content: "";
+}
+.ossshare_iconsprite32.ossshare_facebook {
+    background-position: -174px 0;
+}
+.ossshare_iconsprite32.ossshare_delicious {
+    background-position: 0 0
+}
+.ossshare_iconsprite32.ossshare_digg {
+    background-position: -34px 0
+}
+.ossshare_iconsprite32.ossshare_dotnetkicks {
+    background-position: -68px 0
+}
+.ossshare_iconsprite32.ossshare_email {
+    background-position: -102px 0
+}
+.ossshare_iconsprite32.ossshare_evenmore32 {
+    background-position: -138px 0
+}
+.ossshare_iconsprite32.ossshare_facebook {
+    background-position: -174px 0
+}
+.ossshare_iconsprite32.ossshare_google {
+    background-position: -208px 0
+}
+.ossshare_iconsprite32.ossshare_googleplus {
+    background-position: -242px 0
+}
+.ossshare_iconsprite32.ossshare_hyves {
+    background-position: -276px 0
+}
+.ossshare_iconsprite32.ossshare_linkedin {
+    background-position: -310px 0
+}
+.ossshare_iconsprite32.ossshare_live {
+    background-position: -344px 0
+}
+.ossshare_iconsprite32.ossshare_myspace {
+    background-position: -378px 0
+}
+.ossshare_iconsprite32.ossshare_pinterest {
+    background-position: -412px 0
+}
+.ossshare_iconsprite32.ossshare_print {
+    background-position: -446px 0
+}
+.ossshare_iconsprite32.ossshare_reddit {
+    background-position: -480px 0
+}
+.ossshare_iconsprite32.ossshare_tumblr {
+    background-position: -576px 0
+}
+.ossshare_iconsprite32.ossshare_twitter {
+    background-position: -610px 0
+}
+.ossshare_iconsprite32.ossshare_viadeo {
+    background-position: -644px 0
+}
+.ossshare_iconsprite32.ossshare_vkontakte {
+    background-position: -678px 0
+}
+.ossshare_iconsprite32.ossshare_wordpress {
+    background-position: -712px 0
+}
+.ossshare_iconsprite32.ossshare_yahoo {
+    background-position: -746px 0
+}

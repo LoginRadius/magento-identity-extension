@@ -26,6 +26,15 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store> 
                     <fields>
+                        <hostedpage translate="label">
+                            <label>Enable Hosted Page</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hostedpage>
                         <redirectionafterlogin translate="label">
                             <label>Redirection After Login</label>
                             <frontend_type>select</frontend_type>
@@ -145,26 +154,27 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </updateprofiledata>
-                        <enableusername translate="label">
-                            <label>Enable UserName Login</label>
-                            <frontend_type>select</frontend_type>
-                            <comment><![CDATA[Let users log in with either username or email.]]></comment>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>2</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </enableusername> 
+                         
                         <emailVerified translate="label">
                             <label>Email Verification</label>
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Allow users to verify email address. Please note: your selection will be applied to existing users as well as new users.]]></comment>
                             <source_model>Loginradius_Customerregistration_Model_Source_Emailvalidation</source_model>
-                            <sort_order>3</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </emailVerified>
+                        <enableusername translate="label">
+                            <label>Enable UserName Login</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Let users log in with either username or email.]]></comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enableusername>
                         <loginonemailverification translate="label">
                             <label>Login Upon Email Verification</label>
                             <frontend_type>select</frontend_type>

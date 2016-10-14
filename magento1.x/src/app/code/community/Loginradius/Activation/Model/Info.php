@@ -65,10 +65,7 @@ class Loginradius_Activation_Model_Info extends Mage_Adminhtml_Block_Abstract im
                 <a href="http://ish.re/TRXK" target="_blank">Drupal</a>,
                 <a href="http://ish.re/TRXM" target="_blank">vBulletin</a>,
                 <a href="http://ish.re/TRXR" target="_blank">VanillaForum</a>,
-                <a href="http://ish.re/TRXT" target="_blank">osCommerce</a>,
                 <a href="http://ish.re/TRXU" target="_blank">PrestaShop</a>,
-                <a href="http://ish.re/TRXW" target="_blank">X-Cart</a>,
-                <a href="http://ish.re/TRXY" target="_blank">Zen-Cart</a>,
                 <a href="http://ish.re/TRY1" target="_blank">DotNetNuke</a>,
                 <a href="http://ish.re/TRY2" target="_blank">SMF</a> <?php echo $this->__('and') ?>
                 <a href="http://ish.re/TRY3" target="_blank">phpBB</a> !

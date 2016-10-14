@@ -4,7 +4,6 @@
         <reference name="head">
             <action method="addCss"><script>../../../adminhtml/default/default/Loginradius/common/css/style.css</script></action>
             <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/common/js/jquery.js</script></action>
-            <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/socialshare/js/socialshare.js</script></action>
             <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/socialshare/js/jquery.ui.sortable.min.js</script></action>
             <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/socialshare/js/adminui.js</script></action>
             <action method="addCss"><script>../../../adminhtml/default/default/Loginradius/socialshare/css/adminui.css</script></action>

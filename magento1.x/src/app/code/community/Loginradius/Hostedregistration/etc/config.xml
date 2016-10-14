@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Loginradius_Hostedregistration>
+            <version>2.0.4</version>
+        </Loginradius_Hostedregistration>
+    </modules>
+    <frontend>
+        <routers>
+            <customer>
+                <args>
+                    <modules>
+                        <hostedregistration before="Mage_Customer">Loginradius_Hostedregistration</hostedregistration>
+                    </modules>
+                </args>
+            </customer>
+        </routers>
+        <layout>
+            <updates>
+                <hostedregistration>
+                    <file>hostedregistration.xml</file>
+                </hostedregistration>
+            </updates>
+        </layout>
+    </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <hostedregistration>
+                    <file>Loginradius/hostedregistration.xml</file>
+                </hostedregistration>
+            </updates>
+        </layout>
+    </adminhtml>
+    <!-- helper -->
+    <global>
+        <helpers>
+            <hostedregistration>
+                <class>Loginradius_Hostedregistration_Helper</class>
+            </hostedregistration>
+        </helpers>
+        <blocks>
+            <hostedregistration>
+                <class>Loginradius_Hostedregistration_Block</class>
+            </hostedregistration>
+        </blocks>
+    </global>
+</config>

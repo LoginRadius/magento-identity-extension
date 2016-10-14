@@ -21,7 +21,7 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
             $customer = $quote->getCustomer();
             $customer->setWebsiteId(Mage::app()->getWebsite()->getId());
             if ($customer->getId()) {
-                $this->loginradius_save_data_in_table($loginRadiusProfileData, $customer->getId());
+                $this->lr_save_data_in_table($loginRadiusProfileData, $customer->getId());
             }
         }
     }
@@ -70,19 +70,19 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
      */
 
     public function customer_save_before($observer) {
-        $blockObj = Mage::helper('customerregistration/RaasSDK');
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $userApi = new LoginRadiusSDK\CustomerRegistration\UserAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
         if (Mage::app()->getFrontController()->getRequest()->getRouteName() == "checkout" && !Mage::getSingleton('customer/session')->isLoggedIn()) {
 
             $customer = $observer->getCustomer();
             $address = $observer->getCustomerAddress();
             $modified = $this->loginradius_get_customer_saved_data($customer, $address);
             if (isset($modified['EmailId']) && !empty($modified['EmailId'])) {
-                if (false) {
-                    $modified['emailverificationurl'] = Mage::helper('customer')->getLoginUrl();
-                    $response = $blockObj->raas_create_user_with_email_verification(http_build_query($modified));
-                } else {
-                    $response = $blockObj->raas_create_user(http_build_query($modified));
-                }
+                $response = $userApi->create($modified);
                 if (isset($response->description)) {
                     Mage::throwException($response->description);
                 } else {
@@ -106,6 +106,7 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                 //customer basic info
                 $modified['firstname'] = isset($postData['firstname']) ? $postData['firstname'] : $customer->firstname; //firstname
                 $modified['lastname'] = isset($postData['lastname']) ? $postData['lastname'] : $customer->lastname; //lastname
+                $modified['email'] = isset($postData['email']) ? $postData['email'] : $customer->email; //email
                 $modified['birthdate'] = isset($postData['dob']) ? date('m-d-Y', strtotime($postData['dob'])) : date('m-d-Y', strtotime($customer->dob)); //dob
                 $modified['taxvat'] = isset($postData['taxvat']) ? $postData['taxvat'] : $customer->taxvat; //taxvat
                 $modified['gender'] = isset($postData['gender']) ? $postData['gender'] : $customer->gender; //gender
@@ -128,6 +129,8 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
 
                 //change and set password
                 if (isset($postData['social_password']) && $postData['social_password'] == 1) {
+                    $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
                     $userId = Mage::getSingleton("customer/session")->getId();
                     $loginRadiusConn = Mage::getSingleton('core/resource')->getConnection('core_read');
                     $loginRadiusQuery = "select uid from " . Mage::getSingleton('core/resource')->getTableName('lr_sociallogin') . " where entity_id = '" . $userId . "' LIMIT 1";
@@ -136,7 +139,7 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                     if (isset($loginRadiusResult["uid"]) && !empty($loginRadiusResult["uid"])) {
                         //set password
                         $raasSettings = Mage::getBlockSingleton('customerregistration/customerregistration');
-                       
+
                         if (isset($postData['emailid']) && isset($postData['confirmpassword']) && isset($postData['password'])
                         ) {
                             if (empty($postData['emailid'])) {
@@ -144,51 +147,53 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                                 /* not the best redirect but don`t know how to */
                                 $this->_redirectUrl('customer/account/edit');
                             }
-                            if(($raasSettings->minPasswordLength() != 0) && ($raasSettings->minPasswordLength() > strlen($postData['password']))){
-                                Mage::getSingleton('core/session')->addError('The Password field must be at least '.$raasSettings->minPasswordLength().' characters in length.');
-                            }elseif(($raasSettings->maxPasswordLength() != 0) && (strlen($postData['password']) > $raasSettings->maxPasswordLength())){
-                                Mage::getSingleton('core/session')->addError('The Password field must not exceed '.$raasSettings->maxPasswordLength().' characters in length.');
-                            }elseif ($postData['password'] === $postData['confirmpassword']) { //check both password
+                            if (($raasSettings->minPasswordLength() != 0) && ($raasSettings->minPasswordLength() > strlen($postData['password']))) {
+                                Mage::getSingleton('core/session')->addError('The Password field must be at least ' . $raasSettings->minPasswordLength() . ' characters in length.');
+                            } elseif (($raasSettings->maxPasswordLength() != 0) && (strlen($postData['password']) > $raasSettings->maxPasswordLength())) {
+                                Mage::getSingleton('core/session')->addError('The Password field must not exceed ' . $raasSettings->maxPasswordLength() . ' characters in length.');
+                            } elseif ($postData['password'] === $postData['confirmpassword']) { //check both password
                                 $data = array('accountid' => trim($loginRadiusResult["uid"]), 'emailid' => trim($postData['emailid']), 'password' => trim($postData['password']));
-                                $response = $blockObj->raas_set_password(http_build_query($data));
-                                if (isset($response->description)) { // check any error from loginradius
-                                    Mage::getSingleton('core/session')->addError($response->description);
-                                } else {
+                                try {
+                                    $response = $accountAPI->createUserRegistrationProfile($data);
                                     Mage::getSingleton('core/session')->addSuccess('Password updated successfully.');
+                                } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                    Mage::getSingleton('core/session')->addError($e->getErrorResponse()->description);
                                 }
                             } else { //password not match
                                 Mage::getSingleton('core/session')->addError('Password don\'t match');
                             }
                             $this->_redirectUrl('customer/account/edit');
                         } elseif (isset($postData['newpassword']) && isset($postData['confirmnewpassword'])) {
-                            if(($raasSettings->minPasswordLength() != 0) && ($raasSettings->minPasswordLength() > strlen($postData['newpassword']))){
-                                Mage::getSingleton('core/session')->addError('The Password field must be at least '.$raasSettings->minPasswordLength().' characters in length.');
-                            }elseif(($raasSettings->maxPasswordLength() != 0) && (strlen($postData['newpassword']) > $raasSettings->maxPasswordLength())){
-                                Mage::getSingleton('core/session')->addError('The Password field must not exceed '.$raasSettings->maxPasswordLength().' characters in length.');
-                            }elseif ($postData['newpassword'] !== $postData['confirmnewpassword']) {
+                            if (($raasSettings->minPasswordLength() != 0) && ($raasSettings->minPasswordLength() > strlen($postData['newpassword']))) {
+                                Mage::getSingleton('core/session')->addError('The Password field must be at least ' . $raasSettings->minPasswordLength() . ' characters in length.');
+                            } elseif (($raasSettings->maxPasswordLength() != 0) && (strlen($postData['newpassword']) > $raasSettings->maxPasswordLength())) {
+                                Mage::getSingleton('core/session')->addError('The Password field must not exceed ' . $raasSettings->maxPasswordLength() . ' characters in length.');
+                            } elseif ($postData['newpassword'] !== $postData['confirmnewpassword']) {
                                 //password not match
                                 Mage::getSingleton('core/session')->addError('Password and Confirm Password don\'t match');
-                            }else{
-                                $password['oldpassword'] = $postData['oldpassword'];
-                                $password['newpassword'] = $postData['newpassword'];
-                                $response = $blockObj->raas_update_password(http_build_query($password), $loginRadiusResult["uid"]);
-                                if (isset($response->description)) {
-                                    Mage::getSingleton('core/session')->addError($response->description);
-                                } else {
+                            } else {
+                                try {
+                                    $response = $accountAPI->changeAccountPassword($loginRadiusResult["uid"], $postData['oldpassword'], $postData['newpassword']);
                                     Mage::getSingleton('core/session')->addSuccess('Password updated successfully.');
+                                } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                    Mage::getSingleton('core/session')->addError($e->getErrorResponse()->description);
                                 }
                             }
-                        $this->_redirectUrl('customer/account/edit');
-                        }                        
+                            $this->_redirectUrl('customer/account/edit');
+                        }
                     } else {
                         Mage::getSingleton('core/session')->addError('An error occurred');
                         $this->_redirectUrl('customer/account/edit');
                     }
                 }
+
                 //update  user at raas
-                $response = $blockObj->raas_update_user($modified, $socialId);
-                if (isset($response->description)) {
-                    Mage::getSingleton('core/session')->addError($response->description);
+                try {
+
+                    $response = $userApi->edit($socialId, $modified);
+                } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                    Mage::getSingleton('core/session')->addError($e->getErrorResponse()->description);
                     $this->_redirectUrl('customer/account/edit');
                 }
             }
@@ -223,10 +228,16 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
     }
 
     public function delete_before_customer($observer) {
-        $blockObj = Mage::helper('customerregistration/RaasSDK');
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
         $postData = Mage::app()->getRequest()->getPost();
+
         $isError = '';
-        if (is_array($postData['customer'])) {
+        if (isset($postData['customer']) && is_array($postData['customer'])) {
             $loginRadiusConn = Mage::getSingleton('core/resource')->getConnection('core_read');
 
             foreach ($postData['customer'] as $customerId) {
@@ -234,7 +245,7 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                 $loginRadiusQueryHandle = $loginRadiusConn->query($loginRadiusQuery);
                 $loginRadiusResult = $loginRadiusQueryHandle->fetch();
                 if (isset($loginRadiusResult['uid']) && !empty($loginRadiusResult['uid'])) {
-                    $response = $blockObj->raas_admin_delete_user($loginRadiusResult['uid']);
+                    $response = $accountAPI->deleteAccount($loginRadiusResult['uid']);
                     if (isset($response->description)) {
                         $isError = $response->description;
                     } else {
@@ -254,14 +265,19 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
             $customer = Mage::getModel("customer/customer");
             $customer->setWebsiteId($postData['account']['website_id']);
             $customer->loadByEmail($customer_email);
-            $this->loginradius_save_data_in_table($_POST['lr_raas_resonse'], $customer->getId());
+            $this->lr_save_data_in_table($_POST['lr_raas_resonse'], $customer->getId());
 
             return;
         }
     }
 
     public function admin_customer_save_before($observer) {
-        $blockObj = Mage::helper('customerregistration/RaasSDK');
+        require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+        global $apiClient_class;
+        $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+        $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        $userAPI = new LoginRadiusSDK\CustomerRegistration\UserAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
         $postData = Mage::app()->getRequest()->getPost();
         $formattedDate = '';
 
@@ -273,6 +289,7 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
          * Creating user on RAAS
          */
         if (!isset($postData['customer_id'])) {
+
             if ($postData['account']['website_id'] != 0) {
                 $params = array('EmailId' => $postData['account']['email'], 'firstname' => $postData['account']['firstname'], 'lastname' => $postData['account']['lastname'], 'birthdate' => $formattedDate, 'password' => $postData['account']['password']);
                 if (isset($postData['account']['gender'])) {
@@ -282,11 +299,40 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                         $params['gender'] = 'F';
                     }
                 }
-                $response = $blockObj->raas_create_user(http_build_query($params));
-                if (isset($response->description)) {
-                    Mage::throwException($response->description);
+
+                if ($postData['account']['password'] == 'auto') {
+
+                    $charsPass = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=?";
+                    $autoGenratedPassParams = array('EmailId' => $postData['account']['email'], 'firstname' => $postData['account']['firstname'], 'lastname' => $postData['account']['lastname'], 'birthdate' => $formattedDate, 'password' => substr(str_shuffle($charsPass), 0, 8));
+
+                    try {
+
+                        $response = $userAPI->create($params);
+
+                        $_POST['lr_raas_resonse'] = $response;
+                        $forgotPassDomain = Mage::getBaseUrl() . 'customerregistration/index/verification/';
+                        try {
+
+                            $rsetPasswordUrl = 'https://api.loginradius.com/raas/client/password/forgot?apikey=' . $activationBlockObj->apiKey() . '&emailid=' . $postData['account']['email'] . '&resetpasswordurl=' . $forgotPassDomain;
+                        } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                            Mage::throwException($e->getErrorResponse()->description);
+                        }
+
+                        $result = LoginRadiusSDK\LoginRadius::apiClient($rsetPasswordUrl, FALSE, array('output_format' => 'json'));
+                    } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                        Mage::throwException($e->getErrorResponse()->description);
+                    }
                 } else {
-                    $_POST['lr_raas_resonse'] = $response;
+                    try {
+
+                        $response = $userAPI->create($params);
+
+                        $_POST['lr_raas_resonse'] = $response;
+                    } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                        Mage::throwException($e->getErrorResponse()->description);
+                    }
                 }
             }
         } else {
@@ -300,24 +346,164 @@ class Loginradius_Customerregistration_Model_Observer extends Mage_Core_Model_Ab
                     $params['gender'] = 'F';
                 }
             }
+
             $connection = Mage::getSingleton('core/resource');
             $readConnection = $connection->getConnection('core_read');
             $tableName = $connection->getTableName('lr_sociallogin');
             $query = "select sociallogin_id, uid from $tableName where entity_id= '" . $postData['customer_id'] . "'";
             $result = $readConnection->query($query)->fetch();
+
             if (isset($result['sociallogin_id']) && !empty($result['sociallogin_id'])) {
+
                 //Code for password changing
                 if (isset($postData['account']['new_password']) && !empty($postData['account']['new_password'])) {
-                    $passwordField = array('password' => $postData['account']['new_password']);
-                    $res = $blockObj->raas_admin_set_password(http_build_query($passwordField), $result['sociallogin_id']);
-                    if (isset($res->description)) {
-                        Mage::throwException($res->description);
+
+                    $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+                    $getRaasProfile = $accountAPI->getAccounts($result['uid']);
+
+                    $checkProviderStatus = '';
+                    foreach ($getRaasProfile as $key => $value) {
+                        if ($value->Provider == 'RAAS') {
+
+                            $checkProviderStatus = 'true';
+                        }
+                    }
+
+                    if ($checkProviderStatus == 'true') {
+
+                        if ($postData['account']['new_password'] == 'auto') {
+
+
+
+                            $forgotPassDomain = Mage::getBaseUrl() . 'customerregistration/index/verification/';
+                            try {
+
+                                $rsetPasswordUrl = 'https://api.loginradius.com/raas/client/password/forgot?apikey=' . $activationBlockObj->apiKey() . '&emailid=' . $postData['account']['email'] . '&resetpasswordurl=' . $forgotPassDomain;
+                            } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                Mage::throwException($e->getErrorResponse()->description);
+                            }
+
+                            $result = LoginRadiusSDK\LoginRadius::apiClient($rsetPasswordUrl, FALSE, array('output_format' => 'json'));
+                        } else {
+
+                            try {
+
+                                $accountAPI->setPassword(trim($result['uid']), trim($postData['account']['new_password']));
+                            } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                Mage::throwException($e->getErrorResponse()->description);
+                            }
+                        }
+                    } else {
+
+                        if ($postData['account']['new_password'] == 'auto') {
+                            $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=?";
+                            try {
+                                $data = array('accountid' => trim($result['uid']), 'emailid' => trim($postData['account']['email']), 'password' => substr(str_shuffle($chars), 0, 8));
+                                $res = $accountAPI->createUserRegistrationProfile($data);
+
+                                try {
+
+                                    $forgotPassDomain = Mage::getBaseUrl() . 'customerregistration/index/verification/';
+                                    try {
+
+                                        $rsetPasswordUrl = 'https://api.loginradius.com/raas/client/password/forgot?apikey=' . $activationBlockObj->apiKey() . '&emailid=' . $postData['account']['email'] . '&resetpasswordurl=' . $forgotPassDomain;
+                                    } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                        Mage::throwException($e->getErrorResponse()->description);
+                                    }
+
+                                    $result = LoginRadiusSDK\LoginRadius::apiClient($rsetPasswordUrl, FALSE, array('output_format' => 'json'));
+                                } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                                    Mage::throwException($e->getErrorResponse()->description);
+                                }
+                            } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                                Mage::throwException($e->getErrorResponse()->description);
+                            }
+                        } else {
+
+                            try {
+
+                                $data = array('accountid' => trim($result['uid']), 'emailid' => trim($postData['account']['email']), 'password' => trim($postData['account']['new_password']));
+                                $res = $accountAPI->createUserRegistrationProfile($data);
+                            } catch (LoginRadiusSDK\LoginRadiusException $e) {
+                                Mage::throwException($e->getErrorResponse()->description);
+                            }
+                        }
+
+
                     }
                 }
-                $result = $blockObj->raas_update_user($params, $result['sociallogin_id']);
-                if (isset($result->description)) {
-                    Mage::throwException($result->description);
+
+                $connectionDb = Mage::getSingleton('core/resource');
+                $readConnectionDb = $connection->getConnection('core_read');
+                $tableNameCustomer = $connection->getTableName('customer_entity');
+                $queryCustomer = "select email from $tableNameCustomer where entity_id= '" . $postData['customer_id'] . "'";
+                $resultCustomer = $readConnectionDb->query($queryCustomer)->fetch();
+
+                if ($postData['account']['email'] != $resultCustomer["email"]) {
+
+                    $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+                    /* Adding New Email by Add/Remove Email Api */
+                    $addEmailData = array('EmailId' => $postData['account']['email'], 'EmailType' => 'Primary');
+                    try {
+                        $addEmail = $accountAPI->userAdditionalEmail($result['uid'], 'add', $addEmailData);
+                    } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                        if (isset($e->getErrorResponse()->description)) {
+
+                            /* Getting Raas Profile By User Profile by UID Api */
+                            $getRaasProfile = $accountAPI->getAccounts($result['uid']);
+
+                            $providerStatus = '';
+                            foreach ($getRaasProfile as $key => $value) {
+                                if ($value->Provider == 'RAAS') {
+
+                                    $providerStatus = 'true';
+                                }
+                            }
+
+                            if ($providerStatus == 'true') {
+
+                                $errorDescription = isset($e->getErrorResponse()->description) ? $e->getErrorResponse()->description : '';
+
+                                Mage::throwException($errorDescription);
+                            } else {
+
+                                Mage::throwException('Please Set Password then change the email id.');
+                            }
+                        }
+                        return;
+                    }
+
+                    if (isset($addEmail->isPosted) && ($addEmail->isPosted == 'true')) {
+                        /* Removing Old Email by Add/Remove Email Api */
+                        $removeEmailData = array('EmailId' => $resultCustomer["email"], 'EmailType' => 'Primary');
+                        try {
+                            $removeEmail = $accountAPI->userAdditionalEmail($result['uid'], 'remove', $removeEmailData);
+                        } catch (LoginRadiusSDK\LoginRadiusException $e) {
+
+                            Mage::throwException($e->getErrorResponse()->description);
+                            return;
+                        }
+                    }
                 }
+
+//                if(empty($postData['account']['new_password']) || $postData['account']['new_password'] != 'auto'){
+//                   
+//                  
+//                    try {
+//                        $customer = Mage::getSingleton("customer/session")->getCustomer();
+//                
+//                       
+//                   $userAPI->edit($result['sociallogin_id'], $params);
+//                   
+//                } catch (LoginRadiusSDK\LoginRadiusException $e) {
+//
+//                    Mage::throwException($e->getErrorResponse()->description);
+//                    return;
+//                }
+//                }
             }
         }
     }

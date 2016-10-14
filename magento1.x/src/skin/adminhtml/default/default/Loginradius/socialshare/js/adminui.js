@@ -103,7 +103,7 @@ function loginRadiusPrepareAdminUI() {
                             }
                         }
                     } else {
-                        var loginRadiusSharingProviderArray = ["Facebook Like", "Google+ +1", "Twitter Tweet", "Pinterest Pin it", "Hybridshare"];
+                        var loginRadiusSharingProviderArray = ["Facebook Like", "Google+ +1", "Twitter Tweet", "Pinterest Pin it", "LinkedIn Share"];
                         for (var i = 0; i < loginRadiusSharingProviderArray.length; i++) {
                             if (document.getElementById(sharingType[j] + "_" + sharingModes[jj] + "_" + loginRadiusSharingProviderArray[i])) {
                                 document.getElementById(sharingType[j] + "_" + sharingModes[jj] + "_" + loginRadiusSharingProviderArray[i]).checked = true;
@@ -229,7 +229,7 @@ function loginRadiusShowIcon(pageRefresh, elem, sharingType, lrDefault) {
             var listItem = document.createElement('li');
             listItem.setAttribute('id', 'loginRadius' + sharingType + 'LI' + elem.value);
             listItem.setAttribute('title', elem.value);
-            listItem.setAttribute('class', 'lrshare_iconsprite32 lrshare_' + elem.value.toLowerCase());
+            listItem.setAttribute('class', 'ossshare_iconsprite32 ossshare_' + elem.value.toLowerCase());
             ul.appendChild(listItem);
             // add selected providers in the hiddem field value
             if (!pageRefresh || lrDefault == true) {
@@ -268,9 +268,9 @@ $loginRadiusJquery(document).ready(function () {
     for (var i = 0; i < sharingType.length; i++) {
         for (var j = 0; j < sharingModes.length; j++) {
             if (sharingModes[j] == 'counter') {
-                var providers = $SC.Providers.All;
+                var providers = ["Facebook Like","Facebook Recommend","Facebook Send","Twitter Tweet","Pinterest Pin it","LinkedIn Share","StumbleUpon Badge","Reddit","Google+ +1","Google+ Share"];
             } else {
-                var providers = $SS.Providers.More;
+                var providers = ["Facebook","GooglePlus","LinkedIn","Twitter","Pinterest","Email","Google","Digg","Reddit","Vkontakte","Tumblr","Myspace","Delicious","Print"];
             }
             if (document.getElementById('row_socialshare_' + sharingType[i] + 'sharing_' + sharingType[i] + sharingModes[j] + 'providers') != null) {
                 // populate sharing providers checkbox

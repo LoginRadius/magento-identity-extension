@@ -178,6 +178,7 @@ class Loginradius_Socialprofiledata_Model_ProfileData extends Mage_Adminhtml_Blo
                     color: #fff;
                 }
             </style>
+
             <script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
             <script type="text/javascript">
                 jQuery(document).ready(function () {
@@ -221,8 +222,11 @@ class Loginradius_Socialprofiledata_Model_ProfileData extends Mage_Adminhtml_Blo
             $lrLinkedinCompanies = $this->getprofiledata('linkedin_companies', $customerId);
             //status
             $lrStatus = $this->getprofiledata('status', $customerId);
+             
             //twitter mentions
             $lrTwitterMentions = $this->getprofiledata('twitter_mentions', $customerId);
+            //facebook likes
+            $lrFacebookLikes = $this->getprofiledata('facebook_likes', $customerId);
             ?>
             <h2>User Profile</h2>
             <div id="tabs">
@@ -288,6 +292,13 @@ class Loginradius_Socialprofiledata_Model_ProfileData extends Mage_Adminhtml_Blo
                         <li style="cursor:pointer;"><a href="#tabs-10"><?php echo 'Twitter Mentions'; ?></a></li>
                         <?php
                     }
+                    if (count($lrFacebookLikes) > 0) {
+                        $isLrUserDataEmpty = false;
+                        ?>
+                        <li style="cursor:pointer;"><a href="#tabs-11"><?php echo 'Facebook Likes'; ?></a></li>
+                        <?php
+                    }
+                    
                     ?>
                 </ul>
                 <?php
@@ -793,6 +804,28 @@ class Loginradius_Socialprofiledata_Model_ProfileData extends Mage_Adminhtml_Blo
                             </thead>
                             <?php
                             $this->login_radius_show_data($lrTwitterMentions, true);
+                            ?>
+                        </table>
+                    </div>
+                </div>
+                <?php
+            }
+            if (count($lrFacebookLikes) > 0) {
+                    ?>
+                    <div id="tabs-11">
+                        <table class="sociallogin_table" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="head"><?php echo 'Id'; ?></th>
+                                    <th class="head"><?php echo 'Name'; ?></th>
+                                    <th class="head"><?php echo 'Category'; ?></th>
+                                    <th class="head"><?php echo 'Date Time'; ?></th>                                    
+                                    <th class="head"><?php echo 'Website'; ?></th>
+                                    <th class="head" style="width:400px;"><?php echo 'Description'; ?></th>
+                                </tr>
+                            </thead>
+                            <?php
+                            $this->login_radius_show_data($lrFacebookLikes, true);
                             ?>
                         </table>
                     </div>

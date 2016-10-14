@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Loginradius_Logs>
+            <version>2.0.4</version>
+        </Loginradius_Logs>
+    </modules>
+    <!-- helper -->
+    <global>
+        <helpers>
+            <logs>
+                <class>Loginradius_Logs_Helper</class>
+            </logs>
+        </helpers>
+        <resources>
+            <logs_setup>
+                <setup>
+                    <module>Loginradius_Logs</module>
+                </setup>
+            </logs_setup>
+        </resources>
+        <events>
+            <lr_debug_log_event>
+                <observers>
+                    <Loginradius_Logs_lr_debug_log_event>
+                        <type>singleton</type>
+                        <class>Loginradius_Logs_Model_Observer</class>
+                        <method>lr_debug_log_event</method>
+                    </Loginradius_Logs_lr_debug_log_event>
+                </observers>
+            </lr_debug_log_event>
+        </events>
+    </global>
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <logs>
+                                            <title>Store Logs Module Section</title>
+                                        </logs>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <logs before="Mage_Adminhtml">Loginradius_Logs</logs>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+</config>

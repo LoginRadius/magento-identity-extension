@@ -7,6 +7,7 @@ $activationBlockObj = Mage::getBlockSingleton('activation/activation');
 if ($activationBlockObj->raasEnable() == '1') {
     echo $this->getLayout()->createBlock('sociallogin/sociallogin')->setTemplate('Loginradius/customerregistration/linking.phtml')->toHtml();
 }else{
+    if($this->socialLinking() == '1'){
     ?>
     <div class="dashboard">
         <div class="box-account box-info">
@@ -91,3 +92,4 @@ if ($activationBlockObj->raasEnable() == '1') {
         </div>
     </div>
 <?php }
+}

@@ -100,8 +100,12 @@ if (isset($checkoutUid) && !empty($checkoutUid)) {
         $loginRadiusConn = Mage::getSingleton('core/resource')->getConnection('core_write');
         try {
             // delete query magento way
-            $this->blockObj = new Loginradius_Customerregistration_Helper_RaasSDK();
-            $response = $this->blockObj->raas_unlink_account($uid, $provider, $providerId);
+            require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+            global $apiClient_class;
+            $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+            $accountAPI= new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+        
+            $response = $accountAPI->accountUnlink($uid, $providerId, $provider);
             if (isset($response->isPosted) && $response->isPosted == true) {
                 $loginRadiusConn->delete(
                         Mage::getSingleton('core/resource')->getTableName('lr_sociallogin'), array('entity_id = ?' => $loginRadiusUserId, 'sociallogin_id = ?' => trim($providerId))
