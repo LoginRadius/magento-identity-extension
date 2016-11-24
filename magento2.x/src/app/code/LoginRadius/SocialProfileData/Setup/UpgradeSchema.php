@@ -13,7 +13,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
        
         $setup->startSetup();
         
-        if (version_compare($context->getVersion(), '1.1.1', '<')) {
+        if (version_compare($context->getVersion(), '1.1.2', '<')) {
 
             // Get module table
             $tableName = $setup->getTable('lr_addresses');

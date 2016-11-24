@@ -1,6 +1,6 @@
 <?php
 
-namespace LoginRadius\SocialProfileData\Setup;
+namespace LoginRadius\Apilog\Setup;
 
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;

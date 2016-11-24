@@ -14,7 +14,7 @@
         <script src="LoginRadius_CustomerRegistration::customerregistration/js/LoginRadiusFrontEnd.js"/>
         <script src="LoginRadius_CustomerRegistration::customerregistration/js/LoginRadiusSDK.2.0.1.js"/>
     </head>
-    <referenceContainer name="header.container" >
+    <referenceContainer name="header.container">
         <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customerregistration_checkout" template="checkout.phtml" cacheable="false"/>
     </referenceContainer>
 </page>

@@ -12,6 +12,7 @@
         <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customerregistration_head_script" template="head.phtml" cacheable="false"/>
     </referenceBlock>
     <referenceContainer name="content">
-        <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customer.login.container" template="login.phtml" cacheable="false"/>
+        <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customerregistration_login" template="login.phtml" cacheable="false"/>
+        <referenceBlock name="customer.login.container" remove="true"/>
     </referenceContainer>
 </page>

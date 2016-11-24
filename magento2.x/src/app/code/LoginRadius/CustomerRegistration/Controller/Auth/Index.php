@@ -272,9 +272,8 @@ class Index extends \Magento\Framework\App\Action\Action {
         $entity_id = isset($output[0]['entity_id']) ? $output[0]['entity_id'] : '';
         if (!empty($entity_id)) {
             $customer = $this->checkEntityIdExist($entity_id);
-            if (isset($customer[0]['confirmation']) && !empty($customer[0]['confirmation'])) {
-                return array('is_verified' => true, 'email' => $customer[0]['email']);
-            } elseif (isset($customer[0]['entity_id']) && !empty($customer[0]['entity_id'])) {
+            
+            if (isset($customer[0]['entity_id']) && !empty($customer[0]['entity_id'])) {
                 return $customer[0]['entity_id'];
             } else {
                 $this->unlinkSocialAccount($entity_id);
