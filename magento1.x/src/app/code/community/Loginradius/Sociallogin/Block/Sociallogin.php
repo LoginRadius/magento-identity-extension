@@ -112,7 +112,9 @@ class Loginradius_Sociallogin_Block_Sociallogin extends Mage_Core_Block_Template
     public function emailVerified(){
         return '0';
     }
-
+    public function addressObject() {
+        return Mage::getStoreConfig('sociallogin/othersettings/addressObject');
+    }
     public function getAvatar($id)
     {
         $socialLoginConn = Mage::getSingleton('core/resource')->getConnection('core_read');

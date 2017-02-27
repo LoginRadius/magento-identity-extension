@@ -144,12 +144,22 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
+                        <addressObject translate="label">
+                            <label>Do you want to enable address object field?</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Do you want to enable address object field.]]></comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </addressObject>
                         <updateprofiledata translate="label">
                             <label>Update Profile Data</label>
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Select yes to update user profile details in your Magento website, every time user logs into your website.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -160,7 +170,7 @@
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Allow users to verify email address. Please note: your selection will be applied to existing users as well as new users.]]></comment>
                             <source_model>Loginradius_Customerregistration_Model_Source_Emailvalidation</source_model>
-                            <sort_order>2</sort_order>
+                            <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -170,7 +180,7 @@
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Let users log in with either username or email.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>3</sort_order>
+                            <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>

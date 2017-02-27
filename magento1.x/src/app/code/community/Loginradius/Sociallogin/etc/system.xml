@@ -262,12 +262,22 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
+                        <addressObject translate="label">
+                            <label>Do you want to enable address object field?</label>
+                            <frontend_type>select</frontend_type>
+                            <comment><![CDATA[Do you want to enable address object field.]]></comment>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </addressObject>
                         <updateprofiledata translate="label">
                             <label>Update Profile Data</label>
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Select yes to update user profile details in your Magento website, every time user logs into your website.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>1</sort_order>
+                            <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -277,7 +287,7 @@
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Link social accounts with existing user accounts.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>2</sort_order>
+                            <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -287,7 +297,7 @@
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[Ask the required Magento User Profile fields in a popup when user registers through Social Login.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>3</sort_order>
+                            <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -297,7 +307,7 @@
                             <frontend_type>select</frontend_type>
                             <comment><![CDATA[If your customers are not able to login, Please enable debug mode to display errors.]]></comment>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>4</sort_order>
+                            <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>

@@ -55,6 +55,7 @@ if ($this->horizontalShareEnable() == "1" || $this->verticalShareEnable() == "1"
                 $sharingScript .= 'isMobileFriendly: ' . $this->isMobileFriendly() . ',';
                 $sharingScript .= 'isTotalShare: ' . $this->totalShare() . ',';
             }
+           
             $sharingScript .= 'isEmailContentReadOnly: ' . $this->emailReadOnly() . ',';
             $sharingScript .= ($this->emailSubject() != '') ? ('emailSubject: "' . $this->emailSubject() . '",') : '';
             $sharingScript .= ($this->emailMessage() != '') ? ('emailMessage: "' .trim(preg_replace('/\s\s+/', ' ',$this->emailMessage())) . '",') : '';

@@ -190,6 +190,10 @@ class Loginradius_Customerregistration_Block_Customerregistration extends Loginr
         return '';
     }
 
+    public function addressObject() {
+        return Mage::getStoreConfig('customerregistration/othersettings/addressObject');
+    }
+    
     public function getSocialLoginContainer() {
         $activationBlockObj = Mage::getBlockSingleton('activation/activation');
         $apiKey = trim($activationBlockObj->apiKey());

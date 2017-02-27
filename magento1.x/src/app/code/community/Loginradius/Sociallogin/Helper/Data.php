@@ -48,7 +48,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
                 $redirectionLink .= '?LoginRadiusLinked=0';
             } else {
                 $customerEntity['uid'] = Mage::getSingleton("customer/session")->getLoginRadiusUid();
-                
+
                 if (isset($customerEntity['uid']) && !empty($customerEntity['uid'])) {
                     require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
                     global $apiClient_class;
@@ -62,7 +62,7 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
                     } else {
                         try {
                             $response = $accountAPI->accountLink($customerEntity['uid'], $socialLoginLinkData['sociallogin_id'], $socialLoginLinkData['provider']);
-                            
+
                             if (isset($response->isPosted) && $response->isPosted == true) {
                                 $this->SocialLoginInsert("lr_sociallogin", $socialLoginLinkData);
                                 $session->addSuccess(__('Account linked successfully.'));
@@ -170,45 +170,46 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
         }
         $customer->setConfirmation(null);
         $customer->save();
-        $address = Mage::getModel("customer/address");
-        if (!$update) {
-            $address->setCustomerId($customer->getId());
-            $address->firstname = $customer->firstname;
-            $address->lastname = $customer->lastname;
-            $address->country_id = isset($userProfile->Country->Code) ? ucfirst($userProfile->Country->Code) : '';
-            if (!isset($userProfile->Country->Code) || empty($userProfile->Country->Code)) {
-                if (isset($userProfile->Country->Name) && !empty($userProfile->Country->Name)) {
-                    $countryList = Mage::getResourceModel('directory/country_collection')->loadData()->toOptionArray(false);
-                    foreach ($countryList as $key => $val) {
-                        if (strtolower($val['label']) === strtolower($userProfile->Country->Name)) {
-                            $address->country_id = $val['value'];
-                            break;
+        if ($blockObject->addressObject() == '1') {
+            $address = Mage::getModel("customer/address");
+            if (!$update) {
+                $address->setCustomerId($customer->getId());
+                $address->firstname = $customer->firstname;
+                $address->lastname = $customer->lastname;
+                $address->country_id = isset($userProfile->Country->Code) ? ucfirst($userProfile->Country->Code) : '';
+                if (!isset($userProfile->Country->Code) || empty($userProfile->Country->Code)) {
+                    if (isset($userProfile->Country->Name) && !empty($userProfile->Country->Name)) {
+                        $countryList = Mage::getResourceModel('directory/country_collection')->loadData()->toOptionArray(false);
+                        foreach ($countryList as $key => $val) {
+                            if (strtolower($val['label']) === strtolower($userProfile->Country->Name)) {
+                                $address->country_id = $val['value'];
+                                break;
+                            }
                         }
                     }
                 }
+
+                $address->city = isset($userProfile->City) ? ucfirst($userProfile->City) : '';
+                $address->region = isset($userProfile->State) && !empty($userProfile->State) ? $userProfile->State : '';
+
+                $address->telephone = '';
+                if (isset($userProfile->PhoneNumbers) && is_array($userProfile->PhoneNumbers) && count($userProfile->PhoneNumbers) > 0) {
+                    $address->telephone = isset($userProfile->PhoneNumbers[0]->PhoneNumber) ? $userProfile->PhoneNumbers[0]->PhoneNumber : '';
+                }
+
+                $address->company = isset($userProfile->Industry) ? ucfirst($userProfile->Industry) : '';
+
+                if (isset($userProfile->Addresses) && is_array($userProfile->Addresses) && count($userProfile->Addresses) > 0) {
+                    $address->street = isset($userProfile->Addresses[0]->Address1) ? ucfirst($userProfile->Addresses[0]->Address1) : '';
+                    $address->postcode = isset($userProfile->Addresses[0]->PostalCode) ? $userProfile->Addresses[0]->PostalCode : '';
+                    // If country is USA, set up province
+                    $address->region = isset($userProfile->Addresses[0]->Region) ? $userProfile->Addresses[0]->Region : $address->region;
+                }
+                // set default billing, shipping address and save in address book
+                $address->setIsDefaultShipping('1')->setIsDefaultBilling('1')->setSaveInAddressBook('1');
+                $address->save();
             }
-
-            $address->city = isset($userProfile->City) ? ucfirst($userProfile->City) : '';
-            $address->region = isset($userProfile->State) && !empty($userProfile->State) ? $userProfile->State : '';
-
-            $address->telephone = '';
-            if (isset($userProfile->PhoneNumbers) && is_array($userProfile->PhoneNumbers) && count($userProfile->PhoneNumbers) > 0) {
-                $address->telephone = isset($userProfile->PhoneNumbers[0]->PhoneNumber) ? $userProfile->PhoneNumbers[0]->PhoneNumber : '';
-            }
-
-            $address->company = isset($userProfile->Industry) ? ucfirst($userProfile->Industry) : '';
-
-            if (isset($userProfile->Addresses) && is_array($userProfile->Addresses) && count($userProfile->Addresses) > 0) {
-                $address->street = isset($userProfile->Addresses[0]->Address1) ? ucfirst($userProfile->Addresses[0]->Address1) : '';
-                $address->postcode = isset($userProfile->Addresses[0]->PostalCode) ? $userProfile->Addresses[0]->PostalCode : '';
-                // If country is USA, set up province
-                $address->region = isset($userProfile->Addresses[0]->Region) ? $userProfile->Addresses[0]->Region : $address->region;
-            }
-            // set default billing, shipping address and save in address book
-            $address->setIsDefaultShipping('1')->setIsDefaultBilling('1')->setSaveInAddressBook('1');
-            $address->save();
         }
-
         // add info in sociallogin table
         $fields = array();
         $fields['sociallogin_id'] = $userProfile->ID;
