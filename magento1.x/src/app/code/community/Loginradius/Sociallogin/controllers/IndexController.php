@@ -296,9 +296,9 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                                 $emailQuery = $this->dataObject->getCustomerData(array('customer_entity'), array($this->userProfileData->Email[0]->Value), 'email');
                                 $customerEntity = $emailQuery->fetch();
                                 if ($customerEntity) {
-                                    if ($this->blockObj->socialLinking() == "1") {
+                                    //if ($this->blockObj->socialLinking() == "1") {
                                         $this->dataObject->linkSocialProfile($customerEntity['entity_id'], $this->userProfileData);
-                                    }
+                                    //}
                                     if ($this->blockObj->updateProfileData() != '1') {
                                         $this->dataObject->loginUserProfile($customerEntity['entity_id'], $this->userProfileData);
                                     } else {
