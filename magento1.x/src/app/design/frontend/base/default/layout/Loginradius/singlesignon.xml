@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<layout version="4.0.0">
-    <default>
-        <reference name="head">
-            <block type="singlesignon/singlesignon" name="singlesignonhead" template="Loginradius/singlesignon/head.phtml"/>
-        </reference>
-    </default>
-</layout> 

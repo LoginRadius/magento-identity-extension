@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<layout version="4.0.0">
-    <adminhtml_system_config_edit>
-        <reference name="head">
-            <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/common/js/jquery.js</script></action>
-            <action method="addJs"><script>../skin/adminhtml/default/default/Loginradius/hostedregistration/js/adminui.js</script></action>
-        </reference>
-    </adminhtml_system_config_edit>
-</layout>

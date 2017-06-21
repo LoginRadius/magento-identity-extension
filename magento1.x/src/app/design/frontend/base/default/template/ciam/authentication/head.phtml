@@ -1,0 +1,104 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?><?php
+if (!empty($this->apiKey()) && !empty($this->apiSecret())) {
+    $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+    Mage::getSingleton('core/session')->setCurrentURLData($currentUrl);
+    $loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "authentication";
+
+    if ($this->getValueFromStringUrl($currentUrl, 'redirect_to')) {
+        $loginRadiusCallback .= "?redirect_to=" . urlencode($this->getValueFromStringUrl($currentUrl, 'redirect_to'));
+    }
+    $session = Mage::getSingleton("customer/session");
+    $currentSocialId = $session->getLoginRadiusId();
+    $parseURL = parse_url(Mage::getBaseUrl());
+
+    if (isset($parseURL['host']) && !empty($parseURL['host']) && (strpos($_SERVER["HTTP_REFERER"], $parseURL['host']) !== false)) {
+        Mage::getSingleton('core/session')->setRefererURLData($_SERVER["HTTP_REFERER"]);
+    }
+    ?>
+    <script src="//auth.lrcontent.com/v2/LoginRadiusV2.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="<?php echo $this->getSkinUrl('ciam/authentication/css/style.css', array('_area' => 'frontend')); ?>" media="all" />
+    <script type="text/javascript">
+        //initialize raas options
+        var commonOptions = {};
+        var LocalDomain = '<?php echo $loginRadiusCallback; ?>';
+        commonOptions.apiKey = '<?php echo $this->apiKey(); ?>';
+        commonOptions.formValidationMessage = true;
+        commonOptions.callbackUrl = '<?php echo $loginRadiusCallback; ?>';
+        commonOptions.hashTemplate = true;
+        commonOptions.sott = "<?php echo urlencode($this->getSOTT()); ?>";
+        commonOptions.linkedAccountsTemplate = 'linkedAccountsTemplate';
+        commonOptions.notLinkedAccountsTemplate = 'notLinkedAccountsTemplate';
+        commonOptions.forgotPasswordUrl = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
+        commonOptions.verificationUrl = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
+        var LRObject = new LoginRadiusV2(commonOptions);
+
+    </script>
+    <script src="<?php echo $this->getSkinUrl('ciam/authentication/js/script.js'); ?>"></script>
+    <?php if (!$this->user_is_already_login()) {
+        ?>
+        <script type="text/html" id="loginradiuscustom_tmpl">
+            <div class="lr_icons_box">
+                <div style="width:100%">
+                    <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return LRObject.util.openWindow('<#= Endpoint #>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                    </span>
+                </div>
+            </div>
+
+        </script>
+    <?php } else {
+        ?>
+        <div class="lr-link-social-container">
+            <script type="text/html" id="linkedAccountsTemplate">
+                <# if(isLinked) { #>
+                <div class="lr-social-account">
+                    <span class="lr_providericons lr-icon-<#= Name.toLowerCase() #> button-shade lr-sl-icon lr-sl-icon-<#= Name.toLowerCase() #>"></span>
+                    <span class="lr-social-info"><#= Name #></span>
+                    <# if(providerId == "<?php echo $currentSocialId; ?>" ) { #>
+                    <span onclick='return LRObject.util.unLinkAccount("<#= Name.toLowerCase() #>", "<#= providerId #>")'> <b><i style="color:green;">is currently connected</i></b></span>
+                    <# }  else {#>
+                    <span class="lr-social-unlink" onclick='return LRObject.util.unLinkAccount("<#= Name.toLowerCase() #>", "<#= providerId #>")'>Unlink</span>
+                    <# } #> 
+                </div>
+                <# } #>
+            </script>
+            <script type="text/html" id="notLinkedAccountsTemplate">
+                <# if(!isLinked) { #>
+                <div class="lr_icons_box">
+                    <div style="width:100%">
+                        <span class="lr_providericons lr-icon-<#= Name.toLowerCase() #>"
+                              title="<#= Name #>"  onclick='return LRObject.util.openWindow("<#= Endpoint #>");'></span>
+                        <# } #>
+                    </div>
+                </div>
+            </script>
+        </div>
+        <?php
+    }
+}
