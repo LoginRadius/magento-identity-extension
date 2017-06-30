@@ -1,0 +1,125 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+    <?php
+if (!empty($this->apiKey()) && !empty($this->apiSecret())) {
+    ?>
+    <div class="magento-raas-loading-image-div"><div class="loadinternal"></div></div>
+    <div class="loginradiusmessagediv" style="display:none;width: 760px;margin: 0 auto;"></div>
+    <div id="login_form" class="account-login">
+
+        <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+        <?php echo $this->getChildHtml('customer.form.login.extra') ?>
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="col2-set">
+            <div class="fieldset">
+                <div class="block" style="margin-top:15px">
+                    <div class="block-title">
+                        <strong>
+                            <span>
+                                <?php echo __('Social Login'); ?>
+                            </span>
+                        </strong>
+                    </div>
+                    <div class="block-content">
+                        <p class="empty">
+                        <style>
+                            .interfacecontainerdiv a{float:left;margin-left:5px;}
+                        </style>
+                        <div class="lr_embed_bricks_200 interfacecontainerdiv" id="interfacecontainerdiv"></div>
+                        <div style="clear:both"></div>
+                        </p>
+                    </div>
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <div class="col-1 new-users">
+                <div class="content">
+                    <h2><?php echo $this->__('New Customers') ?></h2>
+                    <p><?php echo $this->__('By creating an account with our store, you will be able to move through the checkout process faster, store multiple shipping addresses, view and track your orders in your account and more.') ?></p>
+                </div>
+            </div>
+            <div class="col-2 registered-users lr-login-padding">
+                <div class="content">
+                    <h2><?php echo $this->__('ALREADY REGISTERED?') ?></h2>
+                    <p><?php echo $this->__('If you have an account with us, please log in.') ?></p>
+                    <div style="margin:5px"><div id="login-container"></div></div>
+                    <div style="padding-top: 15px;"><a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-left"><?php echo $this->__('Forgot your password') ?></a></div>
+                </div>                
+            </div>
+            <div class="col-1 new-users">
+                <div class="buttons-set">
+                    <button type="button" title="<?php echo $this->__('Create an Account') ?>" class="button" onclick="window.location = '<?php echo Mage::helper('customer')->getRegisterUrl() ?>';"><span><span><?php echo $this->__('Create an Account') ?></span></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="reset_form" class="account-login" style="display: none;">
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="content">
+                    <h2><?php echo $this->__('Reset Password') ?></h2>
+                    <div id="resetpassword-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="buttons-set">
+                    <a href="<?php echo Mage::helper('customer')->getRegisterUrl() ?>" class="f-left"><?php echo $this->__('Create an account') ?></a>
+                    <a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-right"><?php echo $this->__('Forgot your password') ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="social_registration_from" class="account-login" style="display:none;">
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="content">
+                    <h2><?php echo $this->__('Information') ?></h2>
+                    <div id="social-registration-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col1-set">
+            <div class="col-1 reset-users">
+                <div class="buttons-set">
+                    <a href="<?php echo Mage::helper('customer')->getRegisterUrl() ?>" class="f-left"><?php echo $this->__('Create an account') ?></a>
+                    <a href="<?php echo Mage::helper('customer')->getForgotPasswordUrl() ?>" class="f-right"><?php echo $this->__('Forgot your password') ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            initializeSocialForm();
+            initializeLoginForm();
+            initializeResetPasswordForm();
+
+        });
+    </script>
+    <?php
+}

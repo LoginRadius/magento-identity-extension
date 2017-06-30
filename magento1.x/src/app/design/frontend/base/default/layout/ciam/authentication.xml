@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<layout version="1.0.0">
+    <default>
+        <reference name="head">
+            <block type="authentication/authentication" name="ciam_head" template="ciam/authentication/head.phtml"/>
+        </reference>
+    </default>
+    <customer_account_login>
+        <remove name="customer_form_login"/>
+        <reference name="content">
+            <block type="authentication/authentication" name="ciam_form_login" template="ciam/authentication/login.phtml"/>
+        </reference>
+    </customer_account_login>
+    <customer_account_create>
+        <remove name="customer_form_register"/>
+        <reference name="content">
+            <block type="authentication/authentication" name="ciam_form_register" template="ciam/authentication/register.phtml"/>
+        </reference>
+    </customer_account_create>
+    <customer_account_forgotpassword translate="label">
+        <reference name="content">
+            <reference name="forgotPassword">
+                <block type="authentication/authentication" name="forgotPassword" template="ciam/authentication/forgotpassword.phtml"/>
+            </reference>
+        </reference>
+    </customer_account_forgotpassword>
+    <authentication_index_resetpassword translate="label">
+        <remove name="right"/>
+        <reference name="content">
+            <block type="authentication/authentication" name="resetPassword" template="ciam/authentication/resetpassword.phtml"/>
+        </reference>
+    </authentication_index_resetpassword>
+    <customer_account_edit>
+        <reference name="content">
+            <remove name="customer_edit"/>
+            <block type="authentication/authentication" name="changepasswordform" template="ciam/authentication/customeredit.phtml"/>
+      
+        </reference>
+    </customer_account_edit>
+    <customer_account_index>
+        <reference name="content">
+            <block type="authentication/authentication" name="accountlinking" after="-" template="ciam/authentication/linking.phtml"/>
+        </reference>
+    </customer_account_index>
+    <checkout_onepage_index>
+        <reference name="content">            
+            <reference name="checkout.onepage.login">
+                <action method="setTemplate">
+                    <template>ciam/authentication/onepage.phtml</template>
+                </action>
+                <block type="authentication/authentication" name="onepageloginbefore" template="ciam/authentication/onepage.phtml"/>
+            </reference>
+        </reference>
+    </checkout_onepage_index>
+</layout>

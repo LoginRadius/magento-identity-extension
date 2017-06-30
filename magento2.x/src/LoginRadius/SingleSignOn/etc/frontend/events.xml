@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/Event/etc/events.xsd">
+    <event name="lr_logout_sso">
+        <observer name="lr_logout_sso" instance="LoginRadius\SingleSignOn\Model\Observer" />
+    </event>
+    <event name="ciam_options">
+        <observer name="ciam_options" instance="LoginRadius\SingleSignOn\Model\Ssooptions" />
+    </event>
+</config>

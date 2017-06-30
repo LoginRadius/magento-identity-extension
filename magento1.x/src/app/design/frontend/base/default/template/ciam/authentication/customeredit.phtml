@@ -1,0 +1,217 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+if (!empty($this->apiKey()) && !empty($this->apiSecret())) {
+    $currentUid = Mage::getSingleton("customer/session")->getLoginRadiusUid();
+    ?>
+    <div class="loginradiusmessagediv" style="display:none;width: 760px;"></div>
+    <div class="page-title">
+        <h1><?php echo $this->__('Edit Account Information') ?></h1>
+    </div>
+    <?php echo $this->getMessagesBlock()->toHtml() ?>
+    <form action="<?php echo $this->getUrl('customer/account/editPost') ?>" method="post" id="form-validate" autocomplete="off">
+        <div class="fieldset">
+            <?php echo $this->getBlockHtml('formkey') ?>
+            <h2 class="legend"><?php echo $this->__('Account Information') ?></h2>
+            <ul class="form-list">
+                <li class="fields">
+                    <?php echo $this->getLayout()->createBlock('customer/widget_name')->setObject(Mage::getSingleton("customer/session")->getCustomer())->toHtml() ?>
+                </li>
+                <?php
+                if (!empty($currentUid)) {
+                    $accountAPIObject = new \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI($this->apiKey(), $this->apiSecret(), array("output_format" => 'json'));
+                    try {
+                        $profile = $accountAPIObject->getProfileByUid($currentUid);
+                        if (isset($profile->Email)) {
+                            ?>
+                            <li>
+                                <?php
+                                $count = 1;
+                                $totalEmail = count($profile->Email);
+                                foreach ($profile->Email as $emailObj) {
+                                    if ($count == 1) {
+                                        ?>
+                                        <label for="email" class="required"><em>*</em><?php echo $this->__('Email Address') ?></label>
+                                    <?php } else {
+                                        ?>
+                                        <label for="email">&nbsp;</label>
+                                        <?php
+                                    }
+                                    ?>
+                                    <div class="input-box">
+                                        <input type="hidden" name="varifiedEmailType[]" value="<?php echo isset($emailObj->Type) ? trim($emailObj->Type) : 'Primary'; ?>">
+                                        <input readonly type="text" name="varifiedEmailValue[]" value="<?php echo isset($emailObj->Value) ? trim($emailObj->Value) : ''; ?>" class="input-text required-entry validate-email" />
+                                        <?php if ($totalEmail != 1) { ?>
+                                            <span class="removeVarifiedEmail" onclick="removeVarifiedEmail('<?php echo isset($emailObj->Value) ? trim($emailObj->Value) : ''; ?>')"></span>
+                                        <?php }if ($totalEmail == $count) { ?>
+                                            <span class="addVarifiedEmail" onclick="addVarifiedEmail()"></span>
+                                        <?php } ?>
+                                    </div>
+                                    <?php
+                                    $count++;
+                                }
+                                ?>
+                            </li>
+                        <?php
+                        }
+                    } catch (\LoginRadiusSDK\LoginRadiusException $e) {
+                        $e->getMessage();
+                    }
+                }
+                ?>
+                <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob') ?>
+                <?php if ($_dob->isEnabled()): ?>
+                    <li><?php echo $_dob->setDate(Mage::getSingleton("customer/session")->getCustomer()->getDob())->toHtml() ?></li>
+                <?php endif ?>
+                <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
+                <?php if ($_taxvat->isEnabled()): ?>
+                    <li><?php echo $_taxvat->setTaxvat(Mage::getSingleton("customer/session")->getCustomer()->getTaxvat())->toHtml() ?></li>
+                <?php endif ?>
+                <?php $_gender = $this->getLayout()->createBlock('customer/widget_gender') ?>
+                <?php if ($_gender->isEnabled()): ?>
+                    <li><?php echo $_gender->setGender(Mage::getSingleton("customer/session")->getCustomer()->getGender())->toHtml() ?></li>
+                    <?php endif ?>
+                    <?php $changePassword = Mage::getSingleton("customer/session")->getCustomer()->getChangePassword() ?>           
+                <li class="control">
+                    <input type="checkbox" name="social_password" id="social_password" value="1" onclick="jQuery('#socialpasswordbox').toggle()" title="<?php echo $this->__('Change Password') ?>"<?php
+                       $style = "none";
+                       if ($changePassword == 1): $style = "block";
+                           ?> checked="checked"<?php endif; ?> class="checkbox"/>
+                    <label for="social_password" id="changepasswordtitlecheckbox"><?php echo $this->__('Change Password') ?></label>
+                </li>
+            </ul>
+        </div>
+        <div class="fieldset" style="display:<?php echo $style ?>" id="socialpasswordbox">
+            <h2 class="legend"><?php echo $this->__('Change Password') ?></h2>
+            <div id="changepasswordbox">
+                <div style="margin:5px">
+                    <div id="changepassword-container"></div>
+                </div>
+            </div>
+        </div>
+        <div class="buttons-set">
+            <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+            <p class="back-link"><a href="<?php echo $this->escapeUrl($this->getBackUrl()) ?>"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+            <button type="submit" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Save')) ?>" class="button"><span><span><?php echo $this->__('Save') ?></span></span></button>
+        </div>
+    </form>
+    <div class="LoginRadius_overlay removeemail_overlay" style="display: none;z-index: 999 !important;">
+        <div id="popupouter">
+            <div id="lr_heading_container_checkout" style="height: 50px;">
+                <div class="lr-popupheading" style="float:left !important;padding: 15px 15px 0px 15px !important;"><?php echo __('Remove Email'); ?></div>
+                <div id="lr_popup_close_container">
+                    <button onclick="closeVarifiedEmail()" type="button" id="lr_close_button">&#215;</button>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div id="popupinner" style="margin:15px !important;"><div id="removeemail-container"></div></div>
+        </div>
+    </div>
+    <div class="LoginRadius_overlay addemail_overlay" style="display: none;z-index: 999 !important;">
+        <div id="popupouter">
+            <div id="lr_heading_container_checkout" style="height: 50px;">
+                <div class="lr-popupheading" style="float:left !important;padding: 15px 15px 0px 15px !important;"><?php echo __('Add Email'); ?></div>
+                <div id="lr_popup_close_container">
+                    <button onclick="closeVarifiedEmail()" type="button" id="lr_close_button">&#215;</button>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div id="popupinner" style="margin:15px !important;"><div id="addemail-container"></div></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //<![CDATA[
+        jQuery(document).ready(function () {
+            initializeChangePasswordForm();
+            initializeRemoveVarifiedEmail();
+            initializeAddVarifiedEmail();
+        });
+        var dataForm = new VarienForm('form-validate', true);
+        function closeVarifiedEmail() {
+            jQuery('.LoginRadius_overlay').hide();
+        }
+        function removeVarifiedEmail(email) {
+            jQuery('#loginradius-removeemail-emailid').val(email);
+            jQuery('.removeemail_overlay').show();
+        }
+        function addVarifiedEmail() {
+            jQuery('.addemail_overlay').show();
+        }
+        function initializeRemoveVarifiedEmail() {
+            var removeemail_options = {};
+            removeemail_options.container = "removeemail-container";
+            removeemail_options.onSuccess = function (response) {
+                // On Success
+                if (response.IsDeleted) {
+                    handleResponse(true, "Your email has been Removed.");
+                    jQuery('input[value="'+jQuery('#loginradius-removeemail-emailid').val()+'"]').parent().next().remove();
+                    jQuery('input[value="'+jQuery('#loginradius-removeemail-emailid').val()+'"]').parent().remove();
+                }
+                closeVarifiedEmail();
+            };
+            removeemail_options.onError = function (errors) {
+                // On Error
+                if (errors[0].Description != null) {
+                    handleResponse(false, errors[0].Description);
+                }
+                closeVarifiedEmail();
+            };
+
+            LRObject.util.ready(function () {
+                LRObject.init("removeEmail", removeemail_options);
+            });
+        }
+        function initializeAddVarifiedEmail() {
+            var addemail_options = {};
+            addemail_options.container = "addemail-container";
+            addemail_options.onSuccess = function (response) {
+                // On Success
+                if (response.IsPosted) {
+                    handleResponse(true, "An email has been sent to " + jQuery("#loginradius-addemail-emailid").val() + ".Please verify your email address.");
+                }
+                jQuery("#loginradius-addemail-emailid,#loginradius-addemail-type").val('');
+                closeVarifiedEmail();
+            };
+            addemail_options.onError = function (errors) {
+                // On Error
+                if (errors[0].Description != null) {
+                    handleResponse(false, errors[0].Description);
+                }
+                jQuery("#loginradius-addemail-emailid,#loginradius-addemail-type").val('');
+                closeVarifiedEmail();
+            };
+
+
+            LRObject.util.ready(function () {
+
+                LRObject.init("addEmail", addemail_options);
+
+            });
+        }
+    </script>
+    <?php
+}

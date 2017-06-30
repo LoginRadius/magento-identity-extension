@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-    <modules>
-        <Loginradius_Sociallogin>
-            <active>true</active>
-            <codePool>community</codePool>
-        </Loginradius_Sociallogin>
-    </modules>
-</config>
