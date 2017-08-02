@@ -1,177 +1,178 @@
 <?php
 $activationBlockObj = Mage::getBlockSingleton('activation/activation');
-if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
-$getBlockDir = $activationBlockObj->getBlockDir();
-if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == "0"){
-/**
- * template to display social linking interface
- */
-$loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
-$session = Mage::getSingleton("customer/session");
-$currentUid = $session->getLoginRadiusUid();
-$currentSocialId = $session->getLoginRadiusId();
-$checkoutUid = $session->getCurrentLoginRadiusUid();
-if (isset($checkoutUid) && !empty($checkoutUid)) {
-    ?>
-    <script type="text/javascript">
-        sessionStorage.setItem("lr-user-uid", "<?php echo $checkoutUid ?>");
-    </script>
-    <?php
-}
-?>
-<script type="text/html" id="loginradiuscustom_tmpl">
-    <# if(isLinked) { #>
-    <div class="lr-linked">
-        <div class="lr-linked-id"><span class="lr-icon-frame">
-                <span class="lr-icon lr-raas-<#= Name.toLowerCase() #>">
-                </span>
-            </span>
-
-            <div class="lr-linked-image" style="float:left;padding-right:10px;"><img src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/images/Linking', array('_area' => 'frontend')); ?>/<#= Name.toLowerCase() #>.png"/></div>
-
-            <# if(providerId == "<?php echo $currentSocialId; ?>" ) { #>
-            <span class="lr-linked-image" style="">   is connected currently</span>
-
-            <# }  else {#>
-            <span class="lr-linked-image" style="">   is connected</span>
-            <a style="margin-left:15px" class="lr-unlink" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . 'customer/account/?providerid=' ?><#= providerId #>&provider=<#= Name.toLowerCase() #>&uid=<?php echo $currentUid ?>">Remove</a>
-
-            <# } #>
-        </div>
-    </div>
-    <# }  else {#>
-    <div class="lr_icons_box">
-        <div class="lr_icons_inner_box" style="width:100%;">
-            <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&ac_linking=true&callback=<?php echo $loginRadiusCallback ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
-            </span>
-        </div>
-    </div>
-    <# } #>
-
-</script>
-<style type="text/css">
-    .lr_embed_bricks_200 .lr_providericons {
-        width: 100%;
-    }
-
-    .lr_embed_bricks_200 .lr_icons_box {
-        width: 22%;
-    }
-
-    div.lr-unlinked {
-        float: left;
-    }
-</style>
-
-<script type="text/javascript">
-    jQuery(document).ready(function () {
-        initializeAccountLinkingRaasForms();
-    });
-</script>
-<div class="dashboard">
-    <?php
-    if (isset($_GET['LoginRadiusLinked'])) {
-        $linkRedirect = false;
-        if (trim($_GET['LoginRadiusLinked']) == 1) {
-            Mage::getSingleton('core/session')->addSuccess('Account linked successfully.');
-            $linkRedirect = true;
-            // account from this provider is already linked
-        } elseif (trim($_GET['LoginRadiusLinked']) == 2) {
-            Mage::getSingleton('core/session')->addError('Multiple accounts cannot be linked from the same Social ID Provider.');
-            $linkRedirect = true;
-            // account already mapped or exists
-        } elseif (trim($_GET['LoginRadiusLinked']) == 0) {
-            Mage::getSingleton('core/session')->addError('Account already exists or mapped.');
-            $linkRedirect = true;
+if ($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != '') {
+    $getBlockDir = $activationBlockObj->getBlockDir();
+    if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == "0") {
+        /**
+         * template to display social linking interface
+         */
+        $loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
+        $session = Mage::getSingleton("customer/session");
+        $currentUid = $session->getLoginRadiusUid();
+        $currentSocialId = $session->getLoginRadiusId();
+        $checkoutUid = $session->getCurrentLoginRadiusUid();
+        if (isset($checkoutUid) && !empty($checkoutUid)) {
+            ?>
+            <script type="text/javascript">
+                sessionStorage.setItem("lr-user-uid", "<?php echo $checkoutUid ?>");
+            </script>
+            <?php
         }
-        if ($linkRedirect) {
-            /* not the best redirect but don`t know how to */
-            header("Location:" . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "customer/account");
-            die;
-        }
-    }
-    // get logged in user's id
-    $loginRadiusUserId = Mage::getSingleton("customer/session")->getCustomer()->getId();
-    // unlink account
-    $uid = isset($_GET['uid']) ? trim($_GET['uid']) : '';
-    $providerId = isset($_GET['providerid']) ? trim($_GET['providerid']) : '';
-    $provider = isset($_GET['provider']) ? trim($_GET['provider']) : '';
-    if (!empty($uid) && !empty($providerId) && !empty($provider)) {
-        $loginRadiusConn = Mage::getSingleton('core/resource')->getConnection('core_write');
-        try {
-            // delete query magento way
-            require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
-            global $apiClient_class;
-            $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
-            $accountAPI= new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
-        
-            $response = $accountAPI->accountUnlink($uid, $providerId, $provider);
-            if (isset($response->isPosted) && $response->isPosted == true) {
-                $loginRadiusConn->delete(
-                        Mage::getSingleton('core/resource')->getTableName('lr_sociallogin'), array('entity_id = ?' => $loginRadiusUserId, 'sociallogin_id = ?' => trim($providerId))
-                );
-                Mage::getSingleton('core/session')->addSuccess('Account removed successfully.');
-            } else {
-                Mage::getSingleton('core/session')->addError($response->description);
-            }
-        } catch (Exception $e) {
-            
-        }
-        header("Location:" . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "customer/account");
-        die;
-    }
-    ?>
-    <div class="box-account box-info" id="loginradius_account_linking_container">
-        <div class="col2-set">
-            <div class="box">
-                <div class="box-title">
-                    <h1><?php echo 'Link Social IDs to your Magento Account' ?></h1>
+        ?>
+        <script type="text/html" id="loginradiuscustom_tmpl">
+            <# if(isLinked) { #>
+            <div class="lr-linked">
+                <div class="lr-linked-id"><span class="lr-icon-frame">
+                        <span class="lr-icon lr-raas-<#= Name.toLowerCase() #>">
+                        </span>
+                    </span>
+
+                    <div class="lr-linked-image" style="float:left;padding-right:10px;"><img src="<?php echo $this->getSkinUrl('Loginradius/sociallogin/images/Linking', array('_area' => 'frontend')); ?>/<#= Name.toLowerCase() #>.png"/></div>
+
+                    <# if(providerId == "<?php echo $currentSocialId; ?>" ) { #>
+                    <span class="lr-linked-image" style="">   is connected currently</span>
+
+                    <# }  else {#>
+                    <span class="lr-linked-image" style="">   is connected</span>
+                    <a style="margin-left:15px" class="lr-unlink" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . 'customer/account/?providerid=' ?><#= providerId #>&provider=<#= Name.toLowerCase() #>&uid=<?php echo $currentUid ?>">Remove</a>
+
+                    <# } #>
                 </div>
-                <div class="box-content">
-                    <div class="lr-linked-data lr-linked-frame"></div>
-                    <div style="clear:both"></div>
-                    <div class="lr-unlinked-data lr_icons_box"></div>
-                    <div style="clear:both"></div>
-                    <div class="lr_embed_bricks_200 interfacecontainerdiv" id="interfacecontainerdiv"></div>
+            </div>
+            <# }  else {#>
+            <div class="lr_icons_box">
+                <div class="lr_icons_inner_box" style="width:100%;">
+                    <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&ac_linking=true&callback=<?php echo $loginRadiusCallback ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                    </span>
+                </div>
+            </div>
+            <# } #>
+
+        </script>
+        <style type="text/css">
+            .lr_embed_bricks_200 .lr_providericons {
+                width: 100%;
+            }
+
+            .lr_embed_bricks_200 .lr_icons_box {
+                width: 22%;
+            }
+
+            div.lr-unlinked {
+                float: left;
+            }
+        </style>
+
+        <script type="text/javascript">
+            jQuery(document).ready(function () {
+                initializeAccountLinkingRaasForms();
+            });
+        </script>
+        <div class="dashboard">
+            <?php
+            if (isset($_GET['LoginRadiusLinked'])) {
+                $linkRedirect = false;
+                if (trim($_GET['LoginRadiusLinked']) == 1) {
+                    Mage::getSingleton('core/session')->addSuccess('Account linked successfully.');
+                    $linkRedirect = true;
+                    // account from this provider is already linked
+                } elseif (trim($_GET['LoginRadiusLinked']) == 2) {
+                    Mage::getSingleton('core/session')->addError('Multiple accounts cannot be linked from the same Social ID Provider.');
+                    $linkRedirect = true;
+                    // account already mapped or exists
+                } elseif (trim($_GET['LoginRadiusLinked']) == 0) {
+                    Mage::getSingleton('core/session')->addError('Account already exists or mapped.');
+                    $linkRedirect = true;
+                }
+                if ($linkRedirect) {
+                    /* not the best redirect but don`t know how to */
+                    header("Location:" . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "customer/account");
+                    die;
+                }
+            }
+            // get logged in user's id
+            $loginRadiusUserId = Mage::getSingleton("customer/session")->getCustomer()->getId();
+            // unlink account
+            $uid = isset($_GET['uid']) ? trim($_GET['uid']) : '';
+            $providerId = isset($_GET['providerid']) ? trim($_GET['providerid']) : '';
+            $provider = isset($_GET['provider']) ? trim($_GET['provider']) : '';
+            
+            if (!empty($uid) && !empty($providerId) && !empty($provider)) {
+                $loginRadiusConn = Mage::getSingleton('core/resource')->getConnection('core_write');
+                try {
+                    // delete query magento way
+                    require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' . DS . 'SDKClient.php';
+                    global $apiClient_class;
+                    $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
+                    $accountAPI = new LoginRadiusSDK\CustomerRegistration\AccountAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
+
+                    $response = $accountAPI->accountUnlink($uid, $providerId, $provider);
+                    if (isset($response->isPosted) && $response->isPosted == true) {
+                        $loginRadiusConn->delete(
+                                Mage::getSingleton('core/resource')->getTableName('lr_sociallogin'), array('entity_id = ?' => $loginRadiusUserId, 'sociallogin_id = ?' => trim($providerId))
+                        );
+                        Mage::getSingleton('core/session')->addSuccess('Account removed successfully.');
+                    } else {
+                        Mage::getSingleton('core/session')->addError($response->description);
+                    }
+                } catch (\LoginRadiusSDK\LoginRadiusException $e) {                    
+                    Mage::getSingleton('core/session')->addError($e->getErrorResponse()->description);
+                }
+                header("Location:" . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "customer/account");
+                die;
+            }
+            ?>
+            <div class="box-account box-info" id="loginradius_account_linking_container">
+                <div class="col2-set">
+                    <div class="box">
+                        <div class="box-title">
+                            <h1><?php echo 'Link Social IDs to your Magento Account' ?></h1>
+                        </div>
+                        <div class="box-content">
+                            <div class="lr-linked-data lr-linked-frame"></div>
+                            <div style="clear:both"></div>
+                            <div class="lr-unlinked-data lr_icons_box"></div>
+                            <div style="clear:both"></div>
+                            <div class="lr_embed_bricks_200 interfacecontainerdiv" id="interfacecontainerdiv"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<script type="text/javascript">
-    function linking() {
-        jQuery(".lr-linked-data, .lr-unlinked-data").html('');
-        jQuery(".lr-linked").each(function () {
-            jQuery(".lr-linked-data").append(jQuery(this).html());
-        });
-        jQuery(".lr_icons_box").each(function () {
-            jQuery(".lr-unlinked-data").append(jQuery(this).html());
-        });
-        var linked_val = jQuery('.lr-linked-data').html();
-        var unlinked_val = jQuery('.lr-unlinked-data').html();
-        if (linked_val != '') {
-            jQuery(".lr-linked-data").prepend('<div class="lr-heading"><h3>Linked Accounts</h3></div>');
-        }
-        if (unlinked_val != '') {
-            jQuery(".lr-unlinked-data").prepend('<div class="lr-heading lr-heading-small" style="margin-top:10px;"><h3>Choose a social account to link<h3></div>');
-        }
-        jQuery('.lr-unlinked-data').addClass('lr_embed_bricks_200 interfacecontainerdiv');
-        if (jQuery('.lr-unlinked-data').length != 0) {
-            var styleForLR = {
-                width: '20%',
-                float: 'left',
-                margin: '0 5px 7px',
-                cursor: 'pointer'
+        <script type="text/javascript">
+            function linking() {
+                jQuery(".lr-linked-data, .lr-unlinked-data").html('');
+                jQuery(".lr-linked").each(function () {
+                    jQuery(".lr-linked-data").append(jQuery(this).html());
+                });
+                jQuery(".lr_icons_box").each(function () {
+                    jQuery(".lr-unlinked-data").append(jQuery(this).html());
+                });
+                var linked_val = jQuery('.lr-linked-data').html();
+                var unlinked_val = jQuery('.lr-unlinked-data').html();
+                if (linked_val != '') {
+                    jQuery(".lr-linked-data").prepend('<div class="lr-heading"><h3>Linked Accounts</h3></div>');
+                }
+                if (unlinked_val != '') {
+                    jQuery(".lr-unlinked-data").prepend('<div class="lr-heading lr-heading-small" style="margin-top:10px;"><h3>Choose a social account to link<h3></div>');
+                }
+                jQuery('.lr-unlinked-data').addClass('lr_embed_bricks_200 interfacecontainerdiv');
+                if (jQuery('.lr-unlinked-data').length != 0) {
+                    var styleForLR = {
+                        width: '20%',
+                        float: 'left',
+                        margin: '0 5px 7px',
+                        cursor: 'pointer'
 
-            };
-            jQuery('.lr_icons_inner_box').css(styleForLR);
-        }
-        jQuery('#interfacecontainerdiv').hide();
+                    };
+                    jQuery('.lr_icons_inner_box').css(styleForLR);
+                }
+                jQuery('#interfacecontainerdiv').hide();
+            }
+
+        </script>
+    <?php
     }
-
-</script>
-<?php } 
-}else{
+} else {
     echo $activationBlockObj->activationErrorMessage();
 }
-?>

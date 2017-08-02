@@ -14,7 +14,7 @@ namespace LoginRadiusSDK;
  * Class For LoginRadius Exception
  * This is the Loginradius Exception class to handle exception when you access LoginRadius APIs.
  *
- * Copyright 2017 LoginRadius Inc. - www.LoginRadius.com
+ * Copyright 2016 LoginRadius Inc. - www.LoginRadius.com
  */
 class LoginRadiusException extends \Exception
 {

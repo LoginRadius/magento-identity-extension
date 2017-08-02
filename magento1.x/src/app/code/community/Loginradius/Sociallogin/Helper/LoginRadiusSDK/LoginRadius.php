@@ -20,7 +20,7 @@ define('LR_CDN_ENDPOINT', 'https://cdn.loginradius.com');
  * Class For LoginRadius
  * This is the Loginradius class to handle response of LoginRadius APIs.
  *
- * Copyright 2017 LoginRadius Inc. - www.LoginRadius.com
+ * Copyright 2016 LoginRadius Inc. - www.LoginRadius.com
  */
 class LoginRadius
 {

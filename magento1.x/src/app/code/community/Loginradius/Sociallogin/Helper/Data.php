@@ -376,6 +376,15 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
                 $currentUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
             }
         }
+        if ($Hover == 'custom' && $write_url == '{{referrer}}') {
+            if (Mage::getSingleton('core/session')->getReferrerURLData()) {
+                if (strpos(Mage::getSingleton('core/session')->getReferrerURLData(), "customerregistration/index/verification")== false) {
+                    $currentUrl = Mage::getSingleton('core/session')->getReferrerURLData();
+                } else {
+                    $currentUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
+                }
+            }
+        }
         Mage::app()->getResponse()->setRedirect($currentUrl);
         return;
     }
@@ -384,14 +393,28 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
      * 
      * @return type
      */
-    public function getSamePage() {
+    public function getSamePage($is_home = false) {
         $url = Mage::helper('core/http')->getHttpReferer() ? Mage::helper('core/http')->getHttpReferer() : Mage::getUrl();
-        if (strpos($url, 'sociallogin') !== false && isset($_GET['redirect_to'])) {
-            $url = trim($_GET['redirect_to']);
+        if (!$is_home && $this->get_valueFromStringUrl($url, 'redirect_to')) {
+            $url = $this->get_valueFromStringUrl($url, 'redirect_to');
         } else {
             $url = Mage::getUrl();
         }
         return $url;
+    }
+
+    function get_valueFromStringUrl($url, $parameter_name) {
+        $parts = parse_url($url);
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+            if (isset($query[$parameter_name])) {
+                return $query[$parameter_name];
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -589,8 +612,6 @@ class Loginradius_Sociallogin_Helper_Data extends Mage_Core_Helper_Abstract {
             return $select;
         }
         if ($select->fetch()) {
-            var_dump($select->fetch());
-            die;
             return true;
         }
 

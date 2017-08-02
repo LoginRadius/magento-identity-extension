@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Loginradius_Activation>
-            <version>2.0.6</version>
+            <version>2.0.8</version>
         </Loginradius_Activation>
     </modules>
     <global>

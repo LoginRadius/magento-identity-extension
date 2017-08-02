@@ -13,7 +13,7 @@ require_once Mage::getModuleDir('', 'Loginradius_Sociallogin') . DS . 'Helper' .
  *
  * This is the main class to communicate with LoginRadius Unified Social API. It contains functions for Social Authentication with User Profile Data (Basic and Extended)
  *
- * Copyright 2017 LoginRadius Inc. - www.LoginRadius.com
+ * Copyright 2015 LoginRadius Inc. - www.LoginRadius.com
  *
  * This file is part of the LoginRadius SDK package.
  *

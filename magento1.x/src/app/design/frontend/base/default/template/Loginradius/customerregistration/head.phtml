@@ -3,115 +3,118 @@
  * template to render script which is required for social login.
  */
 $activationBlockObj = Mage::getBlockSingleton('activation/activation');
-if($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != ''){
-$currentUrl = Mage::helper('core/url')->getCurrentUrl();
-Mage::getSingleton('core/session')->setCurrentURLData($currentUrl);
-$loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
-if (strpos(Mage::helper('core/url')->getCurrentUrl(), 'https://') !== false) {
-    $loginRadiusCallback = str_replace('http://', 'https://', $loginRadiusCallback);
-}
-if ($this->getLayout()->getBlock('head')->getTitle() == "Checkout") {
-    $loginRadiusCallback .= "?loginradiuscheckout=1";
-} else {
-    $loginRadiusCallback .= "?redirect_to=" . Mage::helper('core/url')->getCurrentUrl();
-}
-
-$getBlockDir = $activationBlockObj->getBlockDir();
-echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
-?>
-<link rel="stylesheet" type="text/css" href="<?php echo $this->getSkinUrl('Loginradius/customerregistration/css/interfacecss.css', array('_area' => 'frontend')); ?>" media="all" />
-<script type="text/javascript">
-    //initialize raas options
-    var LocalDomain = '<?php echo $loginRadiusCallback; ?>';
-    var loginPage = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
-    var raasoption = {};
-    raasoption.apikey = '<?php echo $activationBlockObj->apiKey(); ?>';
-    raasoption.appName = '<?php echo htmlentities($activationBlockObj->siteName()); ?>';
-    raasoption.templatename = "loginradiuscustom_tmpl";
-    raasoption.hashTemplate = true;
-    raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
-    raasoption.forgotPasswordUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
-    raasoption.V2Recaptcha = true;
-    raasoption.OptionalEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '2')?"true":"false" ?>;
-    raasoption.DisabledEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '1')?"true":"false" ?>;
-    raasoption.inFormvalidationMessage = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->validationMessage() == '1')?"true":"false" ?>;
-    raasoption.enableLoginOnEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->loginOnEmailVerification() == '1')?"true":"false" ?>;
-    raasoption.promptPasswordOnSocialLogin = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->passwordOnSocialLogin() == '1')?"true":"false" ?>;
-    raasoption.enableUserName = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->enableUserName() == '1')?"true":"false" ?>;
-    raasoption.askEmailAlwaysForUnverified = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->askEmailAlwaysForUnverified() == '1')?"true":"false" ?>;
-    <?php if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->termsAndCondition() != ''){?>
-    raasoption.termsAndConditionHtml = '<?php echo str_replace(array("'",'<script>','</script>'), array('"','',''), Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->termsAndCondition());?>';
-    <?php }if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->formRenderDelay() != ''){?>
-    raasoption.formRenderDelay = <?php echo (int)Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->formRenderDelay();?>;
-    <?php }if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->recaptchaKey() != ''){?>
-    raasoption.V2RecaptchaSiteKey = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->recaptchaKey());?>";
-    <?php }if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->forgotPasswordTemplate() != ''){?>
-    raasoption.forgotPasswordTemplate = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->forgotPasswordTemplate());?>";
-    <?php }if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerificationTemplate() != ''){?>
-    raasoption.emailVerificationTemplate = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerificationTemplate());?>";
-    <?php }if((Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength() != Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength()) && (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength() != '') && (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength() != '')){?>
-        raasoption.passwordlength = {
-            "min":<?php echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength();?>,
-            "max":<?php echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength();?>
-        };
-    <?php }
-    if(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->customRaasOptions() != ''){
+if ($activationBlockObj->apiKey() != '' && $activationBlockObj->apiSecret() != '') {
+    $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+    Mage::getSingleton('core/session')->setCurrentURLData($currentUrl);
+    $loginRadiusCallback = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK) . "sociallogin";
+    if (strpos(Mage::helper('core/url')->getCurrentUrl(), 'https://') !== false) {
+        $loginRadiusCallback = str_replace('http://', 'https://', $loginRadiusCallback);
+    }
+    if ($this->getLayout()->getBlock('head')->getTitle() == "Checkout") {
+        $loginRadiusCallback .= "?loginradiuscheckout=1";
+    } else {
+        $loginRadiusCallback .= "?redirect_to=" . Mage::helper('core/url')->getCurrentUrl();
+    }
+    if (isset($_SERVER["HTTP_REFERER"])) {
+        $parseURL = parse_url($loginRadiusCallback);
+        if(isset($parseURL['host']) && !empty($parseURL['host'])){
+        if((strpos($_SERVER["HTTP_REFERER"], $parseURL['host']) !== false))
+            Mage::getSingleton('core/session')->setReferrerURLData($_SERVER["HTTP_REFERER"]);
+        }
+    }
+    $getBlockDir = $activationBlockObj->getBlockDir();
+    echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->getLoginRadiusInterfaceScript();
+    ?>
+    <link rel="stylesheet" type="text/css" href="<?php echo $this->getSkinUrl('Loginradius/customerregistration/css/interfacecss.css', array('_area' => 'frontend')); ?>" media="all" />
+    <script type="text/javascript">
+        //initialize raas options
+        var LocalDomain = '<?php echo $loginRadiusCallback; ?>';
+        var loginPage = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';
+        var raasoption = {};
+        raasoption.apikey = '<?php echo $activationBlockObj->apiKey(); ?>';
+        raasoption.appName = '<?php echo htmlentities($activationBlockObj->siteName()); ?>';
+        raasoption.templatename = "loginradiuscustom_tmpl";
+        raasoption.hashTemplate = true;
+        raasoption.emailVerificationUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
+        raasoption.forgotPasswordUrl = '<?php echo $this->getUrl('customerregistration/index/verification'); ?>';
+        raasoption.V2Recaptcha = true;
+        raasoption.OptionalEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '2') ? "true" : "false" ?>;
+        raasoption.DisabledEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerified() == '1') ? "true" : "false" ?>;
+        raasoption.inFormvalidationMessage = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->validationMessage() == '1') ? "true" : "false" ?>;
+        raasoption.enableLoginOnEmailVerification = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->loginOnEmailVerification() == '1') ? "true" : "false" ?>;
+        raasoption.promptPasswordOnSocialLogin = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->passwordOnSocialLogin() == '1') ? "true" : "false" ?>;
+        raasoption.enableUserName = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->enableUserName() == '1') ? "true" : "false" ?>;
+        raasoption.askEmailAlwaysForUnverified = <?php echo (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->askEmailAlwaysForUnverified() == '1') ? "true" : "false" ?>;
+    <?php if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->termsAndCondition() != '') { ?>
+            raasoption.termsAndConditionHtml = '<?php echo str_replace(array("'", '<script>', '</script>'), array('"', '', ''), Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->termsAndCondition()); ?>';
+    <?php }if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->formRenderDelay() != '') { ?>
+            raasoption.formRenderDelay = <?php echo (int) Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->formRenderDelay(); ?>;
+    <?php }if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->recaptchaKey() != '') { ?>
+            raasoption.V2RecaptchaSiteKey = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->recaptchaKey()); ?>";
+    <?php }if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->forgotPasswordTemplate() != '') { ?>
+            raasoption.forgotPasswordTemplate = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->forgotPasswordTemplate()); ?>";
+    <?php }if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerificationTemplate() != '') { ?>
+            raasoption.emailVerificationTemplate = "<?php echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->emailVerificationTemplate()); ?>";
+    <?php }if ((Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength() != Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength()) && (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength() != '') && (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength() != '')) { ?>
+            raasoption.passwordlength = {
+                "min":<?php echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->minPasswordLength(); ?>,
+                "max":<?php echo Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->maxPasswordLength(); ?>
+            };
+    <?php
+    }
+    if (Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->customRaasOptions() != '') {
         $lrCustomOption = json_decode(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->customRaasOptions(), true);
-        if(!is_array($lrCustomOption)){
+        if (!is_array($lrCustomOption)) {
             echo htmlentities(Mage::getBlockSingleton($getBlockDir . '/' . $getBlockDir)->customRaasOptions());
-        }else{
-            foreach($lrCustomOption as $lrkey => $lrvalue){
-                echo 'raasoption.'.$lrkey.' = '.(is_array($lrvalue)?json_encode($lrvalue):"'".$lrvalue."'").';';
+        } else {
+            foreach ($lrCustomOption as $lrkey => $lrvalue) {
+                echo 'raasoption.' . $lrkey . ' = ' . (is_array($lrvalue) ? json_encode($lrvalue) : "'" . $lrvalue . "'") . ';';
             }
         }
     }
     ?></script>
-<?php if (!$this->isLoggedIn()) {?>
-    <script type="text/html" id="loginradiuscustom_tmpl">
-        <div class="lr_icons_box">
-            <div style="width:180px">
-                <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&callback=<?php echo $loginRadiusCallback ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
-                </span>
+    <?php if (!$this->isLoggedIn()) { ?>
+        <script type="text/html" id="loginradiuscustom_tmpl">
+            <div class="lr_icons_box">
+                <div style="width:180px">
+                    <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return $SL.util.openWindow('<#= Endpoint #>&is_access_token=true&callback=<?php echo $loginRadiusCallback ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                    </span>
+                </div>
             </div>
-        </div>
-    </script>
-<?php  } ?>
+        </script>
+    <?php } ?>
 
-<script src="<?php echo Mage::getDesign()->getSkinUrl('Loginradius/customerregistration/js/LoginRadiusFrontEnd.js', array('_area' => 'frontend')) ?>"></script>
-<?php }
+    <script src="<?php echo Mage::getDesign()->getSkinUrl('Loginradius/customerregistration/js/LoginRadiusFrontEnd.js', array('_area' => 'frontend')) ?>"></script>
+<?php
+}
 
 $connection = Mage::getSingleton('core/resource');
-            $readConnection = $connection->getConnection('core_read');
-            $tableName = $connection->getTableName('lr_extended_profile_data');
-            $columnName=$readConnection->describeTable($tableName);
-            
-            if(!in_array('total_logins',array_keys($columnName))){
-                 
+$readConnection = $connection->getConnection('core_read');
+$tableName = $connection->getTableName('lr_extended_profile_data');
+$columnName = $readConnection->describeTable($tableName);
 
+if (!in_array('total_logins', array_keys($columnName))) {
+
+
+
+    $readConnection
+            ->addColumn($connection->getTableName('lr_extended_profile_data'), 'total_logins', array(
+                'type' => Varien_Db_Ddl_Table::TYPE_INTEGER,
+                'nullable' => false,
+                'length' => 11,
+                'after' => null, // column name to insert new column after
+                'comment' => 'Total Login'
+    ));
+}
 
 $readConnection
-->addColumn($connection->getTableName('lr_extended_profile_data'),'total_logins', array(
-    'type'      => Varien_Db_Ddl_Table::TYPE_INTEGER,
-    'nullable'  => false,
-    'length'    => 11,
-    'after'     => null, // column name to insert new column after
-    'comment'   => 'Total Login'
-    ));   
-
-            }
-   
-            $readConnection
-    ->changeColumn($connection->getTableName('lr_status'), 'status_id', 'status_id', array(
-        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
-        'nullable' => true,
-        
-    ));
-            $readConnection
-    ->changeColumn($connection->getTableName('lr_status'), 'provider', 'provider', array(
-        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
-        'nullable' => true,
-        
-    ));
-
-
+        ->changeColumn($connection->getTableName('lr_status'), 'status_id', 'status_id', array(
+            'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+            'nullable' => true,
+        ));
+$readConnection
+        ->changeColumn($connection->getTableName('lr_status'), 'provider', 'provider', array(
+            'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+            'nullable' => true,
+        ));
 ?>

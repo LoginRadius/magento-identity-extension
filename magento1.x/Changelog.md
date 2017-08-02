@@ -4,20 +4,27 @@ Contributors: LoginRadius
 
 ## Change Log
 
-### Current version: 2.0.6
+### Current Version: 2.0.7
+
+#### Enhancements
+* Fixed Account Linking issue.
+* Added option in js to ignore session storage and local storage.
+* Cleanup the database tables.
+
+### Version: 2.0.6
 
 #### Enhancements
 * Fixed change password issue.
 * Cleanup the database tables.
 
 
-### Current version: 2.0.5
+### Version: 2.0.5
 
 #### Enhancements
 * Added option to ignore address object.
 
 
-### Current version: 2.0.4
+### Version: 2.0.4
 
 #### Enhancements
 * Fixed all bugs
@@ -28,13 +35,13 @@ Contributors: LoginRadius
 * User can verify email in case of login status.
 
 
-### Current version: 2.0.3
+### Version: 2.0.3
 
 #### Enhancements
 * Minor bug fixes
 
 
-### Current version: 2.0.2
+### Version: 2.0.2
 
 #### Enhancements
 * Added email verification options during registration i.e Required, Optional, Disable.

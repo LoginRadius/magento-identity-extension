@@ -16,7 +16,7 @@ $loginRadiusJquery(document).ready(function () {
     $loginRadiusJquery('#customerregistration_socialinterface_formrenderdelay,#customerregistration_socialinterface_minpasswordlength,#customerregistration_socialinterface_maxpasswordlength').prop("type", "number");
 setTimeout(function(){
     emailVerifiedOption();
-},2000);
+},1000);
 
 
 });

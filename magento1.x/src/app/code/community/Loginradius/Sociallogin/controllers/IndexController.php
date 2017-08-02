@@ -68,7 +68,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
             if (!isset($socialLoginProfileData->ID)) {
                 $session = Mage::getSingleton('customer/session');
                 $session->addError(__('Your session has been expied. Please try again.'));
-                $this->_redirectUrl($this->dataObject->getSamePage());
+                $this->_redirectUrl($this->dataObject->getSamePage(true));
                 return;
             }
             $sessionUserId = $socialLoginProfileData->ID;
@@ -226,10 +226,11 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
         global $apiClient_class;
         $apiClient_class = 'Loginradius_Sociallogin_Helper_SDKClient';
         $activationBlockObj = Mage::getBlockSingleton('activation/activation');
+        Mage::getSingleton('core/session')->setLoginRadiusAllowSSO('true');
         $this->loginradiusSdkObject = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($activationBlockObj->apiKey(), $activationBlockObj->apiSecret(), array('output_format' => 'json'));
         try {
             $this->accessTokenObject = $this->loginradiusSdkObject->exchangeAccessToken($token);
-        } catch (LoginRadiusException $e) {
+        } catch (LoginRadiusSDK\LoginRadiusException $e) {
             Mage::dispatchEvent('lr_logout_sso', array('exception' => $e));
             $this->handleDebugMode($e);
         }
@@ -237,7 +238,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
         if (isset($this->accessTokenObject->access_token) && !empty($this->accessTokenObject->access_token)) {
             try {
                 $this->userProfileData = $this->loginradiusSdkObject->getUserProfiledata($this->accessTokenObject->access_token);
-            } catch (LoginRadiusException $e) {
+            } catch (LoginRadiusSDK\LoginRadiusException $e) {
                 $this->handleDebugMode($e);
             }
             if (isset($this->userProfileData->ID) && !empty($this->userProfileData->ID)) {
@@ -257,7 +258,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                             if ($customerEntity['verified'] == "0") {//Account is not verified
                                 $session = Mage::getSingleton('customer/session');
                                 $session->addError(__('Please verify your email to login.'));
-                                $this->_redirectUrl($this->dataObject->getSamePage());
+                                $this->_redirectUrl($this->dataObject->getSamePage(true));
                             } else {
                                 if ($this->blockObj->socialLinking() == "1") {
                                     $this->dataObject->linkSocialProfile($customerEntity['entity_id'], $this->userProfileData);
@@ -281,7 +282,7 @@ class Loginradius_Sociallogin_IndexController extends Mage_Core_Controller_Front
                             if ($customerEntity['verified'] == "0") {//Account is not verified
                                 $session = Mage::getSingleton('customer/session');
                                 $session->addError(__('Please verify your email to login.'));
-                                $this->_redirectUrl($this->dataObject->getSamePage());
+                                $this->_redirectUrl($this->dataObject->getSamePage(true));
                             } else {
                                 if ($this->blockObj->updateProfileData() != '1') {
                                     //not-update user profile data and login
