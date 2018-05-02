@@ -1,0 +1,317 @@
+<?php
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+    $currentUid = $customerSession->getLoginRadiusUid();
+    $ajaxUrl = $block->getUrl('customerregistration/ajaxcall/setpassword')
+    ?>
+
+    <div id="loginradiusmessagediv"></div>
+    <form class="form form-edit-account" action="<?php echo $block->getUrl('customerregistration/accounts/editpost') ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>" autocomplete="off">
+        <fieldset class="fieldset info">
+            <?php echo $block->getBlockHtml('formkey') ?>
+            <legend class="legend"><span><?php echo __('Account Information') ?></span></legend><br>
+            <?php echo $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Name')->setObject($customerSession->getCustomer())->toHtml() ?>
+            <?php $block->escapeHtml($customerSession->getCustomer()->getEmail()) ?>
+            <?php
+            if (!empty($currentUid)) {
+                $accountAPIObject = new \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array("output_format" => 'json'));
+                try {
+                    $fields = 'Email,Password';
+                    $profile = $accountAPIObject->getProfileByUid($currentUid, $fields);
+
+                    $defaultEmail = isset($profile->Email) ? $profile->Email[0]->Value : '';
+                    if (isset($defaultEmail) && $defaultEmail != '' && $block->escapeHtml($customerSession->getCustomer()->getEmail()) != $defaultEmail) {
+                        
+                        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+                        $changelogName = $resource->getTableName('customer_grid_flat');
+                        $connection = $resource->getConnection();
+                        $data = ['email' => $defaultEmail];
+                        $connection->update($changelogName, $data, "email ='" . $block->escapeHtml($customerSession->getCustomer()->getEmail()) . "'");
+
+                        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+                        $changelogName = $resource->getTableName('customer_entity');
+                        $connection = $resource->getConnection();
+                        $data = ['email' => $defaultEmail];
+                        $connection->update($changelogName, $data, "email ='" . $block->escapeHtml($customerSession->getCustomer()->getEmail()) . "'");
+                    }
+                    if (isset($profile->Email)) {
+                        ?>
+                        <div class="field email required">
+                            <?php
+                            $count = 1;
+                            $totalEmail = count($profile->Email);
+                            foreach ($profile->Email as $emailObj) {
+                                if ($count == 1) {
+                                    ?>
+                                    <label class="label" for="email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></label>
+                                <?php }
+                                ?>
+                                <div class="control">
+                                    <input type="hidden" name="varifiedEmailType[]" value="<?php echo isset($emailObj->Type) ? trim($emailObj->Type) : 'Primary'; ?>">
+                                    <input type="email" name="varifiedEmailValue[]" readonly="readonly" value="<?php echo isset($emailObj->Value) ? trim($emailObj->Value) : ''; ?>" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" class="input-text required-entry emailInput">
+                                    <?php if ($totalEmail != 1) { ?>
+                                        <span class="removeVarifiedEmail" onclick="removeVarifiedEmail('<?php echo isset($emailObj->Value) ? trim($emailObj->Value) : ''; ?>')"></span>
+                                    <?php }if ($totalEmail == $count) { ?>
+                                        <span class="addVarifiedEmail" onclick="addVarifiedEmail()"></span>
+                                    <?php } ?>
+                                </div>
+                                <?php
+                                $count++;
+                            }
+                            ?>
+                        </div>
+                        <?php
+                    }
+                }
+                catch (\LoginRadiusSDK\LoginRadiusException $e) {
+                    $e->getMessage();
+                }
+            }
+            ?>
+            <?php $_dob = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Dob') ?>
+            <?php $_taxvat = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Taxvat') ?>
+            <?php $_gender = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Gender') ?>
+            <?php if ($_dob->isEnabled()): ?>
+                <?php echo $_dob->setDate($customerSession->getCustomer()->getDob())->toHtml() ?>
+            <?php endif ?>
+            <?php if ($_taxvat->isEnabled()): ?>
+                <?php echo $_taxvat->setTaxvat($customerSession->getCustomer()->getTaxvat())->toHtml() ?>
+            <?php endif ?>
+            <?php if ($_gender->isEnabled()): ?>
+                <?php echo $_gender->setGender($customerSession->getCustomer()->getGender())->toHtml() ?>
+            <?php endif ?>
+            <div class="field choice">
+                <input type="checkbox" name="changepassword" onclick="setPasswordForm(this.checked)" id="changepassword" value="1" title="<?php echo __('Change Password') ?>"<?php if ($customerSession->getChangePassword()): ?> checked="checked"<?php endif; ?> class="checkbox"/>
+                <label class="label" for="changepassword"><span><?php echo __('Change Password') ?></span></label>
+            </div>
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button type="submit" class="action save primary" title="<?php echo __('Save') ?>"><span><?php echo __('Save') ?></span></button>
+                </div>
+                <div class="secondary">
+                    <a class="action back" href="<?php echo $block->escapeUrl($block->getBackUrl()) ?>"><span><?php echo __('Go back') ?></span></a>
+                </div>
+            </div>
+        </fieldset>         
+        <div style="clear:both"></div>
+    </form>
+    <fieldset class="fieldset password" style="display:none;" id="socialpasswordbox">
+            <?php
+            if (isset($profile->Password) && $profile->Password != '') {
+                ?>            
+                <legend class="legend"><span id="changepasswordtitle"><?php echo __('Change Password') ?></span></legend><br>
+                <div id="changepassword-container"></div>
+    <?php }
+    else { ?>
+                <legend class="legend"><span id="setpasswordtitle"><?php echo __('Set Password') ?></span></legend><br>
+                <div id="setpassword-container">  
+                        <div class="loginradius--form-element-content content-loginradius-newpassword">
+                            <label for="loginradius-setpassword-newpassword">Password</label>
+                            <input type="password" id="lrnewpassword" name="setnewpassword" class="input-text required-entry" aria-required="true">
+                        <div id="validation-loginradius-setpassword-newpassword" class="loginradius-validation-message validation-loginradius-newpassword"></div>
+
+                        </div>
+                        <div class="loginradius--form-element-content content-loginradius-confirmnewpassword">
+                            <label for="loginradius-setpassword-confirmnewpassword">Confirm Password</label>
+                            <input type="password" name="setconfirmpassword" id="lrconfirmpassword" class="loginradius-password loginradius-confirmnewpassword lr-required">
+                            <div id="validation-loginradius-setpassword-confirmnewpassword" class="loginradius-validation-message validation-loginradius-confirmnewpassword"></div>
+
+                        </div>
+                        <button onclick="SendForm()">submit</button>
+                                                            
+                </div> 
+    <?php } ?>
+        </fieldset>
+    <div class="LoginRadius_overlay removeemail_overlay" style="display: none;z-index: 999 !important;">
+        <div id="popupouter">
+            <div id="lr_heading_container_checkout" style="height: 50px;">
+                <div class="lr-popupheading" style="float:left !important;padding: 15px 15px 0px 15px !important;"><?php echo __('Remove Email'); ?></div>
+                <div id="lr_popup_close_container">
+                    <button onclick="closeVarifiedEmail()" type="button" id="lr_close_button">&#215;</button>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div id="popupinner" style="margin:15px !important;"><div id="removeemail-container"></div></div>
+        </div>
+    </div>
+    <div class="LoginRadius_overlay addemail_overlay" style="display: none;z-index: 999 !important;">
+        <div id="popupouter">
+            <div id="lr_heading_container_checkout" style="height: 50px;">
+                <div class="lr-popupheading" style="float:left !important;padding: 15px 15px 0px 15px !important;"><?php echo __('Add Email'); ?></div>
+                <div id="lr_popup_close_container">
+                    <button onclick="closeVarifiedEmail()" type="button" id="lr_close_button">&#215;</button>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div id="popupinner" style="margin:15px !important;"><div id="addemail-container"></div></div>
+        </div>
+    </div>
+    <script>
+        require([
+                "jquery",
+                "mage/mage",
+                "mage/calendar"
+        ], function($){
+        var dataForm = $('#form-validate');
+        var ignore = <?php echo $_dob->isEnabled() ? '\'input[id$="full"]\'' : 'null'; ?>;
+        dataForm.mage('validation', {
+    <?php if ($_dob->isEnabled()): ?>
+            errorPlacement: function(error, element) {
+            if (element.prop('id').search('full') !== - 1) {
+            var dobElement = $(element).parents('.customer-dob'),
+                    errorClass = error.prop('class');
+            error.insertAfter(element.parent());
+            dobElement.find('.validate-custom').addClass(errorClass)
+                    .after('<div class="' + errorClass + '"></div>');
+            }
+            else {
+            error.insertAfter(element);
+            }
+            },
+                    ignore: ':hidden:not(' + ignore + ')'
+    <?php else: ?>
+            ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+    <?php endif ?>
+        });
+        ciamForm.accountPassword();
+        initializeRemoveVarifiedEmail();
+        initializeAddVarifiedEmail();
+        responseHandler(true);
+    <?php if ($customerSession->getChangePassword()): ?>
+            setPasswordForm(true);
+    <?php endif; ?>
+        
+        });
+        
+        function SendForm() {   
+        
+        var password = jQuery("#lrnewpassword").val();
+        var confirmPassword = jQuery("#lrconfirmpassword").val();
+        if(password == "" && confirmPassword == ""){
+         jQuery("#validation-loginradius-setpassword-newpassword").text('The Password field is required.');
+         jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('Confirm password field is required');         
+        } else if(password == "" && confirmPassword != ""){
+         jQuery("#validation-loginradius-setpassword-newpassword").text('The Password field is required.');   
+         jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('');         
+          if(confirmPassword.length < 6){
+            jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('The Password field must be at least 6 characters in length.');
+          }
+          
+        } else if(password != "" && confirmPassword == ""){
+         jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('The Confirm Password field is required.');   
+         jQuery("#validation-loginradius-setpassword-newpassword").text('');      
+           if(password.length < 6){
+              jQuery("#validation-loginradius-setpassword-newpassword").text('The Password field must be at least 6 characters in length.');
+            }    
+            
+        } else if(password != confirmPassword){
+         jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('The Confirm Password field does not match the Password field.');   
+         jQuery("#validation-loginradius-setpassword-newpassword").text('');         
+             if(password.length < 6){
+              jQuery("#validation-loginradius-setpassword-newpassword").text('The Password field must be at least 6 characters in length.');
+            } 
+               
+        } else if(password.length < 6 || confirmPassword.length < 6){
+                if(password.length < 6){
+                  jQuery("#validation-loginradius-setpassword-newpassword").text('The Password field must be at least 6 characters in length.');
+                }if(confirmPassword.length < 6){
+                    jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('The Password field must be at least 6 characters in length.');
+                }  
+                
+        } else {              
+        jQuery("#validation-loginradius-setpassword-newpassword").text('');   
+        jQuery("#validation-loginradius-setpassword-confirmnewpassword").text('');     
+        jQuery('#ciam-loading-image-div').show();  
+            jQuery.ajax({
+                type : 'POST',
+                url: '<?php echo $ajaxUrl ?>',
+                data: {
+                        password: password,
+                        confirmPassword: confirmPassword
+                    },
+                success: function(result, status) {                     
+                        if (result.success) {
+                            responseHandler(true, result.message);   
+                            jQuery('input[type="password"]').val('');  
+                            jQuery("#socialpasswordbox").css("top", "47px");                        
+                             window.setTimeout(function () {
+                                  window.location.reload();
+                             }, 3000);                      
+                        } else {
+                              if (result.message){
+                                  responseHandler(false, result.message);     
+                                  jQuery("#socialpasswordbox").css("top", "47px");                                                      
+                              }
+                        }      
+                    },
+                    error: function () {
+                        responseHandler(false, "something went wrong");   
+                        jQuery("#socialpasswordbox").css("top", "47px");                     
+                    }
+                });    
+                } 
+        }
+        
+        function closeVarifiedEmail() {
+        jQuery('.LoginRadius_overlay').hide();
+        }
+        function removeVarifiedEmail(email) {
+        jQuery('#loginradius-removeemail-emailid').val(email);
+        jQuery('.removeemail_overlay').show();
+        }
+        function addVarifiedEmail() {
+        jQuery('.addemail_overlay').show();
+        }
+        function initializeRemoveVarifiedEmail() {
+        var removeemail_options = {};
+        removeemail_options.container = "removeemail-container";
+        removeemail_options.onSuccess = function (response) {
+        // On Success
+        if (response.IsDeleted) {
+        responseHandler(true, "Your email has been Removed.");
+        window.setTimeout(function () {
+        window.location.reload();
+        }, 1000);
+        }
+        closeVarifiedEmail();
+        };
+        removeemail_options.onError = function (errors) {
+        // On Error
+        if (errors[0].Description != null) {
+        responseHandler(false, errors[0].Description);
+        }
+        closeVarifiedEmail();
+        };
+        LRObject.util.ready(function () {
+        LRObject.init("removeEmail", removeemail_options);
+        });
+        }
+        function initializeAddVarifiedEmail() {
+        var addemail_options = {};
+        addemail_options.container = "addemail-container";
+        addemail_options.onSuccess = function (response) {
+        // On Success
+        if (response.IsPosted) {
+        responseHandler(true, "An email has been sent to " + document.getElementById('loginradius-addemail-emailid').value + ".Please verify your email address.");
+        }
+        jQuery("#loginradius-addemail-emailid,#loginradius-addemail-type").val('');
+        closeVarifiedEmail();
+        };
+        addemail_options.onError = function (errors) {
+        // On Error
+        if (errors[0].Description != null) {
+        responseHandler(false, errors[0].Description);
+        }
+        jQuery("#loginradius-addemail-emailid,#loginradius-addemail-type").val('');
+        closeVarifiedEmail();
+        };
+        LRObject.util.ready(function () {
+        LRObject.init("addEmail", addemail_options);
+        });
+        }
+    </script>
+    <?php
+}

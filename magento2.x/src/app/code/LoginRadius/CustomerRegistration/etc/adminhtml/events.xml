@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/Event/etc/events.xsd">
+    <event name="customer_save_after_data_object">
+        <observer name="customer_save_after_data_object" instance="LoginRadius\CustomerRegistration\Observer\CreateUser" />
+    </event>
+    <event name="adminhtml_customer_save_after">
+        <observer name="adminhtml_customer_save_after" instance="LoginRadius\CustomerRegistration\Observer\EditUser" />
+    </event>
+    <event name="customer_delete_commit_after">
+        <observer name="customer_delete_commit_after" instance="LoginRadius\CustomerRegistration\Observer\DeleteUser" />
+    </event>    
+</config>

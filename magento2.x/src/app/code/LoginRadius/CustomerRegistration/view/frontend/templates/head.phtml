@@ -1,0 +1,165 @@
+<?php
+global $apiClient_class;
+$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');    
+    $eventManager = $objectManager->get('\Magento\Framework\Event\Manager');    
+     
+        $accountObj = new \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
+
+        try {
+            $result = $accountObj->generateSOTT();
+            $sott = isset($result->Sott) ? $result->Sott : '';
+        }
+        catch (LoginRadiusException $e) {
+           
+        }
+              
+        $currentURL = $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);      
+        $callBackURL = $this->getUrl("customerregistration/auth/");
+        if ($customerRegistrationHelper->getValueFromStringUrl($currentURL, 'redirect_to')) {
+            $callBackURL .= '?redirect_to=' . $customerRegistrationHelper->getValueFromStringUrl($currentURL, 'redirect_to');
+        }
+        
+        $parseURL = parse_url($currentURL);
+        $baseUrl = parse_url($this->getBaseUrl());
+        $appPath = $baseUrl['path'];
+    
+        if (isset($parseURL['host']) && !empty($parseURL['host']) && isset($_SERVER["HTTP_REFERER"]) && (strpos($_SERVER["HTTP_REFERER"], $parseURL['host']) !== false)) {
+            $customerSession->setRefererURLData($_SERVER["HTTP_REFERER"]);
+        }
+        
+          ?>
+        <script type="text/javascript">
+            //initialize common options
+            var LocalDomain = '<?php echo $callBackURL; ?>';
+            var SignInDomain = '<?php echo $this->getUrl("customer/account/login/") ?>';            
+            var LoggedIn = '<?php echo $customerSession->isLoggedIn() ?>';
+            var AutoHideTime = '<?php echo $customerRegistrationHelper->notificationTime()?>';
+            var accessToken = '<?php echo $customerSession->getLoginRadiusAccessToken()?>';
+            var commonOptions = {};
+            commonOptions.apiKey = "<?php echo $activationHelper->siteApiKey(); ?>";
+            commonOptions.appName = "<?php echo $activationHelper->siteName(); ?>";
+            commonOptions.appPath = "<?php echo $appPath; ?>";
+            commonOptions.hashTemplate = true;
+            commonOptions.sott = "<?php echo $sott; ?>";     
+            commonOptions.verificationUrl = "<?php echo $this->getUrl('customerregistration/verification') ?>";
+            commonOptions.resetPasswordUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
+            commonOptions.formValidationMessage = true;
+             <?php if ($customerRegistrationHelper->termsConditions() != '') { ?>
+               commonOptions.termsAndConditionHtml = "<?php echo str_replace(array("'", "\r\n","\n", '<script>', '</script>', '/\s+/'), array('"', ' ', ' ', '', '', ' '), $customerRegistrationHelper->termsConditions()); ?>";  
+        <?php } if($customerRegistrationHelper->existPhoneNo() == '1'){?>
+                commonOptions.existPhoneNumber = true;  
+        <?php } if($customerRegistrationHelper->smsTemplate() != ''){?>
+                commonOptions.smsTemplateWelcome = "<?php echo htmlentities($customerRegistrationHelper->smsTemplate()); ?>";
+        <?php } if($customerRegistrationHelper->smsTemplatePhoneVerification() != ''){?>
+                commonOptions.smsTemplatePhoneVerification = "<?php echo htmlentities($customerRegistrationHelper->smsTemplatePhoneVerification()); ?>";
+        <?php } if($customerRegistrationHelper->instantOtp() != ''){?>
+                commonOptions.smsTemplateInstantOTPLogin = "<?php echo htmlentities($customerRegistrationHelper->instantOtp()); ?>";
+        <?php } if($customerRegistrationHelper->smsTemplate2fa() != ''){?>
+                commonOptions.smsTemplate2FA = "<?php echo htmlentities($customerRegistrationHelper->smsTemplate2fa()); ?>"; 
+        <?php } if($customerRegistrationHelper->displayPasswordStrength() == '1'){?>
+                commonOptions.displayPasswordStrength = true;
+        <?php } if($customerRegistrationHelper->instantLinkLogin() == '1'){?>
+                commonOptions.instantLinkLogin = true;
+        <?php } else {?>
+                commonOptions.instantLinkLogin = false; 
+        <?php } if($customerRegistrationHelper->instantOtpLogin() == '1'){?>
+                commonOptions.instantOTPLogin = true;
+        <?php } else {?>
+                commonOptions.instantOTPLogin = false;  
+        <?php } if($customerRegistrationHelper->askRequiredFieldOnTraditionalLogin() == '1'){?>
+                commonOptions.askRequiredFieldForTraditionalLogin = true;
+        <?php } else {?>
+                commonOptions.askRequiredFieldForTraditionalLogin = false;  
+        <?php } if($customerRegistrationHelper->usernameLogin() == '1'){?>        
+                commonOptions.usernameLogin = true;
+         <?php } else {?>
+                commonOptions.usernameLogin = false;        
+        <?php } if($customerRegistrationHelper->alwaysAskEmailForUnverified() == '1'){?>        
+                commonOptions.askEmailForUnverifiedProfileAlways = true;
+        <?php } else {?>
+                commonOptions.askEmailForUnverifiedProfileAlways = false;
+        <?php } if($customerRegistrationHelper->promptPasswordOnSocialLogin() == '1'){?>        
+                commonOptions.promptPasswordOnSocialLogin = true;
+        <?php } else {?>
+                commonOptions.promptPasswordOnSocialLogin = false;
+        <?php } if ($customerRegistrationHelper->welcomeEmail() != '') {?>
+                commonOptions.welcomeEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->welcomeEmail()); ?>";
+        <?php } if ($customerRegistrationHelper->forgotEmail() != '') {?>
+                commonOptions.resetPasswordEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->forgotEmail()); ?>";
+        <?php } if ($customerRegistrationHelper->verificationEmail() != '') {?>
+                commonOptions.verificationEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->verificationEmail()); ?>";
+        <?php } if ($customerRegistrationHelper->instantLink() != '') {?>
+                commonOptions.instantLinkLoginEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->instantLink()); ?>";
+        <?php }?>
+            commonOptions.debugMode = <?php echo ($customerRegistrationHelper->debug() == '1') ? "true" : "false" ?>;
+           <?php echo $eventManager->dispatch('ciam_options', array('exception' => ''));?>
+            var LRObject = new LoginRadiusV2(commonOptions);
+        <?php
+        if ($customerRegistrationHelper->customJsOptions() != '' && $customerRegistrationHelper->customJsOptions() != 'null' && $customerRegistrationHelper->customJsOptions() != null) {
+            $lrCustomOption = json_decode($customerRegistrationHelper->customJsOptions(), true);
+            if (!is_array($lrCustomOption)) {
+                echo $customerRegistrationHelper->customJsOptions();
+            } else {
+                foreach ($lrCustomOption as $lrkey => $lrvalue) {
+                    echo 'commonOptions.' . $lrkey . ' = ' . (is_array($lrvalue) ? json_encode($lrvalue) : "'" . $lrvalue . "'") . ';';
+                }
+            }
+        }      
+        ?>
+        </script>
+        <?php
+        if (!$customerSession->isLoggedIn()) {
+            ?>
+            <script type="text/html" id="loginradiuscustom_tmpl">
+                <div class="lr_icons_box">
+                    <div style="width:180px">
+                        <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return <#=ObjectName#>.util.openWindow('<#= Endpoint #>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                        </span>
+                    </div>
+                </div>
+            </script>
+        <?php } else { ?>
+            <script type="text/html" id="loginradiuscustom_tmpl_link">
+                <# if(isLinked) { #>
+                <div class="lr-linked">
+                    <div class="lr-linked-id"><span class="lr-icon-frame">
+                            <span class="lr-icon lr-raas-<#= Name.toLowerCase() #>">
+                            </span>
+                        </span>
+                        <div class="lr-linked-image lr-icon-<#= Name.toLowerCase() #> lr-linked-provider" style="float:left;padding-right:30px;"></div>
+                        
+                         <# if("<?php echo $customerSession->getCurrentProvider(); ?>" == Name.toLowerCase()) { #>
+                        <span class="lr-linked-image"><?php echo __(' is currently connected'); ?></span>
+                        <# }  else {#>
+                        <span class="lr-linked-image"><?php echo __(' is connected'); ?></span>
+                        <a style="margin-left:15px" class="lr-unlink" onclick='return  <#=ObjectName#>.util.unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\")'><?php echo __('Remove'); ?></a>
+                        <# } #>
+                    </div>
+                </div>
+                <# } else {#>
+                <div class="lr_icons_box">
+                    <div class="lr_icons_inner_box" style="width:100%;">
+                        <span class="lr_providericons lr_<#=Name.toLowerCase()#>  lr-icon-<#=Name.toLowerCase()#>" onclick="return  <#=ObjectName#>.util.openWindow('<#= Endpoint #>&callback=<?php echo $this->getUrl('customer/account') ?>');" title="<#= Name #>" alt="Sign in with <#=Name#>">
+                        </span>
+                    </div>
+                </div>
+                <# } #>
+            </script>
+        <?php
+        }
+        echo '<div id="ciam-loading-image-div"> <div class="lr_loading_screen">
+      <div class="lr_loading_screen_center" style="position: fixed;">
+          <div class="lr_loading_screen_spinner"></div>
+          <div class="lr_loading-phrases-container">
+              <div class="lr_loading-phrases_wrap">
+                  <div class="lr_loading_phrase" style="color: #646F79">Please wait...</div>                      
+              </div>              
+          </div>                  
+      </div>     
+  </div></div>';
+}

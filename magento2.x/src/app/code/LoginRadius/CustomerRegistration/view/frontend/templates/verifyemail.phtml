@@ -1,0 +1,12 @@
+<div id="loginradiusmessagediv"></div>
+<script>
+    require(['jquery', "mage/calendar"], function ($) {
+       var vtype = LRObject.util.getQueryParameterByName("vtype");    
+       if (vtype == "emailverification") {        
+            ciamForm.emailVerify();
+       } else if(vtype == "oneclicksignin"){             
+            ciamForm.oneClickSignIn();
+       }
+        $('.block-collapsible-nav').hide();
+    });
+</script>

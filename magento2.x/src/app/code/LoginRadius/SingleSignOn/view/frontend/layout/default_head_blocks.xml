@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src_type="url" src="//auth.lrcontent.com/v2/js/LoginRadiusV2.js"/>        
+    </head>
+    <referenceBlock name="after.body.start">
+        <block class="LoginRadius\SingleSignOn\Block\SingleSignOn" name="singlesignon_head_script" template="head.phtml" cacheable="false"/>
+    </referenceBlock>
+</page>
