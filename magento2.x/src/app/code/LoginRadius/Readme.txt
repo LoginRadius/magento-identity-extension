@@ -12,7 +12,7 @@ Fully managed registration service including Email Registration, Social Login, p
 -- CHANGE LOG --
 
   -- 3.0.0 --
-  *  Removed some Advance options from backend and they are directly configured from User Dashborad.
+  *  Removed some Advance options from backend and they are directly configured from User Dashboard.
   *  Implemented set password functionality for social users.
   *  Added Email templates options.
   *  Added Fallback V2JS.
