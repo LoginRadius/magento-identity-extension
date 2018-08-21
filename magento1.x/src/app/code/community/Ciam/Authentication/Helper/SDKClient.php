@@ -69,7 +69,7 @@ class Ciam_Authentication_Helper_SDKClient implements \LoginRadiusSDK\Clients\IH
     private function curlApiMethod($request_url, $options = array()) {
 
         $ssl_verify = isset($options['ssl_verify']) ? $options['ssl_verify'] : false;
-        $method = isset($options['method']) ? strtolower($options['method']) : 'get';
+        $method = isset($options['method']) ? strtoupper($options['method']) : 'GET';
         $data = isset($options['post_data']) ? $options['post_data'] : array();
         $content_type = isset($options['content_type']) ? trim($options['content_type']) : 'x-www-form-urlencoded';
         $curl_handle = curl_init();
@@ -80,12 +80,12 @@ class Ciam_Authentication_Helper_SDKClient implements \LoginRadiusSDK\Clients\IH
         if (!empty($data) || $data === true) {
             curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-type: application/' . $content_type));
             curl_setopt($curl_handle, CURLOPT_POSTFIELDS, (($content_type == 'json') ? $data : \LoginRadiusSDK\Utility\Functions::queryBuild($data)));
-            if ($method == 'post') {
+            if ($method == 'POST') {
                 curl_setopt($curl_handle, CURLOPT_POST, 1);
-            } elseif ($method == 'delete') {
+            } elseif ($method == 'DELETE') {
 
-                curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "delete");
-            } elseif ($method == 'put') {
+                curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "DELETE");
+            } elseif ($method == 'PUT') {
 
                 curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "PUT");
             }
@@ -116,7 +116,7 @@ class Ciam_Authentication_Helper_SDKClient implements \LoginRadiusSDK\Clients\IH
      */
     private function fsockopenApiMethod($request_url, $options = array()) {
         $ssl_verify = isset($options['ssl_verify']) ? $options['ssl_verify'] : false;
-        $method = isset($options['method']) ? strtolower($options['method']) : 'get';
+        $method = isset($options['method']) ? strtoupper($options['method']) : 'GET';
         $data = isset($options['post_data']) ? $options['post_data'] : array();
         $content_type = isset($options['content_type']) ? $options['content_type'] : 'form_params';
 
@@ -135,7 +135,7 @@ class Ciam_Authentication_Helper_SDKClient implements \LoginRadiusSDK\Clients\IH
             $context = stream_context_create($options);
         } else {
             $context = NULL;
-            if ($method == 'delete') {
+            if ($method == 'DELETE') {
                 $options = array('http' =>
                     array('method' => strtoupper($method)));
             }

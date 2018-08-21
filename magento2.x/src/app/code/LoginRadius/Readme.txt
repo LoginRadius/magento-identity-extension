@@ -11,6 +11,9 @@ Fully managed registration service including Email Registration, Social Login, p
 
 -- CHANGE LOG --
 
+  -- 3.0.1 --
+  *  Capitalised HTTP Method Names.
+
   -- 3.0.0 --
   *  Removed some Advance options from backend and they are directly configured from User Dashboard.
   *  Implemented set password functionality for social users.
@@ -24,8 +27,7 @@ Fully managed registration service including Email Registration, Social Login, p
   *  Added redirection functionality based on referer or redirect_to url.
 
 
-
-  
+ 
 
 
  -- LIVE DEMO --

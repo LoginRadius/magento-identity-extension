@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ciam_Authentication>
-            <version>1.0.0</version>
+            <version>3.0.1</version>
         </Ciam_Authentication>
     </modules>
     <global>

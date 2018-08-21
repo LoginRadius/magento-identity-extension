@@ -52,10 +52,10 @@ class Ciam_Authentication_Block_Authentication extends Mage_Core_Block_Template 
     }
 
     public function getSOTT() {
-        new LoginRadiusSDK\Utility\Functions($this->apiKey(), $this->apiSecret());
-        $sott = new LoginRadiusSDK\Utility\SOTT();
-        return $sott->encrypt();
+        $sott = new LoginRadiusSDK\Utility\SOTT($this->apiKey(), $this->apiSecret(), array('output_format' => 'json'));
+        return $sott->encrypt('10')->Sott;
     }
+    
     function getValueFromStringUrl($url, $parameter_name) {
         $parts = parse_url($url);
         if (isset($parts['query'])) {

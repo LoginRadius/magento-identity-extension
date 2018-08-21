@@ -9,7 +9,7 @@
  */
 
 
-namespace LoginRadiusSDK\CustomerRegistration\Social;
+namespace LoginRadiusSDK\Advance;
 
 use LoginRadiusSDK\Utility\Functions;
 use LoginRadiusSDK\LoginRadiusException;
@@ -19,7 +19,7 @@ use LoginRadiusSDK\LoginRadiusException;
  *
  * This is the main class to communicate with LoginRadius to get Social Login Providers.
  */
-class ProvidersAPI
+class CloudAPI
 {
     /**
      *
@@ -33,27 +33,24 @@ class ProvidersAPI
     }
 
     /**
-     * LoginRadius function - To fetch social login providers
+     * LoginRadius function - To fetch options enabled on dashboard
      *
      * @param string $apikey data to validate.
      *
-     * @return object Social Login Providers/error messages.
+     * @return object options/error messages.
      *
-     * try{
-     *   $providers = $GetProvidersAPIObject->getProvidersList();
+     * try {
+     *   $response = $cloudObject->getConfigurationList();
      * }
      * catch (LoginRadiusException $e){
      *   $e->getMessage();
      * }
      */
-    public function getProvidersList()
+    public function getConfigurationList()
     {
-        $url = LR_CDN_ENDPOINT . "/interface/json/" . Functions::getApiKey() . ".json";
-        $response = Functions::apiClient($url);
-        $json_response = explode('(', $response);
-        if ($json_response[0] == 'loginRadiusAppJsonLoaded') {
-            return str_replace(')', '', $json_response[1]);
-        }
-        throw new LoginRadiusException('Error Retrieving Providers List');
-    }
+        $options = array('authentication' => 'key');
+        $url = LR_CLOUD_ENDPOINT . "/ciam/appInfo";
+        return Functions::apiClient($url, '', $options);
+    }  
+    
 }

@@ -51,7 +51,7 @@ class Info implements \Magento\Framework\Option\ArrayInterface {
                         <h4 class="lr_admin_fieldset_title titleHeading"><strong><?= 'Extension Information!' ?></strong></h4>
 
                         <div style="margin:5px 0">
-                            <strong>Version: </strong> 3.0.0<br/>
+                            <strong>Version: </strong> 3.0.1<br/>
                             <strong>Author:</strong> LoginRadius<br/>
                             <strong>Website:</strong> <a href="https://www.loginradius.com" target="_blank">www.loginradius.com</a>
                             <br/>

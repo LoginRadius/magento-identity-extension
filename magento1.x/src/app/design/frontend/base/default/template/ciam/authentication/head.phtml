@@ -52,7 +52,7 @@ if (!empty($this->apiKey()) && !empty($this->apiSecret())) {
         commonOptions.formValidationMessage = true;
         commonOptions.callbackUrl = '<?php echo $loginRadiusCallback; ?>';
         commonOptions.hashTemplate = true;
-        commonOptions.sott = "<?php echo urlencode($this->getSOTT()); ?>";
+        commonOptions.sott = "<?php echo $this->getSOTT(); ?>";
         commonOptions.linkedAccountsTemplate = 'linkedAccountsTemplate';
         commonOptions.notLinkedAccountsTemplate = 'notLinkedAccountsTemplate';
         commonOptions.forgotPasswordUrl = '<?php echo Mage::helper('customer')->getLoginUrl(); ?>';

@@ -2,8 +2,8 @@
 
 /**
  * @link                : http://www.loginradius.com
- * @category            : SocialLogin
- * @package             : GetProviders
+ * @category            : CustomerRegistration
+ * @package             : SchemaAPI
  * @author              : LoginRadius Team
  * @license             : https://opensource.org/licenses/MIT
  */
@@ -29,8 +29,7 @@ class SchemaAPI
      */
     public function __construct($apikey = '', $apisecret = '', $customize_options = array())
     {
-        $options = array_merge(array('authentication' => ''), $customize_options);
-        new Functions($apikey, $apisecret, $options);
+        new Functions($apikey, $apisecret, $customize_options);
     }
 
     /**

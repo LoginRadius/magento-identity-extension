@@ -2,8 +2,8 @@
 
 /**
  * @link                : http://www.loginradius.com
- * @category            : SocialLogin
- * @package             : SocialLoginAPI
+ * @category            : CustomerRegistration
+ * @package             : AdvanceSocialLoginAPI
  * @author              : LoginRadius Team
  * @license             : https://opensource.org/licenses/MIT
  */
@@ -29,8 +29,7 @@ class AdvanceSocialLoginAPI
      */
     function __construct($apikey = '', $apisecret = '', $customize_options = array())
     {
-        $options = array_merge(array('authentication' => true), $customize_options);
-        new Functions($apikey, $apisecret, $options);
+        new Functions($apikey, $apisecret, $customize_options);
     }
 
     /**
@@ -39,9 +38,9 @@ class AdvanceSocialLoginAPI
      * @param $fb_access_token
      * @return type
      */
-    public function getAccessTokenByPassingFacebookToken($fb_access_token)
+    public function getAccessTokenByPassingFacebookToken($fb_access_token, $fields = '*')
     {
-        return $this->apiClientHandler('access_token/facebook', array("key" => Functions::getApiKey(), "fb_access_token" => $fb_access_token));
+        return $this->apiClientHandler('access_token/facebook', array("key" => Functions::getApiKey(), "fb_access_token" => $fb_access_token, 'fields' => $fields));
     }
 
     /**
@@ -51,11 +50,11 @@ class AdvanceSocialLoginAPI
      * @param $tw_token_secret
      * @return type
      */
-    public function getAccessTokenByPassingTwitterToken($tw_access_token, $tw_token_secret)
+    public function getAccessTokenByPassingTwitterToken($tw_access_token, $tw_token_secret, $fields = '*')
     {
-        return $this->apiClientHandler('access_token/twitter', array("key" => Functions::getApiKey(), "tw_access_token" => $tw_access_token, 'tw_token_secret' => $tw_token_secret));
+        return $this->apiClientHandler('access_token/twitter', array("key" => Functions::getApiKey(), "tw_access_token" => $tw_access_token, 'tw_token_secret' => $tw_token_secret, 'fields' => $fields));
     }
-
+    
     /**
      * The User Profile API is used to get the latest updated social profile data from the user’s social account after authentication.
      * The social profile will be retrieved via oAuth and OpenID protocols.
@@ -65,9 +64,9 @@ class AdvanceSocialLoginAPI
      * @param $access_token
      * @return type
      */
-    public function refreshUserProfile($access_token)
+    public function refreshUserProfile($access_token, $fields = '*')
     {
-        return $this->apiClientHandler('userprofile/refresh', array('access_token' => $access_token));
+        return $this->apiClientHandler('userprofile/refresh', array('access_token' => $access_token, 'fields' => $fields));
     }
     /**
      * The Refresh Access Token API is used to refresh the provider access token after authentication.
@@ -78,9 +77,22 @@ class AdvanceSocialLoginAPI
      * @param $access_token
      * @return type
      */
-    public function refreshAccessToken($access_token)
+    public function refreshAccessToken($access_token, $fields = '*')
     {
-        return $this->apiClientHandler('access_token/refresh', array('access_token' => $access_token, "secret" => Functions::getApiSecret()));
+        return $this->apiClientHandler('access_token/refresh', array('access_token' => $access_token, "secret" => Functions::getApiSecret(), 'fields' => $fields));
+    }
+    
+    
+    /**
+     * Get all active seesions by Access Token
+     *
+     * @param $access_token
+     * @return type
+     */
+    
+    public function getActiveSessionByToken($access_token, $fields = '*')
+    {
+        return $this->apiClientHandler('access_token/activesession', array('token' => $access_token, "key" => Functions::getApiKey(), "secret" => Functions::getApiSecret(), 'fields' => $fields));
     }
 
 
@@ -90,9 +102,9 @@ class AdvanceSocialLoginAPI
      * @param $postid
      * @return type
      */
-    public function trackableStatus($postid)
+    public function trackableStatus($postid, $fields = '*')
     {
-        return $this->apiClientHandler('status/trackable', array('postid' => $postid, "secret" => Functions::getApiSecret()));
+        return $this->apiClientHandler('status/trackable', array('postid' => $postid, "secret" => Functions::getApiSecret(), 'fields' => $fields));
     }
 
     /**
@@ -104,9 +116,9 @@ class AdvanceSocialLoginAPI
      * @param $message
      * @return type
      */
-    public function postMessage($access_token, $to, $subject, $message)
+    public function postMessage($access_token, $to, $subject, $message, $fields = '*')
     {
-        return $this->apiClientHandler('message/js', array('access_token' => $access_token, "to" => $to, 'subject' => $subject, 'message' => $message));
+        return $this->apiClientHandler('message/js', array('access_token' => $access_token, "to" => $to, 'subject' => $subject, 'message' => $message, 'fields' => $fields));
     }
     /**
      * The Status API is used to update the status on the user’s wall. It is commonly referred to as Permission based sharing or Push notifications. 
@@ -121,20 +133,20 @@ class AdvanceSocialLoginAPI
      * @param $description
      * @return type
      */
-    public function postStatus($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '')
+    public function postStatus($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '', $fields = '*')
     {
-        return $this->apiClientHandler('status/js', array('access_token' => $access_token, "title" => $title, 'url' => $url, 'imageurl' => $imageurl, 'status' => $status, 'caption' => $caption, 'description' => $description));
+        return $this->apiClientHandler('status/js', array('access_token' => $access_token, "title" => $title, 'url' => $url, 'imageurl' => $imageurl, 'status' => $status, 'caption' => $caption, 'description' => $description, 'fields' => $fields));
     }
 
-        /**
+    /**
      * The Shorten URL API is used to convert your URLs to the LoginRadius short URL - ish.re
      *
      * @param $url
      * @return type
      */
-    public function shortenUrl($url)
+    public function shortenUrl($url, $fields = '*')
     {
-        return Functions::apiClient('/sharing/v1/shorturl/', array('key' => Functions::getApiKey(), "url" => $url));
+        return Functions::apiClient('/sharing/v1/shorturl/', array('key' => Functions::getApiKey(), "url" => $url, 'fields' => $fields));
     }
 
         /**
@@ -150,9 +162,9 @@ class AdvanceSocialLoginAPI
      * @param $description
      * @return type
      */
-    public function trackableStatusStats($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '')
+    public function trackableStatusStats($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '', $fields = '*')
     {
-        return $this->apiClientHandler('status/trackable/js', array('access_token' => $access_token, "title" => $title, 'url' => $url, 'imageurl' => $imageurl, 'status' => $status, 'caption' => $caption, 'description' => $description));
+        return $this->apiClientHandler('status/trackable/js', array('access_token' => $access_token, "title" => $title, 'url' => $url, 'imageurl' => $imageurl, 'status' => $status, 'caption' => $caption, 'description' => $description, 'fields' => $fields));
     }
     /**
      * The Trackable Status API is used to update the status on the user’s wall and return an Post ID value. It is commonly referred to as Permission based sharing or Push notifications.
@@ -166,7 +178,7 @@ class AdvanceSocialLoginAPI
      * @param $description
      * @return type
      */
-    public function trackableStatusPosting($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '')
+    public function trackableStatusPosting($access_token, $status, $title = '', $url = '', $imageurl = '', $caption = '', $description = '', $fields = '*')
     {
         $data = array(
             'title' => $title,
@@ -176,7 +188,7 @@ class AdvanceSocialLoginAPI
             'caption' => $caption,
             'description' => $description
         );
-        return $this->apiClientHandler("status/trackable", array('access_token' => $access_token), array('method' => 'post', 'post_data' => json_encode($data), 'content_type' => 'json'));
+        return $this->apiClientHandler("status/trackable", array('access_token' => $access_token, 'fields' => $fields), array('method' => 'POST', 'post_data' => json_encode($data), 'content_type' => 'json'));
   
     }
 
