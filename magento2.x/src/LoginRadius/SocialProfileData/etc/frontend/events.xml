@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/Event/etc/events.xsd">
+    <event name="save_social_profile_data">
+        <observer name="save_social_profile_data" instance="LoginRadius\SocialProfileData\Model\Observer" />
+    </event>
+    <event name="update_social_profile_data">
+        <observer name="update_social_profile_data" instance="LoginRadius\SocialProfileData\Model\Observer" />
+    </event>
+</config>

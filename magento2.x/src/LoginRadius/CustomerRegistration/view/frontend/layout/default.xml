@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="after.body.start">
+            <block class="LoginRadius\CustomerRegistration\Block\CustomerRegistration" name="customerregistration_head_script" template="head.phtml" cacheable="false"/>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="LoginRadius\CustomerRegistration\Block\AuthenticationPopup" name="authentication-popup" as="authentication-popup" template="authentication-popup.phtml"></block>
+        </referenceContainer>
+    </body>
+</page>

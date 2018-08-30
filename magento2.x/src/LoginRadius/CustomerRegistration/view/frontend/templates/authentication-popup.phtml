@@ -1,0 +1,33 @@
+<?php
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    if ($customerRegistrationHelper->enableRaas() == '1') {
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+    if (!$customerSession->isLoggedIn()) {
+        ?>
+        <div id="authenticationPopup" data-bind="scope:'authenticationPopup'" style="display: none;">
+            <script>
+                require(['jquery'], function ($) {
+                    function checkoutlogin() {
+                        $('#top-cart-btn-checkout').ready(function () {
+                            $('#top-cart-btn-checkout').click(function () {
+                                window.location.href = '<?php echo $this->getUrl('customer/account/login'); ?>';
+                            });
+                        });
+                    }
+                    $(document).ready(function () {
+                        setInterval(checkoutlogin, 3000);
+                    });
+
+                });
+            </script>
+        </div>
+         <?php
+        } else {
+            $customerSession->unsLoginRadiusRedirection();
+        }
+    }
+}
+?>

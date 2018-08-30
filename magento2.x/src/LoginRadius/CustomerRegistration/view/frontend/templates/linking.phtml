@@ -1,0 +1,130 @@
+<?php
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+    $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+    if ($customerRegistrationHelper->enableRaas() == '1') {
+        if (in_array($customerRegistrationHelper->emailVerification(), array("0", "2"))) {
+            ?>
+            <div class="page-title-wrapper">
+                <h1 class="page-title">
+                    <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Account Linking') ?></span>  
+                </h1>
+            </div>
+            <div id="loginradiusmessagediv"></div>
+            <div class="columns">
+                <fieldset class="fieldset create info account form-account-linking">
+                    <div class="lr-linked-data lr-linked-frame"></div>
+                    <div style="clear:both"></div>
+                    <div class="lr-unlinked-data lr_icons_box"></div>
+                    <div style="clear:both"></div>
+                    <?php
+                    echo $customerRegistrationHelper->generateInterfaceDiv();
+                    ?>
+                </fieldset>
+                <div style="clear:both;"></div>
+            </div>
+            <script>
+                require(['jquery', "mage/calendar"], function ($) {
+                    $(document).ready(function () {
+                        raasForm.accountLinking();
+                        LoginRadiusRaaS.$hooks.setProcessHook(function () {
+
+                        }, function () {
+                            if ($('#interfacecontainerdiv').html() != '') {
+                                $(".lr-linked-data, .lr-unlinked-data").html('');
+                                $(".lr-linked").each(function () {
+                                    $(".lr-linked-data").append($(this).html());
+                                });
+                                $(".lr_icons_box").each(function () {
+                                    $(".lr-unlinked-data").append($(this).html());
+                                });
+                                var linked_val = $('.lr-linked-data').html();
+                                var unlinked_val = $('.lr-unlinked-data').html();
+                                if (linked_val != '') {
+                                    $(".lr-linked-data").prepend('<div class="lr-heading"><h3>Linked Accounts</h3></div>');
+                                }
+                                if (unlinked_val != '') {
+                                    $(".lr-unlinked-data").prepend('<div class="lr-heading" style="margin-top:10px;"><h3>Choose a social account to link<h3></div>');
+                                }
+                                $('.lr-unlinked-data').addClass('lr_embed_bricks_200 interfacecontainerdiv');
+                                if ($('.lr-unlinked-data').length != 0) {
+                                    var styleForLR = {
+                                        width: '20%',
+                                        float: 'left',
+                                        margin: '0 5px 7px',
+                                        cursor: 'pointer'
+
+                                    };
+                                    $('.lr_icons_inner_box').css(styleForLR);
+                                }
+                                $('#interfacecontainerdiv').hide();
+                                responseHandler(true);
+                            }
+                        });
+                    });
+                });
+            </script>
+            <?php
+        }
+    } else {
+        $linkedAccounts = $customerRegistrationHelper->selectSocialLinkingData($customerSession->getId());
+        ?>
+        <div class="page-title-wrapper">
+            <h1 class="page-title">
+                <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Account Linking') ?></span>  
+            </h1>
+        </div>
+        <div id="loginradiusmessagediv"></div>
+        <div class="columns">
+            <fieldset class="fieldset create info account form-account-linking">
+        <?php echo $customerRegistrationHelper->generateInterfaceDiv(); ?>
+            </fieldset>
+            <div style="clear:both;"></div>
+        </div>
+        <div class="columns">
+            <?php
+            if (is_array($linkedAccounts) && count($linkedAccounts) > 0) {
+                foreach ($linkedAccounts as $linkedAccount) {
+                    echo '<div class="linkingrow">';
+                    if (isset($linkedAccount['sociallogin_id']) && $linkedAccount['sociallogin_id'] == $customerSession->getLoginRadiusId()) {
+                        echo '<span class="currently_connected">Currently connected with ';
+                        echo ucfirst($linkedAccount['provider']);
+                        echo '</span><button class="action subscribe" disabled><span>' . __('Remove') . '</span></button></div>';
+                    } else {
+                        echo '<span  class="connected">Connected with ';
+                        echo ucfirst($linkedAccount['provider']);
+                        echo '</span><a href="'.$this->getUrl('customerregistration/accounts/linking').'?providerid='.$linkedAccount['sociallogin_id'].'&provider='.$linkedAccount['provider'].'"><button class="action subscribe primary"><span>' . __('Remove') . '</span></button></a></div>';
+                    }
+                }
+            }
+            ?>
+        </div>
+        <?php
+    }
+    ?>
+    <script>
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+            <?php
+            $style = '';
+            $status = $customerSession->getLoginRadiusStatus();
+            $message = $customerSession->getLoginRadiusMessage();
+            if (!empty($status) && !empty($message)) {
+                $status = ($status == 'Success') ? 'true' : 'false';
+                ?>
+                    responseHandler(<?php echo $status; ?>, '<?php echo $message; ?>');
+                <?php
+                $style = '<style>#loginradiusmessagediv{display:block !important;}</style>';
+                $customerSession->unsLoginRadiusStatus();
+                $customerSession->unsLoginRadiusMessage();
+            }
+            ?>
+            });
+        });
+    </script>
+    <?php
+    echo $style;
+}
+?>

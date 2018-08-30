@@ -1,0 +1,348 @@
+<?php
+
+$data = $this->helper('LoginRadius\SocialShare\Model\Helper\Data');
+$activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+
+
+/**
+ * template to add script required for social sharing
+ */
+if($activationHelper->siteApiKey() != ''){
+if ($data->horizontalShareEnable() == "1" || $data->verticalShareEnable() == "1") {
+    ?>
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            // review list page
+            if ($('#customer-reviews')) {
+                $('#customer-reviews dl dd').each(function () {
+                    $(this).append('<div></div><div data-share-url="' + $(this).prev().find("a").attr("href") + '" class="loginRadiusHorizontalSharing"></div>')
+                });
+            }
+            // review detail page
+            if ($('div.product-details')) {
+                $('div.product-details dl').append('<div></div><div class="loginRadiusHorizontalSharing"></div>')
+            }
+        });
+    </script>
+    <?php
+
+}
+
+if ($data->horizontalShareEnable() == "1") {
+    $theme = $data->horizontalSharingTheme();
+
+    switch ($theme) {
+        case '1':
+            $size = '32';
+            $interface = 'square';
+            $countertype = "0";
+            $widgetTheme = '0';
+            break;
+        case '2':
+            $size = '16';
+            $interface = 'square';
+            $countertype = "0";
+            $widgetTheme = '0';
+            break;
+        case '0':
+            $size = '32';
+            $interface = 'responsive';
+            $countertype = "0";
+            $widgetTheme = '0';
+            break;
+        case '3':
+            $size = '32';
+            $interface = 'image';
+            $countertype = "0";
+            $widgetTheme = '0';
+            break;
+        case '4':
+            $size = '16';
+            $interface = 'image';
+            $countertype = "0";
+            $widgetTheme = '0';
+            break;
+        case '5':
+            $size = '32';
+            $countertype = "1";
+            $widgetTheme = '1';
+            break;
+        case '6':
+            $size = '32';
+            $countertype = "0";
+            $widgetTheme = '1';
+            break;
+        default:
+            $size = '32';
+            $interface = 'square';
+            break;
+    }
+
+    $rearrange_settings = str_replace('|', '","', $data->horizontalShareProviders());
+    $counter_list = explode("|", $data->horizontalCounterProviders());
+
+    $countProviders = array();
+    foreach ($counter_list as $key => $value) {
+        $countProviders[] = str_replace('-', ' ', $value);
+    }
+
+    $dataProvider = $countProviders;
+
+    $replacements = array(
+        'pinterest pin it' => 'Pinterest Pin it',
+        'linkedin share' => 'LinkedIn Share',
+        'twitter tweet' => 'Twitter Tweet',
+        'facebook like' => 'Facebook Like',
+        'facebook recommend' => 'Facebook Recommend',
+        'stumbleupon badge' => 'StumbleUpon Badge',
+        'reddit' => 'Reddit',
+        'google 1' => 'Google+ +1',
+        'google share' => 'Google+ Share',
+        'facebook send' => 'Facebook Send'
+    );
+    foreach ($dataProvider as $key => $value) {
+        if (isset($replacements[$value])) {
+            $dataProvider[$key] = $replacements[$value];
+        }
+    }
+
+    $providerData = "";
+    foreach ($dataProvider as $val) {
+        $providerData .= '"' . $val . '",';
+    }
+    $horizontalShare = '';
+    if ($data->getDesiredEmailMessage() != '') {
+        $horizontalShare .='emailMessage:"' . $data->getDesiredEmailMessage() . '",';
+    }
+    if ($data->getEmailSubject() != '') {
+        $horizontalShare .='emailSubject:"' . $data->getEmailSubject() . '",';
+    }
+    if ($data->getEmailContentReadOnly() != '') {
+        $horizontalShare .='isEmailContentReadOnly:' . (($data->getEmailContentReadOnly() == '1') ? "true" : "false") . ',';
+    }
+    if ($data->getTotalShare() != '') {
+        $horizontalShare .='isTotalShare:' . (($data->getTotalShare() == '1') ? "true" : "false") . ',';
+    }
+    if ($data->enableMobileSharing() != '') {
+        $horizontalShare .='isMobileFriendly:' . (($data->enableMobileSharing() == '1') ? "true" : "false") . ',';
+    }    
+    if($activationHelper->siteApiKey() != ''){
+        $horizontalShare .='serviceProviderKey:"' . $activationHelper->siteApiKey() . '",';
+    }
+    if ($data->getFacebookAppId() != '') {
+        $horizontalShare .='facebookAppId:"' . $data->getFacebookAppId() . '",';
+    }
+    if ($data->getShortUrl() != '') {
+        $horizontalShare .='isShortenUrl:' . (($data->getShortUrl() == '1') ? "true" : "false") . ',';
+    }
+    if ($data->getSingleWindowPopUp() != '') {
+        $horizontalShare .='isOpenSingleWindow:' . (($data->getSingleWindowPopUp() == '1') ? "true" : "false") . ',';
+    }
+    
+    if($data->customPopUp() == '1'){
+        if ($data->getPopUpHeight() != '' && $data->getPopUpWidth() != '') {
+        $popUpWindow = '{height:' . $data->getPopUpHeight() . ',width :' . $data->getPopUpWidth() . '}';
+        $horizontalShare .='popupWindowSize:' . $popUpWindow . ',';
+    }
+    }
+    
+    if ($data->getTwitterMention() != '') {
+        $horizontalShare .='twittermention:"' . $data->getTwitterMention() . '",';
+    }
+    if ($data->getTwitterHashTag() != '') {
+        $horizontalShare .='twitterhashtag:"' . $data->getTwitterHashTag() . '",';
+    }
+    if ($data->getCustomOption() != '') {
+        $horizontalShare .= trim($data->getCustomOption(),',') . ',';
+    }
+
+    $share_script = '<script type="text/javascript">
+        var shareWidget = new OpenSocialShare();
+        shareWidget.init({' . $horizontalShare . '';
+    $share_script .= 'isCounterWidgetTheme: ' . $widgetTheme . ', // 0 or 1 - standard themes or counter widget themes
+            isHorizontalCounter: ' . $countertype . ', // 0 or 1 - counter on top or counter to right - counter themes only
+            isHorizontalLayout: 1, // 0 or 1 - vertical layout or horizontal layout
+            widgetIconSize: "' . $size . '", // "16" or "32" - 16px or 32px standard themes only
+           theme: "OpenSocialShareDefaultTheme",';
+    if ($widgetTheme == '0') {
+        $share_script .='   widgetStyle: "' . $interface . '", //"image", "square" or "responsive" - standard themes only
+            providers: {                
+                   top: ["' . trim(str_replace(array("\n", "\r"), '', $rearrange_settings)) . '"]
+                },
+           widgets: {
+                top: ["' . trim(str_replace(array("\n", "\r"), '', $rearrange_settings)) . '"]         
+             }';
+    } else {
+
+        $share_script .='providers: {
+                   top: [' . rtrim($providerData, ',') . ']
+                },
+           widgets: {
+                 //all : _private.getAllButtonName(_private.widgetConfig),
+                top: [' . rtrim($providerData, ',') . ']
+         
+            }';
+    }
+
+    $share_script .= '    });
+        shareWidget.injectInterface(".lr_horizontal_share");
+        shareWidget.setWidgetTheme(".lr_horizontal_share");
+    </script>';
+    echo $share_script;
+}
+
+// vertical sharing interface
+if ($data->verticalShareEnable() == "1") {
+    $choosesharepos = $data->verticalAlignment();
+
+    // relative vertical position
+    if ($choosesharepos == '0') {
+        $style = '.lr_vertical_share{position:fixed;top:10px;left:0px;}';
+    } elseif ($choosesharepos == '1') {
+        $style = '.lr_vertical_share{position:fixed;top:10px;right:0px;}';
+    } elseif ($choosesharepos == '2') {
+        $style = '.lr_vertical_share{position:fixed;bottom:10px;left:0px;}';
+    } else {
+        $style = '.lr_vertical_share{position:fixed;bottom:10px;right:0px;}';
+    }
+
+
+    $vertical_theme = $data->verticalSharingTheme();
+    switch ($vertical_theme) {
+        case '0':
+            $size = '32';
+            $widgetTheme = '0';
+            $countertype = '0';
+            break;
+        case '1':
+            $size = '16';
+            $widgetTheme = '0';
+            $countertype = '0';
+            break;
+        case '2':
+            $countertype = "0";
+            $widgetTheme = '1';
+            break;
+        case '3':
+            $countertype = "1";
+            $widgetTheme = '1';
+            break;
+        default:
+            $size = '32';
+    }
+
+    $verticalShare = '';
+    $rearrange_settings = str_replace('|', '","', $data->verticalSharingProviders());
+    $counter_list = explode("|", $data->verticalCounterProviders());
+
+    $countProviders = array();
+    foreach ($counter_list as $key => $value) {
+        $countProviders[] = str_replace('-', ' ', $value);
+    }
+
+    $dataProvider = $countProviders;
+    $replacements = array(
+        'pinterest pin it' => 'Pinterest Pin it',
+        'linkedin share' => 'LinkedIn Share',
+        'twitter tweet' => 'Twitter Tweet',
+        'facebook like' => 'Facebook Like',
+        'facebook recommend' => 'Facebook Recommend',
+        'stumbleupon badge' => 'StumbleUpon Badge',
+        'reddit' => 'Reddit',
+        'google 1' => 'Google+ +1',
+        'google share' => 'Google+ Share',
+        'facebook send' => 'Facebook Send'
+    );
+    foreach ($dataProvider as $key => $value) {
+        if (isset($replacements[$value])) {
+            $dataProvider[$key] = $replacements[$value];
+        }
+    }
+
+    $providerData = "";
+    foreach ($dataProvider as $val) {
+        $providerData .= '"' . $val . '",';
+    }
+    $providerData = $providerData;
+
+    if ($data->getDesiredEmailMessage() != '') {
+        $verticalShare .='emailMessage:"' . $data->getDesiredEmailMessage() . '",';
+    }
+    if ($data->getEmailSubject() != '') {
+        $verticalShare .='emailSubject:"' . $data->getEmailSubject() . '",';
+    }
+    if ($data->getEmailContentReadOnly() != '') {
+        $verticalShare .='isEmailContentReadOnly:' . (($data->getEmailContentReadOnly() == '1') ? "true" : "false") . ',';
+    }
+    if ($data->getTotalShare() != '') {
+        $verticalShare .='isTotalShare:' . (($data->getTotalShare() == '1') ? "true" : "false") . ',';
+    }
+    if($activationHelper->siteApiKey() != ''){
+        $verticalShare .='serviceProviderKey:"' . $activationHelper->siteApiKey() . '",';
+    }
+    if ($data->getFacebookAppId() != '') {
+        $verticalShare .='facebookAppId:"' . $data->getFacebookAppId() . '",';
+    }
+    if ($data->getShortUrl() != '') {
+        $verticalShare .='isShortenUrl:' . (($data->getShortUrl() == '1') ? "true" : "false") . ',';
+    }
+    if ($data->getSingleWindowPopUp() != '') {
+        $verticalShare .='isOpenSingleWindow:' . (($data->getSingleWindowPopUp() == '1') ? "true" : "false") . ',';
+    }
+    
+    if($data->customPopUp() == '1'){
+    if ($data->getPopUpHeight() != '' && $data->getPopUpWidth() != '') {
+        $popUpWindow = '{height:' . $data->getPopUpHeight() . ',width :' . $data->getPopUpWidth() . '}';
+        $verticalShare .='popupWindowSize:' . $popUpWindow . ',';
+    }
+    }
+    if ($data->getTwitterMention() != '') {
+        $verticalShare .='twittermention:"' . $data->getTwitterMention() . '",';
+    }
+    if ($data->getTwitterHashTag() != '') {
+        $verticalShare .='twitterhashtag:"' . $data->getTwitterHashTag() . '",';
+    }
+    if ($data->getCustomOption() != '') {
+        $verticalShare .= trim($data->getCustomOption(),',') . ',';
+        
+    }
+    $share_script = '';
+    $share_script .= '<script type="text/javascript">
+        var shareWidget = new OpenSocialShare();
+        shareWidget.init({' . $verticalShare . '';
+    $share_script .= 'isCounterWidgetTheme: ' . $widgetTheme . ', // 0 or 1 - standard themes or counter widget themes
+            isHorizontalCounter: ' . $countertype . ', // 0 or 1 - counter on top or counter to right - counter themes only
+            isHorizontalLayout: 0, // 0 or 1 - vertical layout or horizontal layout
+            widgetIconSize: "' . $size . '", // "16" or "32" - 16px or 32px standard themes only
+           theme: "OpenSocialShareDefaultTheme",';
+    if ($widgetTheme == '0') {
+        $share_script .='   widgetStyle: "square", //"image", "square" or "responsive" - standard themes only
+            providers: {
+                   top: ["' . trim(str_replace(array("\n", "\r"), '', $rearrange_settings)) . '"]
+                },
+           widgets: {
+                top: ["' . trim(str_replace(array("\n", "\r"), '', $rearrange_settings)) . '"]
+         
+             }';
+    } else {
+
+        $share_script .='providers: {                
+                   top: [' . rtrim($providerData, ',') . ']
+                },
+           widgets: {
+                top: [' . rtrim($providerData, ',') . ']
+         
+        }';
+    }
+
+
+    $share_script .= '    });
+        shareWidget.injectInterface(".lr_vertical_share");
+        shareWidget.setWidgetTheme(".lr_vertical_share");
+    </script>';
+
+    echo $share_script . '<style>' . $style . '</style>';
+}
+}
+?>
+

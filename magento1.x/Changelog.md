@@ -4,7 +4,18 @@ Contributors: LoginRadius
 
 ## Change Log
 
-### Current Version: 2.0.7
+### Version: 2.0.9
+
+#### Enhancements
+* Capitalised HTTP method names.
+
+### Version: 2.0.8
+
+#### Enhancements
+* Resolved minor issue.
+* Display message on the checkout page if the user already registered at LoginRadius.
+
+### Version: 2.0.7
 
 #### Enhancements
 * Fixed Account Linking issue.
