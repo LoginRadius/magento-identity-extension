@@ -8,9 +8,11 @@
 namespace LoginRadius\CustomerRegistration\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use \LoginRadiusSDK\CustomerRegistration\Authentication\AuthenticationAPI;
 
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+
 
 class SaveUserData implements ObserverInterface {
 
@@ -33,9 +35,18 @@ class SaveUserData implements ObserverInterface {
         $customer = $observer->getEvent()->getCustomerDataObject();
         $request = $this->_request->getParams();
         $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');
-        $customerRegistrationHelper = $this->_objectManager->get("LoginRadius" . "\\" . $activationHelper->getAuthDirectory() . "\Model\Helper\Data");
         $customerSession = $this->_objectManager->get('Magento\Customer\Model\Session');
-        $userAPI = new \LoginRadiusSDK\CustomerRegistration\Authentication\UserAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('authentication' => true, 'output_format' => 'json'));
+      
+      
+        if ($activationHelper->siteApiKey() != ''){
+            define('LR_API_KEY', $activationHelper->siteApiKey());
+        }
+        if ($activationHelper->siteApiSecret() != ''){
+            $decrypted_key = $this->lr_secret_encrypt_and_decrypt($activationHelper->siteApiSecret(), $activationHelper->siteApiKey(), 'd');
+            define('LR_API_SECRET', $decrypted_key);
+        }
+       
+        $authObj = new AuthenticationAPI();
 
         $editUserData = array(
             'FirstName' => $customer->getFirstname(),
@@ -44,13 +55,33 @@ class SaveUserData implements ObserverInterface {
             'BirthDate' => $customer->getDob()
         );
         try {
-            $userEditdata = $userAPI->updateProfile($customerSession->getLoginRadiusAccessToken(), $editUserData);
+            $userEditdata = $authObj->updateProfileByAccessToken($customerSession->getLoginRadiusAccessToken(), $editUserData);
             /* Edit profile in local db */
-        } catch (\LoginRadiusSDK\LoginRadiusException $e) {
-            if ($customerRegistrationHelper->debug() == '1') {
+        } catch (\LoginRadiusSDK\LoginRadiusException $e) {          
                 $errorDescription = isset($e->getErrorResponse()->Description) ? $e->getErrorResponse()->Description : '';
-                $this->_messageManager->addError($errorDescription);
-            }
+                $this->_messageManager->addError($errorDescription);            
         }
+    }
+
+    /**
+     * Encrypt and decrypt
+     *
+     * @param string $string string to be encrypted/decrypted
+     * @param string $action what to do with this? e for encrypt, d for decrypt
+     */     
+    function lr_secret_encrypt_and_decrypt( $string, $secretIv, $action) {
+        $secret_key = $secretIv;
+        $secret_iv = $secretIv;
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+        if( $action == 'e' ) {
+        $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ) {
+        $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); 
+        }   
+        return $output;
     }
 }

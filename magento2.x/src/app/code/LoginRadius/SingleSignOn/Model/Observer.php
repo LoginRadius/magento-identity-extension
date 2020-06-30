@@ -51,7 +51,20 @@ class Observer implements ObserverInterface {
                       //  });
                     </script></head><body>Loading...</body></html>
             <?php
-            if ($this->_objectManager->get("LoginRadius" . "\\" . $activationHelper->getAuthDirectory() . "\Model\Helper\Data")->debug() == '1') {
+            $appState = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Framework\App\State');
+            switch ( $appState->getMode() ) {
+                case \Magento\Framework\App\State::MODE_DEFAULT:
+                    $debugMode = 'default';
+                    break;
+                case \Magento\Framework\App\State::MODE_PRODUCTION:
+                    $debugMode = 'production';
+                    break;
+                case \Magento\Framework\App\State::MODE_DEVELOPER:
+                    $debugMode = 'developer';
+                    break;
+            }
+
+            if (isset($debugMode) && $debugMode === 'developer') {
                 $e = $observer->getEvent()->getException();
                 $errorDescription = isset($e->getErrorResponse()->Description) ? $e->getErrorResponse()->Description : '';
                 $this->_messageManager->addError($errorDescription);

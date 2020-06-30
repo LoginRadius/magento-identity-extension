@@ -5,10 +5,11 @@ namespace LoginRadius\CustomerRegistration\Controller\Auth;
 use Magento\Framework\App\Action\NotFoundException;
 use Magento\Framework\Controller\ResultFactory;
 use LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient;
+use \LoginRadiusSDK\CustomerRegistration\Authentication\AuthenticationAPI;
 
 require_once('Customhttpclient.php');
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 
 class Index extends \Magento\Framework\App\Action\Action {
 
@@ -24,7 +25,7 @@ class Index extends \Magento\Framework\App\Action\Action {
     protected $_messageManager;
     protected $_accountManagement;
 
-    /**
+    /**_helperCustomerRegistration
      * 
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
@@ -59,6 +60,7 @@ class Index extends \Magento\Framework\App\Action\Action {
     public function execute() {
         $this->_request = $this->_objectManager->get('\Magento\Framework\App\RequestInterface');
         $request = $this->_request->getParams();
+        
         $token = isset($request['token']) && !empty($request['token']) ? trim($request['token']) : '';
         if (empty($token)) {
             return $this->redirectLoginPage('customer/account');
@@ -69,14 +71,24 @@ class Index extends \Magento\Framework\App\Action\Action {
         $this->_customerUrl = $this->_objectManager->get('Magento\Customer\Model\Url');
         $this->_storeManager = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface');
         $this->_helperCustomerRegistration = $this->_objectManager->get('LoginRadius\\' . $this->_helperActivation->getAuthDirectory() . '\Model\Helper\Data');
-        $userAPIObject = new \LoginRadiusSDK\CustomerRegistration\Authentication\UserAPI($this->_helperActivation->siteApiKey(), $this->_helperActivation->siteApiSecret(), array('output_format' => 'json'));
+    
+        if ($this->_helperActivation->siteApiKey() != ''){
+            define('LR_API_KEY', $this->_helperActivation->siteApiKey());
+        }
+        if ($this->_helperActivation->siteApiSecret() != ''){
+            $decrypted_key = $this->lr_secret_encrypt_and_decrypt($this->_helperActivation->siteApiSecret(), $this->_helperActivation->siteApiKey(), 'd');
+            define('LR_API_SECRET', $decrypted_key);
+        }
+
+        $authObject = new AuthenticationAPI();
         if (!empty($token)) {
 
             // Social API's
 
             $this->_accessToken = !empty($token) ? trim($token) : '';
             try {
-                $userProfileData = $userAPIObject->getProfile($this->_accessToken);
+                $userProfileData = $authObject->getProfileByAccessToken($this->_accessToken);
+                
                 if (isset($userProfileData->Uid)) {
                     /* Checking  provider id in local database */
                     $socialEntityId = $this->getEntityIdbyProfileData($userProfileData);
@@ -89,7 +101,8 @@ class Index extends \Magento\Framework\App\Action\Action {
                     }
                     else {
                         /* If provider id exists then update user profile */
-                        if (!empty($socialEntityId)) {                            
+                        if (!empty($socialEntityId)) {         
+                                            
                             /* update query */
                             $customer = $this->updateEntitiesData($socialEntityId, $userProfileData);
                             $this->socialLinkingData($socialEntityId, $userProfileData, true);
@@ -113,7 +126,8 @@ class Index extends \Magento\Framework\App\Action\Action {
                             return $this->setCustomerLoggedIn($customer, $userProfileData);
                         }
                         else {
-                            /* Checking if email is not empty */                           
+                            /* Checking if email is not empty */ 
+                                                  
                                 $customerEmail = $this->getEntityIdbyEmail($userProfileData);
                                 if (isset($customerEmail[0]['email']) && !empty($customerEmail[0]['email'])) {
                                     $customer = $this->updateEntitiesData($customerEmail[0]['entity_id'], $userProfileData);
@@ -122,6 +136,7 @@ class Index extends \Magento\Framework\App\Action\Action {
                                 }                            
                                 else {
                                     // Register
+                                
                                     $customer = $this->saveEntitiesData($userProfileData);
                                     $this->socialLinkingData($customer->getId(), $userProfileData);
                                     return $this->setCustomerLoggedIn($customer, $userProfileData, true);
@@ -133,7 +148,9 @@ class Index extends \Magento\Framework\App\Action\Action {
             catch (\LoginRadiusSDK\LoginRadiusException $e) {                
                 $this->_eventManager->dispatch('lr_logout_sso', array('exception' => $e));
             }
-        }return $this->redirectLoginPage('customer/account');
+        }
+        
+        return $this->redirectLoginPage('customer/account');
     }
 
     /**
@@ -234,11 +251,15 @@ class Index extends \Magento\Framework\App\Action\Action {
         $customer->setFirstname($this->nameMapping($userProfileData, 'FirstName'));
         $customer->setLastname($this->nameMapping($userProfileData, 'LastName'));
         
-         if (isset($userProfileData->Email[0]->Value) && !empty($userProfileData->Email[0]->Value)) {               
-            $customer->setEmail($userProfileData->Email[0]->Value);           
-        } else {            
-            $phoneId = isset($userProfileData->PhoneId) ? $userProfileData->PhoneId : $userProfileData->ID;  
-            $reandomEmail = $this->getRandomEmail($_SERVER['HTTP_HOST'], $phoneId);
+        $userEmailVal = '';
+        if(is_array($userProfileData->Email) || is_object($userProfileData->Email)){         
+            $userEmailVal = $userProfileData->Email[0]->Value;            
+        }
+        
+        $saveMailInDb = $this->_helperCustomerRegistration->saveMailInDb();
+       
+        if (empty($userEmailVal) || $saveMailInDb == '0') {         
+            $reandomEmail = $this->randomEmailGeneration($_SERVER['HTTP_HOST']);
             $resource = $this->_objectManager->get('Magento\Framework\App\ResourceConnection');
             $ruleTable = $resource->getTableName('customer_entity');
             $connection = $resource->getConnection();
@@ -246,11 +267,11 @@ class Index extends \Magento\Framework\App\Action\Action {
             $select = $connection->select()->from(['r' => $ruleTable])                
              ->where('email=?', $reandomEmail);
             $output = $connection->fetchAll($select);
-            if (!empty($output)) {
-                $reandomEmail = $this->getRandomEmail($_SERVER['HTTP_HOST'], $userProfileData->ID);
-            }            
-            $customer->setEmail($reandomEmail);           
-        }         
+                 
+            $customer->setEmail($reandomEmail);              
+        }else if (isset($userProfileData->Email[0]->Value) && !empty($userProfileData->Email[0]->Value)) {     
+            $customer->setEmail($userProfileData->Email[0]->Value);           
+        }              
       
         if ($userProfileData->BirthDate != "") {
             $this->_date = $this->_objectManager->create('Magento\Framework\Stdlib\DateTime');
@@ -267,20 +288,36 @@ class Index extends \Magento\Framework\App\Action\Action {
         $customer->save();
         return $customer;
     }
-    
-    public function getRandomEmail($host, $id) {        
-        $email_name = substr(str_replace(array(
-          "-",
-          "/",
-          ".",
-          "+",
-                ), "", $id), -13);
-        
-        $host = str_replace(".com",'.',$host);
-        $email = $email_name . '@' . $host . 'com';
+
+    /**
+     * Get random email.
+     *
+     */
+    public function randomEmailGeneration($host)
+    {
+        $randomNo = $this->getRandomNumber(4);
+        $site_domain = str_replace(array("http://","https://"), "", $host);
+        $email = $randomNo . '@' . $site_domain.'.com';
+        $variable = substr($email, 0, strpos($email, ".com"));
+        $result = explode('.com', $variable);
+        $email = $result[0].'.com';        
         return $email;
     }
 
+    /*
+    * function to generate a random string
+    */
+    function getRandomNumber($n) {            
+        $characters = 'abcdefghijklmnopqrstuvwxyz'.time(); 
+        $randomString = ''; 
+    
+        for ($i = 0; $i < $n; $i++) { 
+            $index = rand(0, strlen($characters) - 1); 
+            $randomString .= $characters[$index]; 
+        }         
+        return $randomString. time(); 
+    } 
+    
     /**
      * 
      * @param type $userProfileData
@@ -358,8 +395,8 @@ class Index extends \Magento\Framework\App\Action\Action {
         $this->_customerSession->setLoginRadiusAccessToken($this->_accessToken);
         $this->_customerSession->unsLoginRadiusUid();
         $this->_customerSession->setLoginRadiusUid($userProfileData->Uid);
-        $socialAPIObject = new \LoginRadiusSDK\CustomerRegistration\Social\SocialLoginAPI($this->_helperActivation->siteApiKey(), $this->_helperActivation->siteApiSecret(), array('output_format' => 'json'));
-        $socialProfileData = $socialAPIObject->getUserProfiledata($this->_accessToken, false, 'Provider');
+        $socialLoginObject = new \LoginRadiusSDK\CustomerRegistration\Social\SocialAPI();
+        $socialProfileData = $socialLoginObject->getSocialUserProfile($this->_accessToken, 'Provider');
             
         $this->_customerSession->setCurrentProvider($socialProfileData->Provider);    
         $emailVerified = isset($userProfileData->EmailVerified) ? $userProfileData->EmailVerified : true;
@@ -411,5 +448,27 @@ class Index extends \Magento\Framework\App\Action\Action {
             }
         }
         return $redirection;
+    }
+
+    /**
+     * Encrypt and decrypt
+     *
+     * @param string $string string to be encrypted/decrypted
+     * @param string $action what to do with this? e for encrypt, d for decrypt
+     */     
+    function lr_secret_encrypt_and_decrypt( $string, $secretIv, $action) {
+        $secret_key = $secretIv;
+        $secret_iv = $secretIv;
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+        if( $action == 'e' ) {
+        $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ) {
+        $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); 
+        }   
+        return $output;
     }
 }

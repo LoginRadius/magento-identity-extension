@@ -1,17 +1,46 @@
 <?php
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 $activationHelper = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+
+include_once('ciam_lang.php');
+include_once('common.php');
+
+if ($activationHelper->siteApiKey() != ''){
+    define('LR_API_KEY', $activationHelper->siteApiKey());
+}
+if ($activationHelper->siteApiSecret() != ''){
+    $decrypted_key = lr_secret_encrypt_and_decrypt($activationHelper->siteApiSecret(), $activationHelper->siteApiKey(), 'd');
+    define('LR_API_SECRET', $decrypted_key);
+}
+if ($activationHelper->apiRequestSinging() == 'true'){
+    define('API_REQUEST_SIGNING', true);
+}
+
 if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
     $customerRegistrationHelper = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $customerSession = $objectManager->get('Magento\Customer\Model\Session');    
     $eventManager = $objectManager->get('\Magento\Framework\Event\Manager');    
-     
-        $accountObj = new \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
+    $appState = $objectManager->get('Magento\Framework\App\State');
+
+    switch ( $appState->getMode() ) {
+        case \Magento\Framework\App\State::MODE_DEFAULT:
+            $debugMode = 'default';
+            break;
+        case \Magento\Framework\App\State::MODE_PRODUCTION:
+            $debugMode = 'production';
+            break;
+        case \Magento\Framework\App\State::MODE_DEVELOPER:
+            $debugMode = 'developer';
+            break;
+    }
+
+
+        $sottObj = new \LoginRadiusSDK\CustomerRegistration\Account\SottAPI();
 
         try {
-            $result = $accountObj->generateSOTT();
+            $result = $sottObj->generateSOTT('20');           
             $sott = isset($result->Sott) ? $result->Sott : '';
         }
         catch (LoginRadiusException $e) {
@@ -31,15 +60,54 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
         if (isset($parseURL['host']) && !empty($parseURL['host']) && isset($_SERVER["HTTP_REFERER"]) && (strpos($_SERVER["HTTP_REFERER"], $parseURL['host']) !== false)) {
             $customerSession->setRefererURLData($_SERVER["HTTP_REFERER"]);
         }
-        
-          ?>
+        $registrationSchema = $customerRegistrationHelper->registrationFormSchema();
+        $registrationSchema = str_replace(array('<script>', '</script>'), '', $registrationSchema);
+        $registrationSchema = trim(str_replace('"', "'", $registrationSchema));
+        $registrationSchema = preg_replace('/[\t]+/', '', preg_replace('/[\r\n]+/', " ", $registrationSchema));
+
+
+        if ($customerRegistrationHelper->termsConditions() != '') {
+            $string = $customerRegistrationHelper->termsConditions();      
+            $string = str_replace(array('<script>', '</script>'), '', $string);
+            $string = trim(str_replace('"', "'", $string));
+            $termsConditions = str_replace(array("\r\n", "\r", "\n"), " ", $string);           
+        }
+
+        ?>
         <script type="text/javascript">
             //initialize common options
+        
             var LocalDomain = '<?php echo $callBackURL; ?>';
             var SignInDomain = '<?php echo $this->getUrl("customer/account/login/") ?>';            
             var LoggedIn = '<?php echo $customerSession->isLoggedIn() ?>';
             var AutoHideTime = '<?php echo $customerRegistrationHelper->notificationTime()?>';
             var accessToken = '<?php echo $customerSession->getLoginRadiusAccessToken()?>';
+            var Messages = {
+                "SOCIAL_LOGIN_MSG": "<?php echo SOCIAL_LOGIN_MSG ?>",
+                "LOGIN_BY_EMAIL_MSG": "<?php echo LOGIN_BY_EMAIL_MSG ?>",
+                "LOGIN_BY_PHONE_MSG": "<?php echo LOGIN_BY_PHONE_MSG ?>",
+                "REGISTRATION_OTP_VERIFICATION_MSG": "<?php echo REGISTRATION_OTP_VERIFICATION_MSG ?>",
+                "REGISTRATION_OTP_MSG": "<?php echo REGISTRATION_OTP_MSG ?>",
+                "REGISTRATION_SUCCESS_MSG": "<?php echo REGISTRATION_SUCCESS_MSG ?>",
+                "FORGOT_PASSWORD_MSG": "<?php echo FORGOT_PASSWORD_MSG ?>",
+                "FORGOT_PASSWORD_PHONE_MSG": "<?php echo FORGOT_PASSWORD_PHONE_MSG ?>",
+                "FORGOT_PHONE_OTP_VERIFICATION_MSG": "<?php echo FORGOT_PHONE_OTP_VERIFICATION_MSG ?>",
+                "FORGOT_PASSWORD_SUCCESS_MSG": "<?php echo FORGOT_PASSWORD_SUCCESS_MSG ?>",
+                "REGISTRATION_SUCCESS_MSG": "<?php echo REGISTRATION_SUCCESS_MSG ?>",
+                "EMAIL_VERIFICATION_SUCCESS_MSG": "<?php echo EMAIL_VERIFICATION_SUCCESS_MSG ?>",
+                "TWO_FA_MSG": "<?php echo TWO_FA_MSG ?>",
+                "TWO_FA_ENABLED_MSG": "<?php echo TWO_FA_ENABLED_MSG ?>",
+                "TWO_FA_DISABLED_MSG": "<?php echo TWO_FA_DISABLED_MSG ?>",
+                "UPDATE_PHONE_MSG": "<?php echo UPDATE_PHONE_MSG ?>",
+                "UPDATE_PHONE_SUCCESS_MSG": "<?php echo UPDATE_PHONE_SUCCESS_MSG ?>",
+                "ACCOUNT_LINKING_MSG": "<?php echo ACCOUNT_LINKING_MSG ?>",
+                "ACCOUNT_UNLINKING_MSG": "<?php echo ACCOUNT_UNLINKING_MSG ?>",
+                "ADD_EMAIL_MSG": "<?php echo ADD_EMAIL_MSG ?>",
+                "REMOVE_EMAIL_MSG": "<?php echo REMOVE_EMAIL_MSG ?>",
+                "ADD_OTP_MSG": "<?php echo ADD_OTP_MSG ?>",
+                "UPDATE_USER_PROFILE": "<?php echo UPDATE_USER_PROFILE ?>",
+                "CHANGE_PASSWORD_SUCCESS_MSG": "<?php echo CHANGE_PASSWORD_SUCCESS_MSG ?>"
+            };
             var commonOptions = {};
             commonOptions.apiKey = "<?php echo $activationHelper->siteApiKey(); ?>";
             commonOptions.appName = "<?php echo $activationHelper->siteName(); ?>";
@@ -49,67 +117,72 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
             commonOptions.verificationUrl = "<?php echo $this->getUrl('customerregistration/verification') ?>";
             commonOptions.resetPasswordUrl = '<?php echo $this->getUrl('customer/account/login') ?>';
             commonOptions.formValidationMessage = true;
-             <?php if ($customerRegistrationHelper->termsConditions() != '') { ?>
-               commonOptions.termsAndConditionHtml = "<?php echo str_replace(array("'", "\r\n","\n", '<script>', '</script>', '/\s+/'), array('"', ' ', ' ', '', '', ' '), $customerRegistrationHelper->termsConditions()); ?>";  
-        <?php } if($customerRegistrationHelper->existPhoneNo() == '1'){?>
-                commonOptions.existPhoneNumber = true;  
-        <?php } if($customerRegistrationHelper->smsTemplate() != ''){?>
-                commonOptions.smsTemplateWelcome = "<?php echo htmlentities($customerRegistrationHelper->smsTemplate()); ?>";
-        <?php } if($customerRegistrationHelper->smsTemplatePhoneVerification() != ''){?>
-                commonOptions.smsTemplatePhoneVerification = "<?php echo htmlentities($customerRegistrationHelper->smsTemplatePhoneVerification()); ?>";
-        <?php } if($customerRegistrationHelper->instantOtp() != ''){?>
-                commonOptions.smsTemplateInstantOTPLogin = "<?php echo htmlentities($customerRegistrationHelper->instantOtp()); ?>";
-        <?php } if($customerRegistrationHelper->smsTemplate2fa() != ''){?>
-                commonOptions.smsTemplate2FA = "<?php echo htmlentities($customerRegistrationHelper->smsTemplate2fa()); ?>"; 
-        <?php } if($customerRegistrationHelper->displayPasswordStrength() == '1'){?>
-                commonOptions.displayPasswordStrength = true;
-        <?php } if($customerRegistrationHelper->instantLinkLogin() == '1'){?>
-                commonOptions.instantLinkLogin = true;
-        <?php } else {?>
-                commonOptions.instantLinkLogin = false; 
-        <?php } if($customerRegistrationHelper->instantOtpLogin() == '1'){?>
-                commonOptions.instantOTPLogin = true;
-        <?php } else {?>
-                commonOptions.instantOTPLogin = false;  
-        <?php } if($customerRegistrationHelper->askRequiredFieldOnTraditionalLogin() == '1'){?>
-                commonOptions.askRequiredFieldForTraditionalLogin = true;
-        <?php } else {?>
-                commonOptions.askRequiredFieldForTraditionalLogin = false;  
-        <?php } if($customerRegistrationHelper->usernameLogin() == '1'){?>        
-                commonOptions.usernameLogin = true;
-         <?php } else {?>
-                commonOptions.usernameLogin = false;        
-        <?php } if($customerRegistrationHelper->alwaysAskEmailForUnverified() == '1'){?>        
-                commonOptions.askEmailForUnverifiedProfileAlways = true;
-        <?php } else {?>
-                commonOptions.askEmailForUnverifiedProfileAlways = false;
-        <?php } if($customerRegistrationHelper->promptPasswordOnSocialLogin() == '1'){?>        
-                commonOptions.promptPasswordOnSocialLogin = true;
-        <?php } else {?>
-                commonOptions.promptPasswordOnSocialLogin = false;
-        <?php } if ($customerRegistrationHelper->welcomeEmail() != '') {?>
-                commonOptions.welcomeEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->welcomeEmail()); ?>";
-        <?php } if ($customerRegistrationHelper->forgotEmail() != '') {?>
-                commonOptions.resetPasswordEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->forgotEmail()); ?>";
-        <?php } if ($customerRegistrationHelper->verificationEmail() != '') {?>
-                commonOptions.verificationEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->verificationEmail()); ?>";
-        <?php } if ($customerRegistrationHelper->instantLink() != '') {?>
-                commonOptions.instantLinkLoginEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->instantLink()); ?>";
-        <?php }?>
-            commonOptions.debugMode = <?php echo ($customerRegistrationHelper->debug() == '1') ? "true" : "false" ?>;
-           <?php echo $eventManager->dispatch('ciam_options', array('exception' => ''));?>
-            var LRObject = new LoginRadiusV2(commonOptions);
-        <?php
-        if ($customerRegistrationHelper->customJsOptions() != '' && $customerRegistrationHelper->customJsOptions() != 'null' && $customerRegistrationHelper->customJsOptions() != null) {
-            $lrCustomOption = json_decode($customerRegistrationHelper->customJsOptions(), true);
-            if (!is_array($lrCustomOption)) {
-                echo $customerRegistrationHelper->customJsOptions();
-            } else {
-                foreach ($lrCustomOption as $lrkey => $lrvalue) {
-                    echo 'commonOptions.' . $lrkey . ' = ' . (is_array($lrvalue) ? json_encode($lrvalue) : "'" . $lrvalue . "'") . ';';
+            <?php if ($registrationSchema != '') { ?>
+                var registrationSchema =  <?php print_r($registrationSchema)?>;
+            <?php }else { ?>
+                var registrationSchema =  '';
+            <?php } if (isset($termsConditions) && $termsConditions != '') { ?>
+                commonOptions.termsAndConditionHtml = "<?php echo trim($termsConditions) ?>";  
+            <?php } if($customerRegistrationHelper->existPhoneNo() == '1'){?>
+                    commonOptions.existPhoneNumber = true;  
+            <?php } if($customerRegistrationHelper->smsTemplate() != ''){?>
+                    commonOptions.smsTemplateWelcome = "<?php echo htmlentities($customerRegistrationHelper->smsTemplate()); ?>";
+            <?php } if($customerRegistrationHelper->smsTemplatePhoneVerification() != ''){?>
+                    commonOptions.smsTemplatePhoneVerification = "<?php echo htmlentities($customerRegistrationHelper->smsTemplatePhoneVerification()); ?>";
+            <?php } if($customerRegistrationHelper->passwordLessLoginOtpTemplate() != ''){?>
+                    commonOptions.smsTemplateInstantOTPLogin = "<?php echo htmlentities($customerRegistrationHelper->passwordLessLoginOtpTemplate()); ?>";
+            <?php } if($customerRegistrationHelper->displayPasswordStrength() == '1'){?>
+                    commonOptions.displayPasswordStrength = true;
+            <?php } if($customerRegistrationHelper->passwordLessLogin() == '1'){?>
+                    commonOptions.instantLinkLogin = true;
+            <?php } else {?>
+                    commonOptions.instantLinkLogin = false; 
+            <?php } if($customerRegistrationHelper->passwordLessOtpLogin() == '1'){?>
+                    commonOptions.instantOTPLogin = true;
+            <?php } else {?>
+                    commonOptions.instantOTPLogin = false;  
+            <?php } if($customerRegistrationHelper->askRequiredFieldOnTraditionalLogin() == '1'){?>
+                    commonOptions.askRequiredFieldForTraditionalLogin = true;
+            <?php } else {?>
+                    commonOptions.askRequiredFieldForTraditionalLogin = false;  
+            <?php } if($customerRegistrationHelper->usernameLogin() == '1'){?>        
+                    commonOptions.usernameLogin = true;
+            <?php } else {?>
+                    commonOptions.usernameLogin = false;        
+            <?php } if($customerRegistrationHelper->alwaysAskEmailForUnverified() == '1'){?>        
+                    commonOptions.askEmailForUnverifiedProfileAlways = true;
+            <?php } else {?>
+                    commonOptions.askEmailForUnverifiedProfileAlways = false;
+            <?php } if($customerRegistrationHelper->promptPasswordOnSocialLogin() == '1'){?>        
+                    commonOptions.promptPasswordOnSocialLogin = true;
+            <?php } else {?>
+                    commonOptions.promptPasswordOnSocialLogin = false;
+            <?php } if ($customerRegistrationHelper->welcomeEmail() != '') {?>
+                    commonOptions.welcomeEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->welcomeEmail()); ?>";
+            <?php } if ($customerRegistrationHelper->forgotEmail() != '') {?>
+                    commonOptions.resetPasswordEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->forgotEmail()); ?>";
+            <?php } if ($customerRegistrationHelper->verificationEmail() != '') {?>
+                    commonOptions.verificationEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->verificationEmail()); ?>";
+            <?php } if ($customerRegistrationHelper->passwordLessLoginEmailTemplate() != '') {?>
+                    commonOptions.instantLinkLoginEmailTemplate = "<?php echo htmlentities($customerRegistrationHelper->passwordLessLoginEmailTemplate()); ?>";
+            <?php }if (isset($debugMode) && $debugMode === 'developer') {?>
+                commonOptions.debugMode = true;
+            <?php }?>
+
+                     
+            <?php echo $eventManager->dispatch('ciam_options', array('exception' => ''));?>
+                var LRObject = new LoginRadiusV2(commonOptions);
+            <?php
+            if ($customerRegistrationHelper->customJsOptions() != '' && $customerRegistrationHelper->customJsOptions() != 'null' && $customerRegistrationHelper->customJsOptions() != null) {
+                $lrCustomOption = json_decode($customerRegistrationHelper->customJsOptions(), true);
+                if (!is_array($lrCustomOption)) {
+                    echo $customerRegistrationHelper->customJsOptions();
+                } else {
+                    foreach ($lrCustomOption as $lrkey => $lrvalue) {
+                        echo 'commonOptions.' . $lrkey . ' = ' . (is_array($lrvalue) ? json_encode($lrvalue) : "'" . $lrvalue . "'") . ';';
+                    }
                 }
-            }
-        }      
+            }  
         ?>
         </script>
         <?php

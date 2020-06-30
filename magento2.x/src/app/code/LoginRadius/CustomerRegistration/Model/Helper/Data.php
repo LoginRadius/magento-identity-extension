@@ -16,123 +16,133 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         );
     }    
    
-    //Redirection Settings on checkout page
-    public function redirectLogin() {
-        return $this->getConfig('customerregistration', 'redirection_settings/login_interface');
+    //Redirection Settings
+    public function enableIefPage() {
+        return $this->getConfig('authentication', 'ief_settings/enable_ief_page');
     }
-
+    
     public function loginRedirection() {
-        return $this->getConfig('customerregistration', 'redirection_settings/login_redirection');
-    }
-
-    public function registerRedirection() {
-        return;
+        return $this->getConfig('authentication', 'redirection_settings/login_redirection');
     }
 
     public function customLoginRedirection() {
-        return $this->getConfig('customerregistration', 'redirection_settings/custom_login_redirection');
+        return $this->getConfig('authentication', 'redirection_settings/custom_login_redirection');
+    }
+
+    public function checkoutRedirection() {
+        return $this->getConfig('authentication', 'redirection_settings/checkout_redirection');
+    }
+
+    public function requiredProfile() {
+        return;
+    }
+    
+    public function registerRedirection() {
+        return;
     }
 
     public function customRegisterRedirection() {
         return;
     }
 
-    //Interface Settings
-     public function termsConditions() {
-        return $this->getConfig('customerregistration', 'interface_customization_settings/terms_conditions');
-    }
-
-    //Password Customization Settings
-    public function displayPasswordStrength() {
-        return $this->getConfig('customerregistration', 'password_customization_settings/display_password_strength');
-    }
  
-    //Email Settings
-    public function welcomeEmail() {
-        return $this->getConfig('customerregistration', 'email_template_settings/welcome_email');
-    }
-    public function forgotEmail() {
-        return $this->getConfig('customerregistration', 'email_template_settings/forgot_email');
-    }
-
-    public function verificationEmail() {
-        return $this->getConfig('customerregistration', 'email_template_settings/verification_email');
-    }
-    
-    public function instantLink() {
-        return $this->getConfig('customerregistration', 'email_template_settings/instant_link');
-    }
-    
-
-    //Advance Settings    
-    public function enableHostedPage() {
-        return $this->getConfig('customerregistration', 'redirection_settings/enable_hosted_page');
-    }
-    
-    public function requiredProfile() {
-        return;
+    //Email Authentication Settings    
+    public function promptPasswordOnSocialLogin() {
+        return $this->getConfig('authentication', 'email_authentication_settings/prompt_password_on_social_login');
     }
 
     public function usernameLogin() {
-        return $this->getConfig('customerregistration', 'advance_settings/username_login');
-    }
-    
-    public function notificationTime() {
-        return $this->getConfig('customerregistration', 'advance_settings/notification_time_out');
+        return $this->getConfig('authentication', 'email_authentication_settings/username_login');
     }
 
     public function alwaysAskEmailForUnverified() {
-        return $this->getConfig('customerregistration', 'advance_settings/always_ask_email_for_unverified');
+        return $this->getConfig('authentication', 'email_authentication_settings/always_ask_email_for_unverified');
     }
     
-    public function instantLinkLogin() {
-        return $this->getConfig('customerregistration', 'advance_settings/instant_link_login');
-    }
-    
-    public function promptPasswordOnSocialLogin() {
-        return $this->getConfig('customerregistration', 'advance_settings/prompt_password_on_social_login');
+    public function askRequiredFieldOnTraditionalLogin() {
+        return $this->getConfig('authentication', 'email_authentication_settings/ask_required_field_on_traditional_login');
     }
 
-    public function customJsOptions() {
-        return $this->getConfig('customerregistration', 'advance_settings/custom_js_options');
+    public function welcomeEmail() {
+        return $this->getConfig('authentication', 'email_authentication_settings/welcome_email');
     }
-        
-    public function askRequiredFieldOnTraditionalLogin() {
-        return $this->getConfig('customerregistration', 'advance_settings/ask_required_field_on_traditional_login');
+
+    public function verificationEmail() {
+        return $this->getConfig('authentication', 'email_authentication_settings/verification_email');
     }
- 
-    //Phone Login Settings
+
+    public function forgotEmail() {
+        return $this->getConfig('authentication', 'email_authentication_settings/forgot_email');
+    } 
+
+
+    //Phone Authentication Settings
     public function existPhoneNo() {
-        return $this->getConfig('customerregistration', 'phone_login_settings/exist_phone_no');
+        return $this->getConfig('authentication', 'phone_authentication_settings/exist_phone_no');
     }
     
     public function smsTemplate() {
-        return $this->getConfig('customerregistration', 'phone_login_settings/sms_template');
+        return $this->getConfig('authentication', 'phone_authentication_settings/welcome_sms_template');
     }
     
     public function smsTemplatePhoneVerification() {
-        return $this->getConfig('customerregistration', 'phone_login_settings/sms_template_phone_verification');
-    }
-    
-    
-    public function instantOtpLogin() {
-        return $this->getConfig('customerregistration', 'phone_login_settings/instant_otp_login');
-    }
-    
-    public function instantOtp() {
-        return $this->getConfig('customerregistration', 'phone_login_settings/instant_otp');
-    }
-        
-    //Two Factor Settings
-    public function smsTemplate2fa() {
-        return $this->getConfig('customerregistration', 'two_fa_settings/sms_template_2fa');
+        return $this->getConfig('authentication', 'phone_authentication_settings/sms_template_phone_verification');
     }
 
-    //Debug Settings
-    public function debug() {
-        return $this->getConfig('customerregistration', 'debug_settings/debug');
+    public function smsTemplateResetPhone() {
+        return $this->getConfig('authentication', 'phone_authentication_settings/sms_template_reset_phone');
     }
 
+    public function smsTemplateChangePhone() {
+        return $this->getConfig('authentication', 'phone_authentication_settings/sms_template_change_phone_number');
+    }
+
+    
+    //Advanced Settings 
+    public function passwordLessLogin() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/passwordless_login');
+    }
+    
+    public function passwordLessLoginEmailTemplate() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/passwordless_login_email_template');
+    }
+
+    public function passwordLessOtpLogin() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/passwordless_otp_login');
+    }
+    
+    public function passwordLessLoginOtpTemplate() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/passwordless_otp_login_template');
+    }
+
+    public function displayPasswordStrength() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/display_password_strength');
+    }
+
+    public function notificationTime() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/notification_time_out');
+    }
+    
+    public function saveMailInDb() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/save_mail_in_db');
+    }
+
+    public function deletelrUserAccount() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/delete_lr_user_account');
+    }
+
+    public function termsConditions() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/terms_conditions');
+    }
+
+    public function customJsOptions() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/custom_js_options');
+    }
+
+    public function registrationFormSchema() {
+        return $this->getConfig('advancedsettings', 'advanced_settings/registration_form_schema');
+    }    
+   
     public function selectSocialLinkingData($id) {
         $resource = $this->_objectManager->get('Magento\Framework\App\ResourceConnection');
         $changelogName = $resource->getTableName('lr_sociallogin');
@@ -148,6 +158,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         if (isset($parts['query'])) {
             parse_str($parts['query'], $query);
             if (isset($query[$parameter_name])) {
+                echo $query[$parameter_name];
                 return $query[$parameter_name];
             } else {
                 return false;

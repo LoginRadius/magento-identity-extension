@@ -1,20 +1,18 @@
 require(['jquery', 'jquery/ui'], function ($) {
-    $(document).ready(function () {
-        hostedPageToggle();
-        $("#lrcustomerregistration_redirection_settings_enable_hosted_page").change(function () {
-            hostedPageToggle();
-        });
-    });
+    // $(document).ready(function () {
+    //     iefPageToggle();
+    //     $("#lrauthentication_redirection_settings_enable_ief_page").change(function () {
+    //         iefPageToggle();
+    //     });
+    // });
     
-    function hostedPageToggle() {
-        if ($('#lrcustomerregistration_redirection_settings_enable_hosted_page').val() == '1') {
-            setTimeout(function () {
-                $('#lrcustomerregistration_interface_customization_settings-state,#lrcustomerregistration_password_customization_settings-state,#lrcustomerregistration_advance_settings-state,#lrcustomerregistration_email_template_settings-state,#lrcustomerregistration_phone_login_settings,#lrcustomerregistration_two_fa_settings').parent().hide();
-            }, 1000);
-        } else {
-            setTimeout(function () {
-                $('#lrcustomerregistration_interface_customization_settings-state,#lrcustomerregistration_password_customization_settings-state,#lrcustomerregistration_advance_settings-state,#lrcustomerregistration_email_template_settings-state,#lrcustomerregistration_phone_login_settings,#lrcustomerregistration_two_fa_settings').parent().show();
-            }, 1000);
-        }
-    }
+    // function iefPageToggle() {
+    //     if ($('#lrauthentication_redirection_settings_enable_ief_page').val() == '1') {
+    //         $('#lrauthentication_email_authentication_settings-state, #lrauthentication_phone_authentication_settings-state').parent().hide();
+           
+    //     } else {
+    //         $('#lrauthentication_email_authentication_settings-state, #lrauthentication_phone_authentication_settings-state').parent().show();
+           
+    //     }
+    // }
 });

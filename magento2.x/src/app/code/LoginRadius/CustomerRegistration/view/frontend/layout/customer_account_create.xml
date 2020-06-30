@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <head>
         <!-- for css file -->
-        <css src="LoginRadius_CustomerRegistration::customerregistration/css/styles.css"/>
+        <css src="LoginRadius_CustomerRegistration::customerregistration/css/style.css"/>
         <script src_type="url" src="//auth.lrcontent.com/v2/js/LoginRadiusV2.js"/>
         <script src="LoginRadius_CustomerRegistration::customerregistration/js/script.js"/>
     </head>

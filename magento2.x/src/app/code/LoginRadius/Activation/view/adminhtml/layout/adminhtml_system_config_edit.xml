@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <head>
-        <!-- for css file -->
-        
-        <css src="LoginRadius_Activation::activation/css/styles.css"/>        
+        <!-- for css file -->        
+        <css src="LoginRadius_Activation::activation/css/style.css"/>        
         <script src="LoginRadius_Activation::activation/js/activation.js"/>          
     </head>
+    <body>
+        <referenceBlock name="after.body.start">
+            <block class="LoginRadius\Activation\Block\Activation" name="activation_head_script" template="secret.phtml" cacheable="false"/>
+        </referenceBlock>
+    </body>
 </page>

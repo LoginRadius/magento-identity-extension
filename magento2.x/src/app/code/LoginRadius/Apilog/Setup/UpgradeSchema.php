@@ -13,7 +13,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
        
         $setup->startSetup();
         
-        if (version_compare($context->getVersion(), '3.0.1', '<')) {
+        if (version_compare($context->getVersion(), '4.0.0', '<')) {
 
             
             $this->createTables($setup);

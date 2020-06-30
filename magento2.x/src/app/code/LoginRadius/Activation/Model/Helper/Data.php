@@ -1,9 +1,10 @@
 <?php
 
 namespace LoginRadius\Activation\Model\Helper;
-use \LoginRadiusSDK\Advance\CloudAPI;
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+use \LoginRadiusSDK\CustomerRegistration\Advanced\ConfigurationAPI;
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+
 class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     public function __construct(\Magento\Framework\App\Helper\Context $context, \Magento\Customer\Model\CustomerFactory $customerFactory, \Magento\Framework\ObjectManagerInterface $objectManager) {
@@ -18,19 +19,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         );
     }
      
-    public function getConfigOptions()
-    {
+    public function getConfigOptions() {
         $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');       
         if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() != '') {
+      
             try {
-                  $cloudObject = new CloudAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
-                  return $cloudObject->getConfigurationList();
+                $configObject = new ConfigurationAPI();
+                return $configObject->getConfigurations();
             }
             catch (LoginRadiusException $e) {
                 
             }
-        }          
-    }  
+        }
+    }
 
     //Activation Settings
   
@@ -43,13 +44,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     }
     
     public function siteName() {
-        $options = $this->getConfigOptions();
-        return (isset($options->AppName) ? $options->AppName : '');
+        $configurations = $this->getConfigOptions();
+        return (isset($configurations->AppName) ? $configurations->AppName : '');
+    }
+
+    public function apiRequestSinging() {
+        $configurations = $this->getConfigOptions();
+        return ((isset($configurations->ApiRequestSigningConfig->IsEnabled) && $configurations->ApiRequestSigningConfig->IsEnabled) ? 'true' : 'false');
+    }
+
+    public function phoneLoginEnabled() {
+        $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');   
+        if ($activationHelper->siteApiKey() != ''){
+            define('LR_API_KEY', $activationHelper->siteApiKey());
+        }
+        if ($activationHelper->siteApiSecret() != ''){
+            $decrypted_key = $this->lr_secret_encrypt_and_decrypt($activationHelper->siteApiSecret(), $activationHelper->siteApiKey(), 'd');
+            define('LR_API_SECRET', $decrypted_key);
+        }
+        $configurations = $this->getConfigOptions();
+        return ((isset($configurations->IsPhoneLogin) && $configurations->IsPhoneLogin) ? $configurations->IsPhoneLogin : false);
+    }
+
+    public function customHubDomain() {        
+        $configurations = $this->getConfigOptions();
+        return ((isset($configurations->CustomDomain) && $configurations->CustomDomain != '') ? $configurations->CustomDomain : '');
     }
     
     public function emailVerificationFlow() {
-        $options = $this->getConfigOptions();
-        return (isset($options->EmailVerificationFlow) ? $options->EmailVerificationFlow : '');
+        $configurations = $this->getConfigOptions();
+        return (isset($configurations->EmailVerificationFlow) ? $configurations->EmailVerificationFlow : '');
     }
 
     public function enableCustomerRegistration() {
@@ -58,5 +82,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     public function getAuthDirectory() {
         return 'CustomerRegistration';
+    }
+
+    /**
+     * Encrypt and decrypt
+     *
+     * @param string $string string to be encrypted/decrypted
+     * @param string $action what to do with this? e for encrypt, d for decrypt
+     */     
+    public function lr_secret_encrypt_and_decrypt( $string, $secretIv, $action) {
+        $secret_key = $secretIv;
+        $secret_iv = $secretIv;
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+        if( $action == 'e' ) {
+        $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ) {
+        $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); 
+        }   
+        return $output;
     }
 }

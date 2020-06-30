@@ -7,10 +7,11 @@
             <tab>lractivation</tab>
             <resource>LoginRadius_SingleSignOn::singlesignon_config</resource>
             <group id="singlesignon" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>Single Sign On Configuration Options</label>
+                <label>Single Sign On Settings</label>
                 <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Enable Single Sign On</label>
+                    <label>Do you want to enable Single Sign On (SSO)</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[This feature allows Single Sign On to be enabled on different sites with common LoginRadius app.]]></tooltip>
                 </field>
             </group>
             

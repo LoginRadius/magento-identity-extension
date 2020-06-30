@@ -3,4 +3,7 @@
     <event name="model_save_before">
         <observer name="loginradius_activation_model_save_before" instance="LoginRadius\Activation\Observer\CheckKey" />
     </event>   
+    <event name="model_save_after">
+        <observer name="loginradius_activation_model_save_after" instance="LoginRadius\Activation\Observer\SaveKey" />
+    </event>  
 </config>

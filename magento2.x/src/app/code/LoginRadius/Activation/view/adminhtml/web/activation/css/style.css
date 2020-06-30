@@ -1,0 +1,87 @@
+#lr_thank_message_container, #lr_extension_help_container, #lr_thank_message_container2 {
+    width: 64%;
+    float: left;
+    border: 1px solid #e3e3e3;
+    background: #f1f1f1;
+}
+.innerDiv{padding: 10px 33px;}
+.innerDivRight{padding: 10px;}
+#lr_extension_info_container, #lr_extension_support_container {
+    width: 32%;
+    float: right;
+    border: 1px solid #e3e3e3;
+    background: #f1f1f1;
+}
+#lr_media_pages_container{
+    margin-top:70px;
+}
+.facebookHelp{
+    background: url(../images/facebook.png);
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 60px;
+}
+.twitterHelp{
+    background: url(../images/twitter.png);
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 60px;
+}
+.googleHelp{
+    background: url(../images/google.png);
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 60px;
+}
+.linkedinHelp{
+    background: url(../images/linkedin.png);
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 60px;
+}
+.youtubeHelp{
+    background: url(../images/youtube.png);
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 60px;
+}
+#lr_thank_message_container2{
+    margin-top:20px;
+}
+
+.titleHeading{font-size: 15px !important;
+    padding-bottom: 0px;
+    margin-bottom: 6px;
+    color: #000 !important;
+}
+
+#lrauthentication_redirection_settings td.value .admin__control-select,
+#lrauthentication_email_authentication_settings td.value .admin__control-select,
+#lrauthentication_phone_authentication_settings td.value .admin__control-select,
+#lradvancedsettings_advanced_settings td.value .admin__control-select,
+#lradvancedsettings_advanced_settings td.value .admin__control-text,
+#lradvancedsettings_advanced_settings td.value .admin__control-textarea,
+#lrsinglesignon_singlesignon td.value .admin__control-select
+{
+    width: 98%;
+}
+
+tr#row_lractivation_activation_site_secret td {
+    position: relative;
+}
+
+div#show_and_hide_secret {
+    padding: 7px 8px;
+    background: #29d;
+    width: 40px;
+    color: #fff;
+    position: absolute;
+    cursor: pointer;
+    top: 21px;
+    right: 20px;
+}

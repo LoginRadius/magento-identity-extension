@@ -2,6 +2,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <head>
         <!-- for js file -->     
-        <script src="LoginRadius_CustomerRegistration::customerregistration/js/customerregistration.js"/>       
+        <!-- <script src="LoginRadius_CustomerRegistration::customerregistration/js/customerregistration.js"/>        -->
     </head>
 </page>

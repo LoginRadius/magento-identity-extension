@@ -9,22 +9,15 @@
             <label>Activation</label>
             <tab>lractivation</tab>
             <resource>LoginRadius_Activation::activation_config</resource>
-            <group id="activationhelp" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                <field id="example" type="hidden" translate="label" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <source_model>LoginRadius\Activation\Model\Source\Info</source_model>
-                </field> 
-            </group>
             <group id="activation" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>Activation Configuration Options</label>                
+                <label>LoginRadius API Configurations</label>
                 <field id="site_api" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>API Key</label>
+                    <label>LoginRadius API Key*</label>
                     <validate>required-entry</validate>
-                    <tooltip><![CDATA[Paste LoginRadius Site Key here. To get the Site Key, login to <a href="http://www.loginradius.com" target="_blank">LoginRadius</a>]]></tooltip>
                 </field>
-                <field id="site_secret" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>API Secret</label>
-                    <validate>required-entry</validate>
-                    <tooltip><![CDATA[Paste LoginRadius Site Secret here. To get the Site Secret, login to <a href="http://www.loginradius.com" target="_blank">LoginRadius</a>]]></tooltip>
+                <field id="site_secret" translate="label" type="password" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>LoginRadius API Secret*</label>
+                    <validate>required-entry</validate>  
                 </field>
             </group>
         </section>

@@ -8,10 +8,10 @@
 namespace LoginRadius\Activation\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use \LoginRadiusSDK\CustomerRegistration\Social\SocialLoginAPI;
+use \LoginRadiusSDK\Utility\Functions;
 
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 
 class CheckKey implements ObserverInterface {
 
@@ -23,31 +23,36 @@ class CheckKey implements ObserverInterface {
             \Magento\Framework\App\RequestInterface $request,
             \Magento\Framework\Message\ManagerInterface $messageManager,
             \Magento\Framework\ObjectManagerInterface $objectManager,
-            \Magento\Framework\App\Response\RedirectInterface $redirect
+            \Magento\Framework\App\Response\RedirectInterface $redirect,
+            \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
     ) {
         $this->_request = $request;
         $this->_messageManager = $messageManager;
         $this->_objectManager = $objectManager;
         $this->_redirect = $redirect;
+        $this->resultRedirectFactory = $resultRedirectFactory;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer) {
 
-        global $alreadyLoad, $apiClient_class;
-        $apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+        global $alreadyLoad, $apiClientClass;
+        $apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
         if ($alreadyLoad != 'true') {
             $alreadyLoad = 'true';
             try {
                 $post = $this->_request->getParams();
                 if (isset($post['config_state']['lractivation_activation']) && $post['config_state']['lractivation_activation'] == '1') {
                     $apiKey = (($post['groups']['activation']['fields']['site_api']['value'] != null) ? trim($post['groups']['activation']['fields']['site_api']['value']) : '');
-                    $apiSecret = (($post['groups']['activation']['fields']['site_api']['value'] != null) ? trim($post['groups']['activation']['fields']['site_secret']['value']) : '');
+                    $apiSecret = (($post['groups']['activation']['fields']['site_secret']['value'] != null) ? trim($post['groups']['activation']['fields']['site_secret']['value']) : '');
                  
-                    $validateUrl = 'https://api.loginradius.com/api/v2/app/validate?apikey=' . $apiKey . '&apisecret=' . $apiSecret;
+                    $query_array = array(
+                        'apiKey' => $apiKey,
+                        'apiSecret' => $apiSecret
+                    );
 
-                    $checkUrl = new $apiClient_class();
-                    $result = json_decode($checkUrl->request($validateUrl));
-                    
+                    $validateUrl = 'https://api.loginradius.com/api/v2/app/validate';
+                    $result = Functions::_apiClientHandler('GET', $validateUrl, $query_array);
+                
                     if (isset($result->Status) && $result->Status != true) {
                         if ($result->Messages[0] == 'API_KEY_NOT_FORMATED') {
                             $data = 'LoginRadius API key is not correct.';
@@ -59,16 +64,16 @@ class CheckKey implements ObserverInterface {
                             $data = 'LoginRadius API Secret key is not valid.';
                         }
                         $errorDescription = isset($data) ? $data : '';
-                        $this->_messageManager->addError($errorDescription);  
-                    }elseif (isset($result->Status) && $result->Status == true) {
-                        return;
-                    }else {
-                        $this->_messageManager->addError('an error occurred. Please try again');                          
+                        $this->_messageManager->addError($errorDescription);                         
+                    } elseif (isset($result->Status) && $result->Status == true) {
+                        
+                       return;
+                    } else {
+                        $this->_messageManager->addError('an error occurred. Please try againyy');                          
                     }             
                 }
             } catch (\LoginRadiusSDK\LoginRadiusException $e) {
-                //throw new \Exception('an error occurred. Please try again');
-                $this->_messageManager->addError('an error occurred. Please try again');      
+                $this->_messageManager->addError('an error occurred. Please try againtt');      
             }
         }
     }

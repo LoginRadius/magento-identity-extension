@@ -5,7 +5,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $customerSession = $objectManager->get('Magento\Customer\Model\Session');
 
-    if ($customerRegistrationHelper->redirectLogin() == '1') {
+    if ($customerRegistrationHelper->checkoutRedirection() == 'onlogin') {
         $customerSession = $objectManager->get('Magento\Customer\Model\Session');
         if (!$customerSession->isLoggedIn()) {
             $customerSession->setLoginRadiusRedirection('checkout');
@@ -17,7 +17,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
         } else {
             $customerSession->unsLoginRadiusRedirection();
         }
-    } else {
+    } else if($customerRegistrationHelper->checkoutRedirection() == 'oncheckout'){
         if (!$customerSession->isLoggedIn()) {
             ?>
             <main id="maincontent" class="page-main">
@@ -36,7 +36,7 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
                         <div class="login-container">
                             <div class="block block-customer-login">
                                 <div class="block-title">
-                                    <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Registered Customers') ?></strong>
+                                    <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Login Customers') ?></strong>
                                 </div>
                                 <div class="block-content" aria-labelledby="block-customer-login-heading">
                                     <div id="login-container"></div>

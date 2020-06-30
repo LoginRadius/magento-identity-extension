@@ -14,7 +14,7 @@ namespace LoginRadius\CustomerRegistration\Model\Source;
 class Redirection implements \Magento\Framework\Option\ArrayInterface
 {
     /**
-     * Options getter
+     * Get options in "key-value" format
      *
      * @return array
      */
@@ -25,14 +25,5 @@ class Redirection implements \Magento\Framework\Option\ArrayInterface
             ['value' => 'home', 'label' => __('Home page')],
             ['value' => 'custom', 'label' => __('Custom URL')]];
     }
-
-    /**
-     * Get options in "key-value" format
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return ['same' => __('Same page'), 'account' => __('Account page'), 'home' => __('Home page'), 'custom' => __('Custom URL')];
-    }
+       
 }

@@ -8,10 +8,10 @@
 namespace LoginRadius\CustomerRegistration\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI;
+use \LoginRadiusSDK\CustomerRegistration\Account\AccountAPI;
 
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 
 class EditUser implements ObserverInterface {
 
@@ -30,6 +30,14 @@ class EditUser implements ObserverInterface {
         $activationHelper = $this->_objectManager->get('LoginRadius\Activation\Model\Helper\Data');
         $events = $observer->getEvent();
         $customerData = $events->getRequest()->getPostValue();
+
+        if ($activationHelper->siteApiKey() != ''){
+            define('LR_API_KEY', $activationHelper->siteApiKey());
+        }
+        if ($activationHelper->siteApiSecret() != ''){
+            $decrypted_key = $this->lr_secret_encrypt_and_decrypt($activationHelper->siteApiSecret(), $activationHelper->siteApiKey(), 'd');
+            define('LR_API_SECRET', $decrypted_key);
+        }
 
         $customer = $observer->getEvent()->getCustomer();
         $this->_date = $this->_objectManager->create('Magento\Framework\Stdlib\DateTime');
@@ -54,10 +62,10 @@ class EditUser implements ObserverInterface {
             $select = $connection->select()->from(['r' => $ruleTable])->where('entity_id=?', $customerData['customer']['entity_id']);
             $output = $connection->fetchAll($select);
 
-            $accountApi = new AccountAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
+            $accountObj = new AccountAPI();
 
             try {
-                $response = $accountApi->update($output[0]['uid'], $editUserData);
+                $response = $accountObj->updateAccountByUid($editUserData, $output[0]['uid']);
             }
             catch (\LoginRadiusSDK\LoginRadiusException $e) {
 
@@ -65,5 +73,27 @@ class EditUser implements ObserverInterface {
                 $this->_messageManager->addError($errorDescription);
             }
         }
+    }
+
+     /**
+     * Encrypt and decrypt
+     *
+     * @param string $string string to be encrypted/decrypted
+     * @param string $action what to do with this? e for encrypt, d for decrypt
+     */     
+    function lr_secret_encrypt_and_decrypt( $string, $secretIv, $action) {
+        $secret_key = $secretIv;
+        $secret_iv = $secretIv;
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+        if( $action == 'e' ) {
+        $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ) {
+        $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); 
+        }   
+        return $output;
     }
 }

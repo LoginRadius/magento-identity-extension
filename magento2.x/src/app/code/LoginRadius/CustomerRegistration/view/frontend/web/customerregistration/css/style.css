@@ -14,15 +14,10 @@
 }
 #registration-container #loginradius-submit-register, 
 #registration-container #loginradius-submit-verify,
+#registration-container #loginradius-otp-skip,
 #registration-container #loginradius-button-resendotp{
     width: 100px;
     margin-left:2px;
-}
-input#loginradius-otpsignin-send-otp-to-sign-in {
-    margin-left: 2px;
-}
-input#loginradius-linksignin-email-me-a-link-to-sign-in {
-    margin-left: 2px;
 }
 
 .lr_embed_bricks_200 {
@@ -420,13 +415,7 @@ div#socialpasswordbox {
 #login-container .loginradius-validation-message{
     margin-left: 0px;
 }
-#login-container #loginradius-button-resendotp,
-#login-container #loginradius-button-changenumber{
-    margin-left: 2px;
-}
-#login-container #loginradius-button-backupcodebutton{
-    margin-top: 2px;
-}
+
 table#lr_required_fields label {
     width: 225px;
 }
@@ -447,11 +436,28 @@ table#lr_required_fields input, table#lr_required_fields select {
     margin-bottom: 10px;
 }
 
-#loginradius-submit-login{
-  margin-top:0px !important;
+#login-container #loginradius-button-resendotp,
+#login-container #loginradius-button-changenumber,
+#login-container #loginradius-button-backupcodebutton,
+#login-container #loginradius-otpsignin-send-an-otp-to-sign-in,
+#login-container #loginradius-linksignin-email-me-a-link-to-sign-in,
+#login-container #loginradius-button-sendotp{
+    margin-left: 2px;
 }
+
 #loginradius-submit-login,
 #loginradius-submit-send,
+#loginradius-button-backupcodebackbutton,
+#loginradius-button-backupcodebutton,
+#loginradius-button-sendotp,
+#loginradius-submit-verify,
+#loginradius-submit-update,
+#loginradius-showQRcode-ManualEntryCode,
+#loginradius-otp-skip,
+#loginradius-button-resendotp,
+#loginradius-pinLogin-backtologinform,
+#loginradius-linksignin-email-me-a-link-to-sign-in,
+#loginradius-otpsignin-send-an-otp-to-sign-in,
 #loginradius-submit-register,
 #resetpassword-container input[type=submit]{
     background: #1979c3;
@@ -465,14 +471,26 @@ table#lr_required_fields input, table#lr_required_fields select {
     font-family: "Raleway", "Helvetica Neue", Verdana, Arial, sans-serif;
     line-height: 19px;
     text-align: center;
-    text-transform: uppercase;
     vertical-align: middle;
     white-space: nowrap;
-    margin-top: 10px;
+    margin-top: 5px;
 }
+
 #loginradius-submit-login:hover,
 #loginradius-submit-send:hover,
+#loginradius-linksignin-email-me-a-link-to-sign-in:hover,
+#loginradius-otpsignin-send-an-otp-to-sign-in:hover,
 #loginradius-submit-register:hover,
+#loginradius-button-backupcodebackbutton:hover,
+#loginradius-button-backupcodebackbutton:hover,
+#loginradius-button-backupcodebutton:hover,
+#loginradius-button-sendotp:hover,
+#loginradius-submit-verify:hover,
+#loginradius-submit-update:hover,
+#loginradius-showQRcode-ManualEntryCode:hover,
+#loginradius-otp-skip:hover,
+#loginradius-pinLogin-backtologinform:hover,
+#loginradius-button-resendotp:hover,
 #resetpassword-container input[type=submit]:hover{
     background: #2e8ab8;
     cursor: pointer;
@@ -497,6 +515,7 @@ table#lr_required_fields input, table#lr_required_fields select {
 .Loginradius-checkout-contenter input[type=submit]{
     width: 100px;
 }
+#passwordmessagediv,
 #loginradiusmessagediv {
     margin: 0 auto;
 }
@@ -504,11 +523,14 @@ table#lr_required_fields input, table#lr_required_fields select {
     color: #ff0000;
 }
 
+#passwordmessagediv .Error,
 #loginradiusmessagediv .Error{
     background: #fdf0d5;
     color: #6f4400;
     padding: 12px 20px 12px 25px;
 }
+
+#passwordmessagediv .Error:before,
 #loginradiusmessagediv .Error:before{
     content: '';
     background-image: url('../images/warning.gif');
@@ -517,11 +539,14 @@ table#lr_required_fields input, table#lr_required_fields select {
     padding-left: 30px;
     margin-left: -17px;
 }
+#passwordmessagediv .Success,
 #loginradiusmessagediv .Success{
     color: #006400;
     background: #e5efe5;
     padding: 12px 20px 12px 25px;
 }
+
+#passwordmessagediv .Success:before,
 #loginradiusmessagediv .Success:before{
     content: '';
     background-image: url('../images/ok.png');
@@ -558,12 +583,17 @@ table#lr_required_fields input, table#lr_required_fields select {
     }
 }
 
-#changepasswordbox{
-    margin-top: 8px;
-}
-#changepassword-container label {
-    font-weight: bold;
+#changepassword-container label,
+#authentication-container label,
+#profileeditor-container label {
     margin: 5px 0px;    
+    width: 100%;
+}
+#changepassword-container input[type=password],
+#authentication-container input[type=text],
+#profileeditor-container input[type=text],
+#profileeditor-container input[type=password] {
+    width: 42% !important;
 }
 .content-loginradius-newpassword{
     margin-top: 17px;
@@ -881,7 +911,14 @@ body.customer-account-edit .column.main {
     position: relative;
 }
 #socialpasswordbox {    
-    position: absolute;
+    /* position: absolute; */
     top: 0;
     right: 0;
+}
+.ciamforgotpassword{
+    margin-top: 2px;
+}
+
+.authentication-wrapper .action-auth-toggle {
+    display: none;
 }

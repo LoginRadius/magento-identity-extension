@@ -3,7 +3,7 @@
     <head>
         <!-- for css file -->
         
-        <css src="LoginRadius_SingleSignOn::singlesignon/css/styles.css"/>        
+        <css src="LoginRadius_SingleSignOn::singlesignon/css/style.css"/>        
                   
     </head>
 </page>

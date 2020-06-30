@@ -9,25 +9,18 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
             <div id="loginradiusmessagediv"></div>
             <div class="columns">
                 <div id="login_form">
-                    <div class="page-title-wrapper">
-                        <h1 class="page-title">
-                            <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
-                        </h1>
-                    </div>
                     <fieldset class="fieldset create info account form-create-account">
                         <div style="margin:5px"></div><div class="lr_embed_bricks_200 interfacecontainerdiv" id="interfacecontainerdiv" ></div>
 
                     </fieldset>
 
                     <?php echo $block->getBlockHtml('formkey'); ?>
-                    <div class="login-container"><div class="block block-customer-login">
-                            <div class="block-title">
-                                <strong id="block-customer-login-heading" role="heading" aria-level="2"><?php echo __('Registered Customers') ?></strong>
-                            </div>
+                    <div class="login-container">
+                        <div class="block block-customer-login">
                             <div class="block-content" aria-labelledby="block-customer-login-heading">
                                 <div id="login-container"></div>
                                 <div class="ciamforgotpassword primary">
-                                    <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>"><span><?php echo __('Forgot Password') ?></span></a>
+                                    <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>" class="action create primary"><span><?php echo __('Forgot Password') ?></span></a>
                                 </div>
                             </div>
                         </div>
@@ -47,11 +40,6 @@ if ($activationHelper->siteApiKey() != '' && $activationHelper->siteApiSecret() 
                     </div>
                 </div>
                 <div id="required_form">
-                    <div class="page-title-wrapper">
-                        <h1 class="page-title">
-                            <span class="base" data-ui-id="page-title-wrapper"><?php echo __('Customer Login') ?></span>  
-                        </h1>
-                    </div>
                     <div id="social-registration-container"></div>
                 </div>
                 <div id="reset_form" style="display: none;">

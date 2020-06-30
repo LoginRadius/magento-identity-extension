@@ -8,11 +8,11 @@
 namespace LoginRadius\CustomerRegistration\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use \LoginRadiusSDK\CustomerRegistration\Management\AccountAPI;
-use \LoginRadiusSDK\CustomerRegistration\Authentication\UserAPI;
+use \LoginRadiusSDK\CustomerRegistration\Account\AccountAPI;
+use \LoginRadiusSDK\CustomerRegistration\Authentication\AuthenticationAPI;
 
-global $apiClient_class;
-$apiClient_class = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
+global $apiClientClass;
+$apiClientClass = 'LoginRadius\CustomerRegistration\Controller\Auth\Customhttpclient';
 
 class CreateUser implements ObserverInterface {
 
@@ -56,17 +56,25 @@ class CreateUser implements ObserverInterface {
             "Birthdate":"'.$birthDate.'"
             }';  
               
-        $userObj = new UserAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
-        $accountObj = new AccountAPI($activationHelper->siteApiKey(), $activationHelper->siteApiSecret(), array('output_format' => 'json'));
+        if ($activationHelper->siteApiKey() != ''){
+            define('LR_API_KEY', $activationHelper->siteApiKey());
+        }
+        if ($activationHelper->siteApiSecret() != ''){
+            $decrypted_key = $this->lr_secret_encrypt_and_decrypt($activationHelper->siteApiSecret(), $activationHelper->siteApiKey(), 'd');
+            define('LR_API_SECRET', $decrypted_key);
+        }
+
+        $authObj = new AuthenticationAPI();
+        $accountObj = new AccountAPI();
         $homeDomain = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')
                 ->getStore()
                 ->getBaseUrl();
         if (!isset($_POST['customer']['entity_id'])) {          
             try {
-                $userCreatedata = $accountObj->create($newUserData);                
+                $userCreatedata = $accountObj->createAccount($newUserData);                
                 try {
                     $resetPasswordUrl = $homeDomain . 'customer/account/login/';
-                    $result = $userObj->forgotPassword($customer->getEmail(),$resetPasswordUrl);                  
+                    $result = $authObj->forgotPassword($customer->getEmail(), $resetPasswordUrl);                  
                 } catch (\LoginRadiusSDK\LoginRadiusException $e) {
                     $errorDescription = isset($e->getErrorResponse()->Description) ? $e->getErrorResponse()->Description : '';
                     $this->_messageManager->addError($errorDescription);
@@ -74,10 +82,10 @@ class CreateUser implements ObserverInterface {
                 try {
                     $this->socialLinkingData($customer->getId(), $userCreatedata);
                 } catch (\Exception $e) {
-                    
+                    $this->_messageManager->addError('error is occoured');
                 }
             } catch (\LoginRadiusSDK\LoginRadiusException $e) {
-                
+                $this->_messageManager->addError('error is occouredff');
             }
             return;
         }
@@ -90,5 +98,27 @@ class CreateUser implements ObserverInterface {
             return 'F';
         }
         return 'U';
+    }
+
+    /**
+     * Encrypt and decrypt
+     *
+     * @param string $string string to be encrypted/decrypted
+     * @param string $action what to do with this? e for encrypt, d for decrypt
+     */     
+    function lr_secret_encrypt_and_decrypt( $string, $secretIv, $action) {
+        $secret_key = $secretIv;
+        $secret_iv = $secretIv;
+        $output = false;
+        $encrypt_method = "AES-256-CBC";
+        $key = hash( 'sha256', $secret_key );
+        $iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+        if( $action == 'e' ) {
+        $output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+        }
+        else if( $action == 'd' ) {
+        $output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv ); 
+        }   
+        return $output;
     }
 }

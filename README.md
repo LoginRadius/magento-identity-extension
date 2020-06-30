@@ -1,7 +1,7 @@
 # LoginRadius Magento Identity Extension
 
 
-![Home Image](https://d2lvlj7xfpldmj.cloudfront.net/support/github/banner-1544x500.png)
+![Home Image](http://docs.lrcontent.com/resources/github/banner-1544x500.png)
 
 ## Introduction ##
 
@@ -15,7 +15,7 @@ Please visit [here](http://www.loginradius.com/) for more information.
 
 
 ## Documentation
-* [User Registration](http://apidocs.loginradius.com/docs/user-registration) - Everything you need to implement the full LoginRadius User Registration system including Social Login.
+* [User Registration](https://www.loginradius.com/docs/api/v2/getting-started/introduction/) - Everything you need to implement the full LoginRadius User Registration system including Social Login.
 * [Extension Installation](http://support.loginradius.com/hc/en-us/articles/205133845-Magento-Advanced-Plugin-Instructions) - Everything you need to implement with magento 1.x.
 * [Extension Installation](http://support.loginradius.com/hc/en-us/articles/208501296-Magento-Customer-Identity-Extension-instructions-for-v2-x) - Everything you need to implement with magento 2.x.
 

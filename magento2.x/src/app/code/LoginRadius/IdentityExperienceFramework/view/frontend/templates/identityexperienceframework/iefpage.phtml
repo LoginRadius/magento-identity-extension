@@ -1,0 +1,41 @@
+<?php
+
+$data = $this->helper('LoginRadius\CustomerRegistration\Model\Helper\Data');
+$activationData = $this->helper('LoginRadius\Activation\Model\Helper\Data');
+
+$changePassUrl = basename(dirname($_SERVER['REQUEST_URI']));
+
+$arr = explode('/', $_SERVER['REQUEST_URI']);
+$count = count($arr);
+$loginUrl = $arr[$count - 4];
+
+$lastWordUrl = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+
+if ($data->enableIefPage() == '1') {
+    if (isset($loginUrl) && $loginUrl == 'login') {
+        if($activationData->customHubDomain() != ''){
+            $iefPageUrl = 'https://' . $activationData->customHubDomain() . '/auth.aspx?action=' . $loginUrl . '&return_url=' . $this->getUrl("customerregistration/auth/");
+        }else{
+            $iefPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $loginUrl . '&return_url=' . $this->getUrl("customerregistration/auth/");
+        }      
+        header('Location:' . $iefPageUrl);
+        exit;
+    }elseif($lastWordUrl == 'create'){
+        if($activationData->customHubDomain() != ''){
+            $iefPageUrl = 'https://' . $activationData->customHubDomain() . '/auth.aspx?action=register&return_url=' . $this->getUrl("customerregistration/auth/");
+        }else{
+            $iefPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=register&return_url=' . $this->getUrl("customerregistration/auth/");
+        }
+        header('Location:' . $iefPageUrl);
+        exit;
+    }elseif($lastWordUrl == 'forgotpassword'){
+        if($activationData->customHubDomain() != ''){
+            $iefPageUrl = 'https://' . $activationData->customHubDomain() . '/auth.aspx?action=' . $lastWordUrl . '&return_url=' . $this->getUrl('customerregistration/auth/');
+        }else{
+            $iefPageUrl = 'https://' . $activationData->siteName() . '.hub.loginradius.com/auth.aspx?action=' . $lastWordUrl . '&return_url=' . $this->getUrl('customerregistration/auth/');
+        }       
+        header('Location:' . $iefPageUrl);
+        exit;
+    }    
+}
